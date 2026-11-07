@@ -1,0 +1,408 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		10C4D3F3F8B7AE0449CFE47D /* RideScreenUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 015041680631E474EA606CB3 /* RideScreenUITests.swift */; };
+		B2DA3040117ED450674628CE /* TripCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CC5A71234DE55D3BF2FA747 /* TripCard.swift */; };
+		C45EFDD2106C0FF73E21FD14 /* TransitMapSpikeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36F3D29840425BB01212855D /* TransitMapSpikeApp.swift */; };
+		D53D6AA64357B43DAA936156 /* Trip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15587B430F928FA150A98B6B /* Trip.swift */; };
+		DBD7F7F9E97E8D487B2A16A2 /* TransitMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 139FAE6B1FDB8D0119200DBE /* TransitMapView.swift */; };
+		EF9CB893FB248179C932D31B /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF698504AE145E46B5AD4A26 /* Route.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		9D0FF3DC9F9F054AD2DB43B0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B369E3794B0C1976A247E02C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F9D02ED0BB6A5EB9F3B39860;
+			remoteInfo = TransitMapSpike;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		015041680631E474EA606CB3 /* RideScreenUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RideScreenUITests.swift; sourceTree = "<group>"; };
+		139FAE6B1FDB8D0119200DBE /* TransitMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitMapView.swift; sourceTree = "<group>"; };
+		15587B430F928FA150A98B6B /* Trip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trip.swift; sourceTree = "<group>"; };
+		2CC5A71234DE55D3BF2FA747 /* TripCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripCard.swift; sourceTree = "<group>"; };
+		2F80CAF51875A1163CEA1345 /* TransitMapSpikeUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TransitMapSpikeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		36F3D29840425BB01212855D /* TransitMapSpikeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitMapSpikeApp.swift; sourceTree = "<group>"; };
+		A914AECE5C70DCFD5272E513 /* TransitMapSpike.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TransitMapSpike.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CF698504AE145E46B5AD4A26 /* Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		1A11485672F10206DF9A432B /* TransitMapSpike */ = {
+			isa = PBXGroup;
+			children = (
+				CF698504AE145E46B5AD4A26 /* Route.swift */,
+				36F3D29840425BB01212855D /* TransitMapSpikeApp.swift */,
+				139FAE6B1FDB8D0119200DBE /* TransitMapView.swift */,
+				15587B430F928FA150A98B6B /* Trip.swift */,
+				2CC5A71234DE55D3BF2FA747 /* TripCard.swift */,
+			);
+			path = TransitMapSpike;
+			sourceTree = "<group>";
+		};
+		76EBE1331B94C59D0D93D9F8 /* TransitMapSpikeUITests */ = {
+			isa = PBXGroup;
+			children = (
+				015041680631E474EA606CB3 /* RideScreenUITests.swift */,
+			);
+			path = TransitMapSpikeUITests;
+			sourceTree = "<group>";
+		};
+		AA0458708697490C47EE1816 = {
+			isa = PBXGroup;
+			children = (
+				1A11485672F10206DF9A432B /* TransitMapSpike */,
+				76EBE1331B94C59D0D93D9F8 /* TransitMapSpikeUITests */,
+				F471D337AE79DFEA6C2732A3 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F471D337AE79DFEA6C2732A3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A914AECE5C70DCFD5272E513 /* TransitMapSpike.app */,
+				2F80CAF51875A1163CEA1345 /* TransitMapSpikeUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		74385ABC49A30227085D7EF1 /* TransitMapSpikeUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AE3DC94B93AD2FD3DA2C4AF3 /* Build configuration list for PBXNativeTarget "TransitMapSpikeUITests" */;
+			buildPhases = (
+				56EB46020E9327792C323722 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				50DDE434CB21229452E6A929 /* PBXTargetDependency */,
+			);
+			name = TransitMapSpikeUITests;
+			packageProductDependencies = (
+			);
+			productName = TransitMapSpikeUITests;
+			productReference = 2F80CAF51875A1163CEA1345 /* TransitMapSpikeUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		F9D02ED0BB6A5EB9F3B39860 /* TransitMapSpike */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AF062844A5797F3FC03EEE75 /* Build configuration list for PBXNativeTarget "TransitMapSpike" */;
+			buildPhases = (
+				0E8191B9056E51241AD4F0D0 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TransitMapSpike;
+			packageProductDependencies = (
+			);
+			productName = TransitMapSpike;
+			productReference = A914AECE5C70DCFD5272E513 /* TransitMapSpike.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B369E3794B0C1976A247E02C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					74385ABC49A30227085D7EF1 = {
+						TestTargetID = F9D02ED0BB6A5EB9F3B39860;
+					};
+				};
+			};
+			buildConfigurationList = FCF68A3B1FED585B6AA4ABF8 /* Build configuration list for PBXProject "TransitMapSpike" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = AA0458708697490C47EE1816;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = F471D337AE79DFEA6C2732A3 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F9D02ED0BB6A5EB9F3B39860 /* TransitMapSpike */,
+				74385ABC49A30227085D7EF1 /* TransitMapSpikeUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0E8191B9056E51241AD4F0D0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EF9CB893FB248179C932D31B /* Route.swift in Sources */,
+				C45EFDD2106C0FF73E21FD14 /* TransitMapSpikeApp.swift in Sources */,
+				DBD7F7F9E97E8D487B2A16A2 /* TransitMapView.swift in Sources */,
+				D53D6AA64357B43DAA936156 /* Trip.swift in Sources */,
+				B2DA3040117ED450674628CE /* TripCard.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		56EB46020E9327792C323722 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10C4D3F3F8B7AE0449CFE47D /* RideScreenUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		50DDE434CB21229452E6A929 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F9D02ED0BB6A5EB9F3B39860 /* TransitMapSpike */;
+			targetProxy = 9D0FF3DC9F9F054AD2DB43B0 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1884157DBAD761D4A56192E4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 0.1;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		3FF9EA409BCB6B3C5A980C18 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.divinedavis.transitmapspike;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		487C071F14E3FD05C7CF77EF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.divinedavis.TransitMapSpikeUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = TransitMapSpike;
+			};
+			name = Debug;
+		};
+		971B8128F874CAD59880DB6F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.divinedavis.transitmapspike;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		9C89CDBD55D82040C8B95E68 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.divinedavis.TransitMapSpikeUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = TransitMapSpike;
+			};
+			name = Release;
+		};
+		D4B1EC78D84BBF1FD97F5503 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 0.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AE3DC94B93AD2FD3DA2C4AF3 /* Build configuration list for PBXNativeTarget "TransitMapSpikeUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				487C071F14E3FD05C7CF77EF /* Debug */,
+				9C89CDBD55D82040C8B95E68 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		AF062844A5797F3FC03EEE75 /* Build configuration list for PBXNativeTarget "TransitMapSpike" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				971B8128F874CAD59880DB6F /* Debug */,
+				3FF9EA409BCB6B3C5A980C18 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FCF68A3B1FED585B6AA4ABF8 /* Build configuration list for PBXProject "TransitMapSpike" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1884157DBAD761D4A56192E4 /* Debug */,
+				D4B1EC78D84BBF1FD97F5503 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = B369E3794B0C1976A247E02C /* Project object */;
+}
