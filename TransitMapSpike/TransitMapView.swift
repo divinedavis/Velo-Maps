@@ -16,6 +16,7 @@ struct TransitMapView: UIViewRepresentable {
         config.pointOfInterestFilter = .excludingAll
         config.showsTraffic = false
         map.preferredConfiguration = config
+        map.overrideUserInterfaceStyle = trip.night ? .dark : .light
         map.showsCompass = false
         map.showsScale = false
         map.isUserInteractionEnabled = false   // camera is driven by the trip

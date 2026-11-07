@@ -1,6 +1,6 @@
 import SwiftUI
 
-private let busRed = Color(red: 0.84, green: 0.07, blue: 0.13)
+let busRed = Color(red: 0.84, green: 0.07, blue: 0.13)
 
 /// Frosted bottom card: line badge, destination, ETA + load, the next few stops, and a
 /// hold-to-end button with the ride timer.
@@ -98,7 +98,7 @@ struct TripCard: View {
         }
         .contentShape(Rectangle())
         .onLongPressGesture(minimumDuration: 0.9) {
-            trip.restart()
+            trip.endRide()
             withAnimation(.easeOut(duration: 0.2)) { holdProgress = 0 }
         } onPressingChanged: { pressing in
             withAnimation(pressing ? .linear(duration: 0.9) : .easeOut(duration: 0.2)) {
