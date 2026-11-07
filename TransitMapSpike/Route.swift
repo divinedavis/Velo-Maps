@@ -100,8 +100,7 @@ extension CLLocationCoordinate2D {
 
 extension Route {
     /// M10 northbound along Central Park West, W 72 St → W 96 St. Stop coordinates are the
-    /// intersections; the line between them is replaced by Apple's road-following directions
-    /// at launch when those are available (see RouteLoader).
+    /// intersections; the line is the avenue's real centreline.
     static let m10 = Route(
         line: "M10",
         destination: "CPW / W 96 St",
@@ -113,49 +112,91 @@ extension Route {
             Stop(id: 4, name: "CPW / W 90 St", coordinate: .init(latitude: 40.78790, longitude: -73.96778)),
             Stop(id: 5, name: "CPW / W 96 St", coordinate: .init(latitude: 40.79165, longitude: -73.96505)),
         ],
+        // Central Park West centreline from OpenStreetMap (© OpenStreetMap contributors, ODbL).
         points: [
-            .init(latitude: 40.77630, longitude: -73.97620),
-            .init(latitude: 40.77955, longitude: -73.97383),
-            .init(latitude: 40.78215, longitude: -73.97195),
-            .init(latitude: 40.78530, longitude: -73.96965),
-            .init(latitude: 40.78790, longitude: -73.96778),
-            .init(latitude: 40.79165, longitude: -73.96505),
+            .init(latitude: 40.7762266, longitude: -73.9759630),
+            .init(latitude: 40.7763121, longitude: -73.9758997),
+            .init(latitude: 40.7765182, longitude: -73.9757504),
+            .init(latitude: 40.7768546, longitude: -73.9755068),
+            .init(latitude: 40.7769031, longitude: -73.9754712),
+            .init(latitude: 40.7769426, longitude: -73.9754419),
+            .init(latitude: 40.7774869, longitude: -73.9750388),
+            .init(latitude: 40.7775416, longitude: -73.9749993),
+            .init(latitude: 40.7775922, longitude: -73.9749628),
+            .init(latitude: 40.7781184, longitude: -73.9745824),
+            .init(latitude: 40.7781744, longitude: -73.9745417),
+            .init(latitude: 40.7782297, longitude: -73.9745019),
+            .init(latitude: 40.7785507, longitude: -73.9742700),
+            .init(latitude: 40.7787616, longitude: -73.9741176),
+            .init(latitude: 40.7788134, longitude: -73.9740803),
+            .init(latitude: 40.7788725, longitude: -73.9740373),
+            .init(latitude: 40.7793764, longitude: -73.9736737),
+            .init(latitude: 40.7794104, longitude: -73.9736486),
+            .init(latitude: 40.7794865, longitude: -73.9735934),
+            .init(latitude: 40.7795660, longitude: -73.9735358),
+            .init(latitude: 40.7798151, longitude: -73.9733542),
+            .init(latitude: 40.7807149, longitude: -73.9726981),
+            .init(latitude: 40.7809834, longitude: -73.9725008),
+            .init(latitude: 40.7813224, longitude: -73.9722516),
+            .init(latitude: 40.7816180, longitude: -73.9720367),
+            .init(latitude: 40.7819198, longitude: -73.9718126),
+            .init(latitude: 40.7820388, longitude: -73.9717224),
+            .init(latitude: 40.7821384, longitude: -73.9716479),
+            .init(latitude: 40.7824229, longitude: -73.9714456),
+            .init(latitude: 40.7826372, longitude: -73.9712933),
+            .init(latitude: 40.7826689, longitude: -73.9712708),
+            .init(latitude: 40.7827163, longitude: -73.9712370),
+            .init(latitude: 40.7827717, longitude: -73.9711974),
+            .init(latitude: 40.7833020, longitude: -73.9708126),
+            .init(latitude: 40.7833528, longitude: -73.9707756),
+            .init(latitude: 40.7834159, longitude: -73.9707295),
+            .init(latitude: 40.7839304, longitude: -73.9703541),
+            .init(latitude: 40.7839869, longitude: -73.9703125),
+            .init(latitude: 40.7840515, longitude: -73.9702639),
+            .init(latitude: 40.7842861, longitude: -73.9700939),
+            .init(latitude: 40.7845721, longitude: -73.9698866),
+            .init(latitude: 40.7846230, longitude: -73.9698495),
+            .init(latitude: 40.7846848, longitude: -73.9698012),
+            .init(latitude: 40.7848398, longitude: -73.9696855),
+            .init(latitude: 40.7852035, longitude: -73.9694094),
+            .init(latitude: 40.7852965, longitude: -73.9693444),
+            .init(latitude: 40.7854012, longitude: -73.9692709),
+            .init(latitude: 40.7859234, longitude: -73.9688909),
+            .init(latitude: 40.7859742, longitude: -73.9688537),
+            .init(latitude: 40.7860311, longitude: -73.9688136),
+            .init(latitude: 40.7865517, longitude: -73.9684311),
+            .init(latitude: 40.7866050, longitude: -73.9683927),
+            .init(latitude: 40.7866638, longitude: -73.9683486),
+            .init(latitude: 40.7869227, longitude: -73.9681638),
+            .init(latitude: 40.7871816, longitude: -73.9679789),
+            .init(latitude: 40.7872350, longitude: -73.9679404),
+            .init(latitude: 40.7872934, longitude: -73.9678961),
+            .init(latitude: 40.7878081, longitude: -73.9675140),
+            .init(latitude: 40.7878716, longitude: -73.9674683),
+            .init(latitude: 40.7879373, longitude: -73.9674218),
+            .init(latitude: 40.7881763, longitude: -73.9672511),
+            .init(latitude: 40.7884375, longitude: -73.9670646),
+            .init(latitude: 40.7885002, longitude: -73.9670210),
+            .init(latitude: 40.7885487, longitude: -73.9669851),
+            .init(latitude: 40.7886992, longitude: -73.9668738),
+            .init(latitude: 40.7890673, longitude: -73.9666014),
+            .init(latitude: 40.7891218, longitude: -73.9665628),
+            .init(latitude: 40.7891735, longitude: -73.9665257),
+            .init(latitude: 40.7894158, longitude: -73.9663475),
+            .init(latitude: 40.7896838, longitude: -73.9661503),
+            .init(latitude: 40.7897447, longitude: -73.9661041),
+            .init(latitude: 40.7897946, longitude: -73.9660676),
+            .init(latitude: 40.7903238, longitude: -73.9656836),
+            .init(latitude: 40.7903702, longitude: -73.9656483),
+            .init(latitude: 40.7904251, longitude: -73.9656070),
+            .init(latitude: 40.7906542, longitude: -73.9654397),
+            .init(latitude: 40.7909467, longitude: -73.9652262),
+            .init(latitude: 40.7909985, longitude: -73.9651883),
+            .init(latitude: 40.7910513, longitude: -73.9651495),
+            .init(latitude: 40.7915874, longitude: -73.9647609),
+            .init(latitude: 40.7916758, longitude: -73.9646940),
+            .init(latitude: 40.7917586, longitude: -73.9646332),
+            .init(latitude: 40.7920130, longitude: -73.9644503),
         ]
     )
-}
-
-/// Snaps the route line to real roads with MKDirections, one hop per stop pair. A hop is kept
-/// only if Apple's path is close to the straight-line distance (i.e. it stayed on the avenue);
-/// otherwise the straight segment stays.
-enum RouteLoader {
-    @MainActor
-    static func snapped(_ route: Route) async -> Route {
-        var out: [CLLocationCoordinate2D] = [route.stops[0].coordinate]
-        for (a, b) in zip(route.stops, route.stops.dropFirst()) {
-            let req = MKDirections.Request()
-            req.source = mapItem(a.coordinate)
-            req.destination = mapItem(b.coordinate)
-            req.transportType = .automobile
-            let straight = a.coordinate.distance(to: b.coordinate)
-            if let r = try? await MKDirections(request: req).calculate().routes.first,
-               r.distance < straight * 1.3 {
-                let pl = r.polyline
-                var coords = [CLLocationCoordinate2D](repeating: .init(), count: pl.pointCount)
-                pl.getCoordinates(&coords, range: NSRange(location: 0, length: pl.pointCount))
-                out.append(contentsOf: coords.dropFirst())
-            } else {
-                out.append(b.coordinate)
-            }
-        }
-        var r = route
-        r.replacePoints(out)
-        return r
-    }
-
-    private static func mapItem(_ c: CLLocationCoordinate2D) -> MKMapItem {
-        if #available(iOS 26, *) {
-            return MKMapItem(location: CLLocation(latitude: c.latitude, longitude: c.longitude), address: nil)
-        }
-        return MKMapItem(placemark: MKPlacemark(coordinate: c))
-    }
 }

@@ -7,7 +7,6 @@ struct TransitMapSpikeApp: App {
     var body: some Scene {
         WindowGroup {
             RideScreen(trip: trip)
-                .task { await trip.loadRoadGeometry() }
         }
     }
 }

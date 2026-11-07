@@ -12,7 +12,7 @@ struct TransitMapView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> MKMapView {
         let map = MKMapView()
-        let config = MKStandardMapConfiguration(elevationStyle: .realistic, emphasisStyle: .muted)
+        let config = MKStandardMapConfiguration(elevationStyle: .realistic, emphasisStyle: .default)
         config.pointOfInterestFilter = .excludingAll
         config.showsTraffic = false
         map.preferredConfiguration = config
@@ -79,7 +79,7 @@ struct TransitMapView: UIViewRepresentable {
             let heading = trip.route.smoothedHeading(at: trip.distance)
             // Aim the camera a little ahead of the bus so the bus lands just above the card,
             // as in the reference video.
-            let lead = trip.cameraDistance * 0.18
+            let lead = trip.cameraDistance * trip.cameraLead
             let (ahead, _) = trip.route.position(at: trip.distance + lead)
             let camera = MKMapCamera(lookingAtCenter: ahead,
                                      fromDistance: trip.cameraDistance,
@@ -121,22 +121,34 @@ final class RouteGlow: MKPolyline {}
 final class BusAnnotation: NSObject, MKAnnotation {
     @objc dynamic var coordinate = CLLocationCoordinate2D()
 
-    /// Small dark rounded bus seen from above, like the vehicle in the reference.
+    /// White bus seen from above and behind, like the vehicle in the reference: roof with an
+    /// AC unit, dark windscreen at the front (screen-up = direction of travel, since the camera
+    /// heading follows the bus), and the rear face with a green livery stripe at the bottom.
     static let image: UIImage = {
-        let size = CGSize(width: 20, height: 30)
+        let size = CGSize(width: 30, height: 60)
         return UIGraphicsImageRenderer(size: size).image { ctx in
-            let body = UIBezierPath(roundedRect: CGRect(x: 1, y: 1, width: 18, height: 28), cornerRadius: 5)
-            UIColor(white: 0.16, alpha: 1).setFill()
-            body.fill()
-            UIColor.white.withAlphaComponent(0.9).setStroke()
-            body.lineWidth = 1.5
-            body.stroke()
-            // windscreen + roof panel
-            UIColor(white: 0.55, alpha: 1).setFill()
-            UIBezierPath(roundedRect: CGRect(x: 4, y: 3.5, width: 12, height: 5), cornerRadius: 2).fill()
-            UIColor(white: 0.32, alpha: 1).setFill()
-            UIBezierPath(roundedRect: CGRect(x: 5, y: 11, width: 10, height: 15), cornerRadius: 2).fill()
-            _ = ctx
+            let cg = ctx.cgContext
+            // soft ground shadow
+            cg.setShadow(offset: CGSize(width: 2, height: 3), blur: 4, color: UIColor.black.withAlphaComponent(0.35).cgColor)
+            UIColor(white: 0.97, alpha: 1).setFill()
+            UIBezierPath(roundedRect: CGRect(x: 3, y: 2, width: 24, height: 54), cornerRadius: 6).fill()
+            cg.setShadow(offset: .zero, blur: 0, color: nil)
+            // body outline
+            UIColor(white: 0.7, alpha: 1).setStroke()
+            let outline = UIBezierPath(roundedRect: CGRect(x: 3, y: 2, width: 24, height: 54), cornerRadius: 6)
+            outline.lineWidth = 1
+            outline.stroke()
+            // front windscreen
+            UIColor(white: 0.22, alpha: 1).setFill()
+            UIBezierPath(roundedRect: CGRect(x: 6, y: 4, width: 18, height: 6), cornerRadius: 2.5).fill()
+            // roof AC unit
+            UIColor(white: 0.84, alpha: 1).setFill()
+            UIBezierPath(roundedRect: CGRect(x: 8, y: 16, width: 14, height: 14), cornerRadius: 2).fill()
+            // rear face: dark window band + green livery stripe
+            UIColor(white: 0.2, alpha: 1).setFill()
+            UIBezierPath(roundedRect: CGRect(x: 5, y: 40, width: 20, height: 7), cornerRadius: 2).fill()
+            UIColor(red: 0.18, green: 0.62, blue: 0.27, alpha: 1).setFill()
+            UIBezierPath(roundedRect: CGRect(x: 5, y: 48.5, width: 20, height: 3.5), cornerRadius: 1.5).fill()
         }
     }()
 }

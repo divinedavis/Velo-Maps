@@ -12,9 +12,12 @@ final class Trip: ObservableObject {
     @Published var paused: Bool
 
     /// Demo tuning, overridable from launch arguments for screenshot passes:
-    /// -progress 0.35  -paused YES  -cameraDistance 420  -cameraPitch 62  -speed 9
+    /// -progress 0.35  -paused YES  -cameraDistance 330  -cameraPitch 50  -cameraLead -0.05  -speed 9
     let cameraDistance: Double
     let cameraPitch: Double
+    /// How far ahead of the bus the camera aims, as a fraction of camera distance. Negative
+    /// aims behind it, which pushes the bus up the screen, clear of the card.
+    let cameraLead: Double
     let speed: Double              // metres per second of simulated travel
     private(set) var distance: CLLocationDistance
 
@@ -26,17 +29,10 @@ final class Trip: ObservableObject {
         let progress = defaults.object(forKey: "progress") as? Double ?? 0.08
         distance = route.length * min(max(progress, 0), 1)
         paused = defaults.bool(forKey: "paused")
-        cameraDistance = defaults.object(forKey: "cameraDistance") as? Double ?? 420
-        cameraPitch = defaults.object(forKey: "cameraPitch") as? Double ?? 62
+        cameraDistance = defaults.object(forKey: "cameraDistance") as? Double ?? 330
+        cameraPitch = defaults.object(forKey: "cameraPitch") as? Double ?? 50
+        cameraLead = defaults.object(forKey: "cameraLead") as? Double ?? -0.05
         speed = defaults.object(forKey: "speed") as? Double ?? 9
-        publish(force: true)
-    }
-
-    func loadRoadGeometry() async {
-        let fraction = route.length > 0 ? distance / route.length : 0
-        let snapped = await RouteLoader.snapped(route)
-        route = snapped
-        distance = snapped.length * fraction
         publish(force: true)
     }
 

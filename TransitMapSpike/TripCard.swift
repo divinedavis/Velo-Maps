@@ -47,6 +47,7 @@ struct TripCard: View {
                     .frame(width: 30, height: 30)
                     .background(.white.opacity(0.7), in: Circle())
             }
+            .buttonStyle(.plain)
             .accessibilityLabel(expanded ? "Collapse stops" : "Show stops")
         }
     }
