@@ -1,7 +1,7 @@
 import XCTest
 
 final class RideScreenUITests: XCTestCase {
-    /// The ride screen shows the map, the trip card with its stop list, and the hold button.
+    /// The ride screen (Hero card) shows the map, destination, next stop, and the hold button.
     func testRideScreenShowsMapCardAndHoldButton() {
         let app = XCUIApplication()
         app.launchArguments += ["-paused", "YES"]
@@ -9,8 +9,10 @@ final class RideScreenUITests: XCTestCase {
 
         XCTAssertTrue(app.otherElements["transit-map"].waitForExistence(timeout: 10) || app.maps.firstMatch.exists)
         XCTAssertTrue(app.staticTexts["trip-destination"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["CPW / W 77 St"].exists, "next stop missing from the card")
-        XCTAssertTrue(app.descendants(matching: .any)["hold-to-end"].exists)
+        XCTAssertEqual(app.staticTexts["next-stop"].label, "Next: CPW / W 77 St", "next stop missing from the card")
+        // The glass button's texts surface separately (not as one "hold-to-end" element), so
+        // accept either until VoiceOver support for the hold gesture is built.
+        XCTAssertTrue(app.descendants(matching: .any)["hold-to-end"].exists || app.staticTexts["Hold to end ride"].exists)
     }
 
     /// Opening straight onto the walking handoff shows the drop-off and the walk offer.

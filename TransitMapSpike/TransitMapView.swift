@@ -5,8 +5,8 @@ import MapKit
 /// the bus. UIKit rather than SwiftUI's Map because the camera is set every frame.
 struct TransitMapView: UIViewRepresentable {
     @ObservedObject var trip: Trip
-    /// Height of the card covering the bottom of the map, so the bus sits in the visible part.
-    var bottomInset: CGFloat
+    /// Screen y of the card's top edge; the camera keeps the bus a fixed gap above it.
+    var cardTop: CGFloat
 
     func makeCoordinator() -> Coordinator { Coordinator(trip: trip) }
 
@@ -27,7 +27,7 @@ struct TransitMapView: UIViewRepresentable {
     }
 
     func updateUIView(_ map: MKMapView, context: Context) {
-        context.coordinator.bottomInset = bottomInset
+        context.coordinator.cardTop = cardTop
         context.coordinator.syncRoute()
     }
 
@@ -35,7 +35,10 @@ struct TransitMapView: UIViewRepresentable {
     final class Coordinator: NSObject, MKMapViewDelegate {
         let trip: Trip
         weak var map: MKMapView?
-        var bottomInset: CGFloat = 0
+        var cardTop: CGFloat = 0
+        /// Metres ahead of the bus the camera aims. Starts from the launch setting, then is
+        /// nudged every frame until the bus sits `trip.busGap` points above the card.
+        private lazy var leadMetres: Double = trip.cameraDistance * trip.cameraLead
         private var link: CADisplayLink?
         private var lastTick: CFTimeInterval = 0
         private let bus = BusAnnotation()
@@ -78,15 +81,23 @@ struct TransitMapView: UIViewRepresentable {
             let (coord, _) = trip.route.position(at: trip.distance)
             bus.coordinate = coord
             let heading = trip.route.smoothedHeading(at: trip.distance)
-            // Aim the camera a little ahead of the bus so the bus lands just above the card,
-            // as in the reference video.
-            let lead = trip.cameraDistance * trip.cameraLead
-            let (ahead, _) = trip.route.position(at: trip.distance + lead)
+            let (ahead, _) = trip.route.position(at: trip.distance + leadMetres)
             let camera = MKMapCamera(lookingAtCenter: ahead,
                                      fromDistance: trip.cameraDistance,
                                      pitch: trip.cameraPitch,
                                      heading: heading)
             map.setCamera(camera, animated: false)
+            keepBusAboveCard(coord, in: map)
+        }
+
+        /// Measures where the bus landed on screen and moves the aim point so its centre sits
+        /// `busGap` points above the card. Bus too high → aim further ahead (bus moves down).
+        private func keepBusAboveCard(_ coord: CLLocationCoordinate2D, in map: MKMapView) {
+            guard cardTop > 0 else { return }
+            let y = map.convert(coord, toPointTo: map).y
+            guard y.isFinite else { return }
+            let error = Double((cardTop - trip.busGap) - y)
+            leadMetres = min(max(leadMetres + error * 0.12, -250), 250)
         }
 
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {

@@ -42,8 +42,8 @@ final class Walk: ObservableObject {
 
     init(defaults: UserDefaults = .standard) {
         paused = defaults.bool(forKey: "paused")
-        startProgress = defaults.object(forKey: "walkProgress") as? Double ?? 0.12
-        speed = defaults.object(forKey: "walkSpeed") as? Double ?? 4
+        startProgress = defaults.number("walkProgress") ?? 0.12
+        speed = defaults.number("walkSpeed") ?? 4
         if let s = defaults.string(forKey: "demoClock") {
             let parts = s.split(separator: ":").compactMap { Int($0) }
             clockBase = parts.count == 2 ? Calendar.current.date(bySettingHour: parts[0], minute: parts[1], second: 0, of: Date()) : nil

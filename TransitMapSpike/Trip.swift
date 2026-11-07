@@ -28,6 +28,8 @@ final class Trip: ObservableObject {
     /// How far ahead of the bus the camera aims, as a fraction of camera distance. Negative
     /// aims behind it, which pushes the bus up the screen, clear of the card.
     let cameraLead: Double
+    /// Points between the bus marker's centre and the top of the card (-busGap).
+    let busGap: Double
     let speed: Double              // metres per second of simulated travel
     private(set) var distance: CLLocationDistance
 
@@ -36,17 +38,20 @@ final class Trip: ObservableObject {
 
     init(route: Route = .m10, defaults: UserDefaults = .standard) {
         self.route = route
-        let progress = defaults.object(forKey: "progress") as? Double ?? 0.08
+        let progress = defaults.number("progress") ?? 0.08
         distance = route.length * min(max(progress, 0), 1)
         paused = defaults.bool(forKey: "paused")
-        cameraDistance = defaults.object(forKey: "cameraDistance") as? Double ?? 330
-        cameraPitch = defaults.object(forKey: "cameraPitch") as? Double ?? 50
-        cameraLead = defaults.object(forKey: "cameraLead") as? Double ?? -0.05
-        speed = defaults.object(forKey: "speed") as? Double ?? 9
-        cardStyle = defaults.integer(forKey: "cardStyle")
+        cameraDistance = defaults.number("cameraDistance") ?? 330
+        cameraPitch = defaults.number("cameraPitch") ?? 50
+        cameraLead = defaults.number("cameraLead") ?? -0.05
+        busGap = defaults.number("busGap") ?? 90
+        speed = defaults.number("speed") ?? 9
+        // Hero (4) chosen by the owner 11/7; other designs stay reachable for comparison.
+        cardStyle = defaults.number("cardStyle").map(Int.init) ?? 4
         night = defaults.bool(forKey: "night")
         walking = defaults.string(forKey: "mode") == "walk"
-        walkStyle = defaults.integer(forKey: "walkStyle")
+        // Glance (4) chosen by the owner 11/7 for the walking leg.
+        walkStyle = defaults.number("walkStyle").map(Int.init) ?? 4
         publish(force: true)
     }
 
@@ -76,5 +81,17 @@ final class Trip: ObservableObject {
         if mins != minutesLeft { minutesLeft = mins }
         elapsed = now.timeIntervalSince(startedAt)
         progress = route.length > 0 ? distance / route.length : 0
+    }
+}
+
+extension UserDefaults {
+    /// Launch arguments (-progress 0.25) land in UserDefaults as strings, while values set in
+    /// code are numbers; accept both.
+    func number(_ key: String) -> Double? {
+        switch object(forKey: key) {
+        case let n as NSNumber: return n.doubleValue
+        case let s as String: return Double(s)
+        default: return nil
+        }
     }
 }

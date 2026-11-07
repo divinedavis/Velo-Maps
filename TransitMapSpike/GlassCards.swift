@@ -100,6 +100,7 @@ struct GlassSheetCard: View {
         }
         .padding(16)
         .glassEffect(.regular, in: .rect(cornerRadius: 34))
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("trip-card")
     }
 
@@ -168,6 +169,7 @@ struct GlassPillCard: View {
             }
         }
         .padding(.bottom, 6)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("trip-card")
     }
 
@@ -218,6 +220,7 @@ struct GlassClusterCard: View {
                 .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
             }
         }
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("trip-card")
     }
 
@@ -243,20 +246,31 @@ struct GlassHeroCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .firstTextBaseline) {
-                Text("\(trip.minutesLeft)")
-                    .font(.system(size: 64, weight: .bold, design: .rounded))
-                    .monospacedDigit()
-                Text("min").font(.system(size: 22, weight: .semibold)).foregroundStyle(.secondary)
+            // .lastTextBaseline puts "9 min" on the same line as the "10 aboard" row.
+            HStack(alignment: .lastTextBaseline) {
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text("\(trip.minutesLeft)")
+                        .font(.system(size: 64, weight: .bold, design: .rounded))
+                        .monospacedDigit()
+                    Text("min").font(.system(size: 22, weight: .semibold)).foregroundStyle(.secondary)
+                }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 6) {
                     LineBadge(line: trip.route.line)
                     Text("to \(trip.route.destination)").font(.system(size: 14, weight: .semibold))
+                        .accessibilityIdentifier("trip-destination")
                     Label("10 aboard", systemImage: "person.2.fill")
                         .font(.system(size: 12, weight: .medium)).foregroundStyle(.secondary)
                 }
             }
-            timeline
+            VStack(alignment: .leading, spacing: 6) {
+                HeroTrack(stopCount: trip.route.stops.count,
+                          position: trip.stopSpacePosition,
+                          red: Color.tripRed(scheme))
+                Text("Next: \(trip.nextStopName)")
+                    .font(.system(size: 14, weight: .bold))
+                    .accessibilityIdentifier("next-stop")
+            }
             TimelineView(.periodic(from: .now, by: 1)) { _ in
                 HStack {
                     Text("Hold to end ride")
@@ -274,46 +288,68 @@ struct GlassHeroCard: View {
         }
         .padding(18)
         .glassEffect(.regular, in: .rect(cornerRadius: 36))
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("trip-card")
-    }
-
-    /// All stops left to right; passed ones faded, next one large with its name under it.
-    private var timeline: some View {
-        let count = trip.route.stops.count
-        let next = trip.nextStop
-        return VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 0) {
-                ForEach(0..<count, id: \.self) { i in
-                    TimelineStop(index: i, next: next, isLast: i == count - 1, red: Color.tripRed(scheme))
-                }
-            }
-            Text("Next: \(trip.nextStopName)")
-                .font(.system(size: 14, weight: .bold))
-        }
     }
 }
 
-private struct TimelineStop: View {
-    let index: Int
-    let next: Int
-    let isLast: Bool
+private extension Trip {
+    /// Where the bus is on the evenly spaced stop track: 2.4 = 40% of the way from stop 2 to 3.
+    var stopSpacePosition: Double {
+        let d = progress * route.length
+        let sd = route.stopDistances
+        guard sd.count > 1 else { return 0 }
+        guard let i = sd.indices.dropLast().last(where: { sd[$0] <= d }) else { return 0 }
+        let span = sd[i + 1] - sd[i]
+        return Double(i) + (span > 0 ? min(max((d - sd[i]) / span, 0), 1) : 0)
+    }
+}
+
+/// Stop dots on a line, red up to the bus, with a tiny copy of the map's bus riding on it.
+private struct HeroTrack: View {
+    let stopCount: Int
+    let position: Double
     let red: Color
 
+    private static let bus: UIImage = {
+        // Map marker is drawn front-up; rotate so the front faces right (direction of travel).
+        let src = BusAnnotation.image
+        let size = CGSize(width: src.size.height, height: src.size.width)
+        return UIGraphicsImageRenderer(size: size).image { ctx in
+            ctx.cgContext.translateBy(x: size.width / 2, y: size.height / 2)
+            ctx.cgContext.rotate(by: .pi / 2)
+            src.draw(at: CGPoint(x: -src.size.width / 2, y: -src.size.height / 2))
+        }
+    }()
+
     var body: some View {
-        let isNext = index == next
-        let reached = index <= next
-        let size: CGFloat = isNext ? 14 : 8
-        HStack(spacing: 0) {
-            Circle()
-                .fill(reached ? red : Color.secondary.opacity(0.35))
-                .frame(width: size, height: size)
-                .overlay(Circle().strokeBorder(Color.white.opacity(isNext ? 0.9 : 0), lineWidth: 2))
-            if !isLast {
-                Capsule()
-                    .fill(index < next ? red : Color.secondary.opacity(0.3))
-                    .frame(height: 3)
+        GeometryReader { g in
+            let inset: CGFloat = 5
+            let usable = g.size.width - inset * 2
+            let step = stopCount > 1 ? usable / CGFloat(stopCount - 1) : 0
+            let busX = inset + step * CGFloat(position)
+            let midY = g.size.height / 2
+            ZStack(alignment: .topLeading) {
+                Capsule().fill(Color.secondary.opacity(0.3))
+                    .frame(width: usable, height: 3)
+                    .position(x: inset + usable / 2, y: midY)
+                Capsule().fill(red)
+                    .frame(width: max(0, busX - inset), height: 3)
+                    .position(x: inset + max(0, busX - inset) / 2, y: midY)
+                ForEach(0..<stopCount, id: \.self) { i in
+                    Circle()
+                        .fill(Double(i) <= position ? red : Color.secondary.opacity(0.45))
+                        .frame(width: 8, height: 8)
+                        .position(x: inset + step * CGFloat(i), y: midY)
+                }
+                Image(uiImage: Self.bus)
+                    .resizable()
+                    .frame(width: 36, height: 18)
+                    .position(x: busX, y: midY)
+                    .accessibilityHidden(true)
             }
         }
+        .frame(height: 22)
     }
 }
 
@@ -381,6 +417,7 @@ struct GlassActivityCard: View {
         }
         .padding(16)
         .glassEffect(.regular, in: .rect(cornerRadius: 32))
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("trip-card")
     }
 }

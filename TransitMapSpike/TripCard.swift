@@ -20,6 +20,7 @@ struct TripCard: View {
         .background(Color.white.opacity(0.35), in: RoundedRectangle(cornerRadius: 26, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 26, style: .continuous).strokeBorder(.white.opacity(0.6), lineWidth: 1))
         .shadow(color: .black.opacity(0.08), radius: 12, y: 4)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("trip-card")
     }
 
@@ -72,6 +73,7 @@ struct TripCard: View {
             }
         }
         .padding(.leading, 2)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("stop-list")
     }
 

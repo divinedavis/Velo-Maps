@@ -15,7 +15,7 @@ struct TransitMapSpikeApp: App {
 struct RideScreen: View {
     @ObservedObject var trip: Trip
     @ObservedObject var walk: Walk
-    @State private var cardHeight: CGFloat = 220
+    @State private var cardTop: CGFloat = 0
 
     var body: some View {
         Group {
@@ -46,12 +46,12 @@ struct RideScreen: View {
 
     private var rideScreen: some View {
         ZStack(alignment: .bottom) {
-            TransitMapView(trip: trip, bottomInset: cardHeight)
+            TransitMapView(trip: trip, cardTop: cardTop)
                 .ignoresSafeArea()
             card
                 .padding(.horizontal, 10)
                 .padding(.bottom, 4)
-                .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { cardHeight = $0 }
+                .onGeometryChange(for: CGFloat.self) { $0.frame(in: .global).minY } action: { cardTop = $0 }
         }
     }
 
