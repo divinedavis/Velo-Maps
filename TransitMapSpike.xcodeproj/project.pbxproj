@@ -8,8 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		10C4D3F3F8B7AE0449CFE47D /* RideScreenUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 015041680631E474EA606CB3 /* RideScreenUITests.swift */; };
+		193EB51656FD7BA5BD02EA4E /* Pothole.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74C1183ECFBE0B949BC5AEEA /* Pothole.swift */; };
 		4699FD17060A73B5F7E41879 /* Walk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E857914D4C93697368D9732 /* Walk.swift */; };
 		5866C8F70E65C2D40238919B /* GlassCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E9999F64D4FF9ABBE3FC010 /* GlassCards.swift */; };
+		58F0228A4EBDE7A61F3C19EC /* ReportMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273951A9EC7E8479082BA89C /* ReportMenu.swift */; };
 		743F0BD5E36010890A55B2AE /* WalkMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D3997B67CF1B11F8708B1B4 /* WalkMapView.swift */; };
 		8E9ED09AAAE101A8CD5F8E01 /* WalkCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92BCCFCF565CD0AA6701F289 /* WalkCards.swift */; };
 		B2DA3040117ED450674628CE /* TripCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CC5A71234DE55D3BF2FA747 /* TripCard.swift */; };
@@ -33,10 +35,12 @@
 		015041680631E474EA606CB3 /* RideScreenUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RideScreenUITests.swift; sourceTree = "<group>"; };
 		139FAE6B1FDB8D0119200DBE /* TransitMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitMapView.swift; sourceTree = "<group>"; };
 		15587B430F928FA150A98B6B /* Trip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trip.swift; sourceTree = "<group>"; };
+		273951A9EC7E8479082BA89C /* ReportMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportMenu.swift; sourceTree = "<group>"; };
 		2CC5A71234DE55D3BF2FA747 /* TripCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripCard.swift; sourceTree = "<group>"; };
 		2F80CAF51875A1163CEA1345 /* TransitMapSpikeUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TransitMapSpikeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		36F3D29840425BB01212855D /* TransitMapSpikeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitMapSpikeApp.swift; sourceTree = "<group>"; };
 		3D3997B67CF1B11F8708B1B4 /* WalkMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalkMapView.swift; sourceTree = "<group>"; };
+		74C1183ECFBE0B949BC5AEEA /* Pothole.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pothole.swift; sourceTree = "<group>"; };
 		7E9999F64D4FF9ABBE3FC010 /* GlassCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassCards.swift; sourceTree = "<group>"; };
 		92BCCFCF565CD0AA6701F289 /* WalkCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalkCards.swift; sourceTree = "<group>"; };
 		9E857914D4C93697368D9732 /* Walk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Walk.swift; sourceTree = "<group>"; };
@@ -49,6 +53,8 @@
 			isa = PBXGroup;
 			children = (
 				7E9999F64D4FF9ABBE3FC010 /* GlassCards.swift */,
+				74C1183ECFBE0B949BC5AEEA /* Pothole.swift */,
+				273951A9EC7E8479082BA89C /* ReportMenu.swift */,
 				CF698504AE145E46B5AD4A26 /* Route.swift */,
 				36F3D29840425BB01212855D /* TransitMapSpikeApp.swift */,
 				139FAE6B1FDB8D0119200DBE /* TransitMapView.swift */,
@@ -165,6 +171,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				5866C8F70E65C2D40238919B /* GlassCards.swift in Sources */,
+				193EB51656FD7BA5BD02EA4E /* Pothole.swift in Sources */,
+				58F0228A4EBDE7A61F3C19EC /* ReportMenu.swift in Sources */,
 				EF9CB893FB248179C932D31B /* Route.swift in Sources */,
 				C45EFDD2106C0FF73E21FD14 /* TransitMapSpikeApp.swift in Sources */,
 				DBD7F7F9E97E8D487B2A16A2 /* TransitMapView.swift in Sources */,

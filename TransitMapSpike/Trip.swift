@@ -19,6 +19,13 @@ final class Trip: ObservableObject {
     let cardStyle: Int
     /// -mode walk -walkStyle 1…5 opens straight onto a walking design.
     let walkStyle: Int
+    /// Preview states: -expanded YES (card swiped up), -pothole YES (report sheet open),
+    /// -potholeDone YES (confirmation showing).
+    let startExpanded: Bool
+    let startPotholeSheet: Bool
+    let startPotholeToast: Bool
+    /// -reportMenu YES opens the "+" report menu ~1.5 s after launch (for screenshots/video).
+    let startReportMenu: Bool
     let night: Bool
 
     /// Demo tuning, overridable from launch arguments for screenshot passes:
@@ -50,6 +57,10 @@ final class Trip: ObservableObject {
         cardStyle = defaults.number("cardStyle").map(Int.init) ?? 4
         night = defaults.bool(forKey: "night")
         walking = defaults.string(forKey: "mode") == "walk"
+        startExpanded = defaults.bool(forKey: "expanded")
+        startPotholeSheet = defaults.bool(forKey: "pothole")
+        startPotholeToast = defaults.bool(forKey: "potholeDone")
+        startReportMenu = defaults.bool(forKey: "reportMenu")
         // Glance (4) chosen by the owner 11/7 for the walking leg.
         walkStyle = defaults.number("walkStyle").map(Int.init) ?? 4
         publish(force: true)

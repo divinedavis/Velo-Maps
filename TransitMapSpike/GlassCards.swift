@@ -238,14 +238,30 @@ struct GlassClusterCard: View {
     }
 }
 
-// MARK: 4 — Hero: giant ETA, horizontal stop timeline, red glass end button.
+// MARK: 4 — Hero: giant ETA, next stop, red glass end button. Swipe up for navigation settings.
 
 struct GlassHeroCard: View {
     @ObservedObject var trip: Trip
     @Environment(\.colorScheme) private var scheme
+    @State private var expanded: Bool
+    @GestureState private var drag: CGFloat = 0
+
+    init(trip: Trip) {
+        self.trip = trip
+        _expanded = State(initialValue: trip.startExpanded)
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
+            Capsule()
+                .fill(Color.secondary.opacity(0.45))
+                .frame(width: 38, height: 5)
+                .frame(maxWidth: .infinity)
+                .padding(.top, -6)
+                .accessibilityLabel(expanded ? "Hide navigation settings" : "Show navigation settings")
+                .accessibilityAddTraits(.isButton)
+                .accessibilityIdentifier("card-grabber")
+                .onTapGesture { toggle() }
             // .lastTextBaseline puts "9 min" on the same line as the "10 aboard" row.
             HStack(alignment: .lastTextBaseline) {
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
@@ -263,14 +279,9 @@ struct GlassHeroCard: View {
                         .font(.system(size: 12, weight: .medium)).foregroundStyle(.secondary)
                 }
             }
-            VStack(alignment: .leading, spacing: 6) {
-                HeroTrack(stopCount: trip.route.stops.count,
-                          position: trip.stopSpacePosition,
-                          red: Color.tripRed(scheme))
-                Text("Next: \(trip.nextStopName)")
-                    .font(.system(size: 14, weight: .bold))
-                    .accessibilityIdentifier("next-stop")
-            }
+            Text("Next: \(trip.nextStopName)")
+                .font(.system(size: 14, weight: .bold))
+                .accessibilityIdentifier("next-stop")
             TimelineView(.periodic(from: .now, by: 1)) { _ in
                 HStack {
                     Text("Hold to end ride")
@@ -285,71 +296,104 @@ struct GlassHeroCard: View {
             }
             .modifier(HoldToEnd(trip: trip))
             .clipShape(Capsule())
+            if expanded {
+                NavSettings()
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
         }
         .padding(18)
         .glassEffect(.regular, in: .rect(cornerRadius: 36))
+        // Follows the finger a little while dragging, then snaps open or closed.
+        .offset(y: max(-40, min(40, drag * 0.35)))
+        // Simultaneous so the buttons and hold gesture inside the card don't swallow the swipe;
+        // predicted end counts a quick flick as a full swipe.
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 12)
+                .updating($drag) { v, state, _ in state = v.translation.height }
+                .onEnded { v in
+                    let up = min(v.translation.height, v.predictedEndTranslation.height)
+                    let down = max(v.translation.height, v.predictedEndTranslation.height)
+                    if up < -40, !expanded { toggle() } else if down > 40, expanded { toggle() }
+                }
+        )
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("trip-card")
     }
-}
 
-private extension Trip {
-    /// Where the bus is on the evenly spaced stop track: 2.4 = 40% of the way from stop 2 to 3.
-    var stopSpacePosition: Double {
-        let d = progress * route.length
-        let sd = route.stopDistances
-        guard sd.count > 1 else { return 0 }
-        guard let i = sd.indices.dropLast().last(where: { sd[$0] <= d }) else { return 0 }
-        let span = sd[i + 1] - sd[i]
-        return Double(i) + (span > 0 ? min(max((d - sd[i]) / span, 0), 1) : 0)
+    private func toggle() {
+        withAnimation(.spring(response: 0.38, dampingFraction: 0.86)) { expanded.toggle() }
     }
 }
 
-/// Stop dots on a line, red up to the bus, with a tiny copy of the map's bus riding on it.
-private struct HeroTrack: View {
-    let stopCount: Int
-    let position: Double
-    let red: Color
-
-    private static let bus: UIImage = {
-        // Map marker is drawn front-up; rotate so the front faces right (direction of travel).
-        let src = BusAnnotation.image
-        let size = CGSize(width: src.size.height, height: src.size.width)
-        return UIGraphicsImageRenderer(size: size).image { ctx in
-            ctx.cgContext.translateBy(x: size.width / 2, y: size.height / 2)
-            ctx.cgContext.rotate(by: .pi / 2)
-            src.draw(at: CGPoint(x: -src.size.width / 2, y: -src.size.height / 2))
-        }
-    }()
+/// Revealed by swiping the card up. Stored locally for the preview; not yet wired to the map.
+private struct NavSettings: View {
+    @AppStorage("voiceGuidance") private var voice = true
+    @AppStorage("stopAlert") private var stopAlert = "1 stop before"
+    @AppStorage("appearance") private var appearance = "Auto"
+    @AppStorage("buildings3D") private var buildings = true
+    @AppStorage("showPotholes") private var potholes = true
 
     var body: some View {
-        GeometryReader { g in
-            let inset: CGFloat = 5
-            let usable = g.size.width - inset * 2
-            let step = stopCount > 1 ? usable / CGFloat(stopCount - 1) : 0
-            let busX = inset + step * CGFloat(position)
-            let midY = g.size.height / 2
-            ZStack(alignment: .topLeading) {
-                Capsule().fill(Color.secondary.opacity(0.3))
-                    .frame(width: usable, height: 3)
-                    .position(x: inset + usable / 2, y: midY)
-                Capsule().fill(red)
-                    .frame(width: max(0, busX - inset), height: 3)
-                    .position(x: inset + max(0, busX - inset) / 2, y: midY)
-                ForEach(0..<stopCount, id: \.self) { i in
-                    Circle()
-                        .fill(Double(i) <= position ? red : Color.secondary.opacity(0.45))
-                        .frame(width: 8, height: 8)
-                        .position(x: inset + step * CGFloat(i), y: midY)
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Navigation settings")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(.secondary)
+                .textCase(.uppercase)
+                .padding(.top, 4)
+                .accessibilityIdentifier("nav-settings")
+            VStack(spacing: 0) {
+                row("speaker.wave.2.fill", "Voice guidance") { Toggle("", isOn: $voice).labelsHidden() }
+                Divider().padding(.leading, 44)
+                row("bell.badge.fill", "Stop alert") {
+                    Menu {
+                        ForEach(["Off", "At my stop", "1 stop before", "2 stops before"], id: \.self) { o in
+                            Button(o) { stopAlert = o }
+                        }
+                    } label: {
+                        HStack(spacing: 4) {
+                            Text(stopAlert)
+                            Image(systemName: "chevron.up.chevron.down").font(.system(size: 11, weight: .semibold))
+                        }
+                        .font(.system(size: 15))
+                        .foregroundStyle(.secondary)
+                    }
                 }
-                Image(uiImage: Self.bus)
-                    .resizable()
-                    .frame(width: 36, height: 18)
-                    .position(x: busX, y: midY)
-                    .accessibilityHidden(true)
+                Divider().padding(.leading, 44)
+                row("circle.lefthalf.filled", "Map appearance") {
+                    Picker("", selection: $appearance) {
+                        ForEach(["Auto", "Day", "Night"], id: \.self) { Text($0) }
+                    }
+                    .pickerStyle(.segmented)
+                    .frame(width: 168)
+                }
+                Divider().padding(.leading, 44)
+                row("building.2.fill", "3D buildings") { Toggle("", isOn: $buildings).labelsHidden() }
+                Divider().padding(.leading, 44)
+                row("exclamationmark.triangle.fill", "Show reported potholes") { Toggle("", isOn: $potholes).labelsHidden() }
             }
+            .padding(.horizontal, 12)
+            .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+            Button {} label: {
+                Label("Share trip progress", systemImage: "square.and.arrow.up")
+                    .font(.system(size: 15, weight: .semibold))
+                    .frame(maxWidth: .infinity, minHeight: 34)
+            }
+            .buttonStyle(.glass)
         }
-        .frame(height: 22)
+        .tint(Color.tripRed(.light))
+    }
+
+    private func row<Accessory: View>(_ icon: String, _ title: String, @ViewBuilder accessory: () -> Accessory) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(.secondary)
+                .frame(width: 22)
+            Text(title).font(.system(size: 15, weight: .medium))
+            Spacer(minLength: 8)
+            accessory()
+        }
+        .frame(minHeight: 46)
     }
 }
 
