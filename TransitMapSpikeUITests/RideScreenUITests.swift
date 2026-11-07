@@ -41,8 +41,8 @@ final class RideScreenUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Voice guidance"].exists)
     }
 
-    /// The pothole button opens the report sheet; reporting closes it and confirms.
-    func testPotholeButtonReportsAndConfirms() {
+    /// One tap on Pothole reports it straight away (no form) and confirms.
+    func testPotholeIsOneTap() {
         let app = XCUIApplication()
         app.launchArguments += ["-paused", "YES"]
         app.launch()
@@ -50,10 +50,18 @@ final class RideScreenUITests: XCTestCase {
         let button = app.buttons["report-pothole"]
         XCTAssertTrue(button.waitForExistence(timeout: 10))
         button.tap()
-        let send = app.buttons["send-pothole-report"]
-        XCTAssertTrue(send.waitForExistence(timeout: 3))
-        send.tap()
-        XCTAssertTrue(app.staticTexts["Pothole reported. Thanks!"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Pothole reported for all riders"].waitForExistence(timeout: 3))
+    }
+
+    /// Approaching the turn shows the turn banner with the street name.
+    func testTurnBannerShowsUpcomingTurn() {
+        let app = XCUIApplication()
+        app.launchArguments += ["-paused", "YES", "-turnAhead", "120", "-turnStyle", "1"]
+        app.launch()
+
+        let banner = app.descendants(matching: .any)["turn-banner"]
+        XCTAssertTrue(banner.waitForExistence(timeout: 10))
+        XCTAssertTrue(banner.label.contains("W 96 St"), "banner label was: \(banner.label)")
     }
 
     /// The "+" button opens the report menu (police, accident, …) and confirms a report.
@@ -69,6 +77,11 @@ final class RideScreenUITests: XCTestCase {
         let police = app.buttons["report-Police"]
         XCTAssertTrue(police.waitForExistence(timeout: 3))
         XCTAssertTrue(app.buttons["report-Accident"].exists)
+        // The open menu must sit entirely above the trip card, never over it.
+        let card = app.descendants(matching: .any)["trip-card"]
+        let lowestItem = app.buttons["report-Crowded bus"]
+        XCTAssertLessThan(lowestItem.frame.maxY, card.frame.minY, "report menu overlaps the trip card")
+        XCTAssertLessThan(lowestItem.frame.maxY, plus.frame.minY, "report menu covers the + / × button")
         police.tap()
         XCTAssertTrue(app.staticTexts["Police reported. Thanks!"].waitForExistence(timeout: 3))
     }

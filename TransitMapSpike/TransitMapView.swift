@@ -29,6 +29,7 @@ struct TransitMapView: UIViewRepresentable {
     func updateUIView(_ map: MKMapView, context: Context) {
         context.coordinator.cardTop = cardTop
         context.coordinator.syncRoute()
+        context.coordinator.syncPotholes()
     }
 
     @MainActor
@@ -67,6 +68,17 @@ struct TransitMapView: UIViewRepresentable {
             let core = MKPolyline(coordinates: pts, count: pts.count)
             map.addOverlay(glow, level: .aboveRoads)
             map.addOverlay(core, level: .aboveRoads)
+        }
+
+        private var shownPotholes: Set<UUID> = []
+
+        /// Adds a warning sign for every reported pothole not yet on the map.
+        func syncPotholes() {
+            guard let map else { return }
+            let new = trip.potholes.filter { !shownPotholes.contains($0.id) }
+            guard !new.isEmpty else { return }
+            map.addAnnotations(new.map { PotholeAnnotation(pothole: $0) })
+            new.forEach { shownPotholes.insert($0.id) }
         }
 
         @objc private func tick(_ link: CADisplayLink) {
@@ -116,6 +128,17 @@ struct TransitMapView: UIViewRepresentable {
         }
 
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+            if annotation is PotholeAnnotation {
+                let v = mapView.dequeueReusableAnnotationView(withIdentifier: "pothole")
+                    ?? MKAnnotationView(annotation: annotation, reuseIdentifier: "pothole")
+                v.annotation = annotation
+                v.image = PotholeAnnotation.sign
+                v.centerOffset = CGPoint(x: 0, y: -PotholeAnnotation.sign.size.height / 2)  // sign stands on the spot
+                v.zPriority = .defaultSelected
+                v.collisionMode = .none
+                v.accessibilityLabel = "Pothole"
+                return v
+            }
             guard annotation is BusAnnotation else { return nil }
             let v = mapView.dequeueReusableAnnotationView(withIdentifier: "bus")
                 ?? MKAnnotationView(annotation: annotation, reuseIdentifier: "bus")
@@ -161,6 +184,45 @@ final class BusAnnotation: NSObject, MKAnnotation {
             UIBezierPath(roundedRect: CGRect(x: 5, y: 40, width: 20, height: 7), cornerRadius: 2).fill()
             UIColor(red: 0.18, green: 0.62, blue: 0.27, alpha: 1).setFill()
             UIBezierPath(roundedRect: CGRect(x: 5, y: 48.5, width: 20, height: 3.5), cornerRadius: 1.5).fill()
+        }
+    }()
+}
+
+/// A reported pothole on the map, drawn as a yellow warning sign on a short post.
+final class PotholeAnnotation: NSObject, MKAnnotation {
+    let coordinate: CLLocationCoordinate2D
+    init(pothole: Pothole) { coordinate = pothole.coordinate }
+
+    static let sign: UIImage = {
+        let size = CGSize(width: 34, height: 42)
+        return UIGraphicsImageRenderer(size: size).image { ctx in
+            let cg = ctx.cgContext
+            // post
+            UIColor(white: 0.35, alpha: 1).setFill()
+            UIBezierPath(roundedRect: CGRect(x: 15.5, y: 26, width: 3, height: 14), cornerRadius: 1.5).fill()
+            // triangle with rounded corners, dark border
+            cg.setShadow(offset: CGSize(width: 0, height: 2), blur: 3, color: UIColor.black.withAlphaComponent(0.35).cgColor)
+            let tri = UIBezierPath()
+            tri.move(to: CGPoint(x: 17, y: 2))
+            tri.addLine(to: CGPoint(x: 32, y: 28))
+            tri.addLine(to: CGPoint(x: 2, y: 28))
+            tri.close()
+            tri.lineJoinStyle = .round
+            tri.lineWidth = 3.5
+            UIColor(red: 0.99, green: 0.80, blue: 0.10, alpha: 1).setFill()
+            tri.fill()
+            cg.setShadow(offset: .zero, blur: 0, color: nil)
+            UIColor(white: 0.1, alpha: 1).setStroke()
+            tri.stroke()
+            // pothole glyph: dark ellipse with a crack
+            UIColor(white: 0.12, alpha: 1).setFill()
+            UIBezierPath(ovalIn: CGRect(x: 10.5, y: 17, width: 13, height: 6)).fill()
+            let crack = UIBezierPath()
+            crack.move(to: CGPoint(x: 17, y: 10)); crack.addLine(to: CGPoint(x: 15.5, y: 13))
+            crack.addLine(to: CGPoint(x: 18, y: 15)); crack.addLine(to: CGPoint(x: 16.5, y: 17.5))
+            crack.lineWidth = 1.6
+            UIColor(white: 0.12, alpha: 1).setStroke()
+            crack.stroke()
         }
     }()
 }

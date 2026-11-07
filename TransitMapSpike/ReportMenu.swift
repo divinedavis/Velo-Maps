@@ -34,58 +34,64 @@ enum ReportKind: String, CaseIterable, Identifiable {
     }
 }
 
-/// Glass "+" button that morphs into a menu of report types.
+/// Glass "+" button that opens a menu of report types straight up from the button.
 ///
-/// Uses the technique from the 11/7 reference recording: `matchedTransitionSource` on the
-/// label (before the glass button style is applied) plus a zoom navigation transition on the
-/// popover content. On iOS 27 that gives the native menu-style morph out of the glass button;
-/// on iOS 26 it shows as a regular popover.
+/// A custom overlay rather than a system popover: iOS places popovers itself and covered the
+/// trip card with one (11/7). This always opens above the button row, right-aligned.
 struct ReportMenuButton: View {
     @Binding var isOpen: Bool
     let onReport: (ReportKind) -> Void
-    @Namespace private var ns
 
     var body: some View {
-        Button { isOpen = true } label: {
+        Button {
+            withAnimation(.spring(response: 0.32, dampingFraction: 0.8)) { isOpen.toggle() }
+        } label: {
             Image(systemName: "plus")
                 .font(.system(size: 20, weight: .semibold))
+                .rotationEffect(.degrees(isOpen ? 45 : 0))   // + becomes ×
                 .frame(width: 34, height: 34)
-                .matchedTransitionSource(id: "report-menu", in: ns)
         }
         .buttonStyle(.glass)
         .buttonBorderShape(.circle)
-        .accessibilityLabel("Report police, accidents and more")
+        .accessibilityLabel(isOpen ? "Close report menu" : "Report police, accidents and more")
         .accessibilityIdentifier("report-menu")
-        .popover(isPresented: $isOpen, arrowEdge: .bottom) {
-            VStack(alignment: .leading, spacing: 4) {
-                ForEach(ReportKind.allCases) { kind in
-                    Button {
-                        isOpen = false
-                        onReport(kind)
-                    } label: {
-                        HStack(spacing: 12) {
-                            Image(systemName: kind.icon)
-                                .font(.system(size: 14, weight: .semibold))
-                                .foregroundStyle(.white)
-                                .frame(width: 32, height: 32)
-                                .background(kind.color, in: Circle())
-                            Text(kind.rawValue)
-                                .font(.system(size: 16, weight: .medium))
-                                .foregroundStyle(.primary)
-                            Spacer(minLength: 0)
-                        }
-                        .padding(.vertical, 5)
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier("report-\(kind.rawValue)")
-                }
+        .overlay(alignment: .bottomTrailing) {
+            if isOpen {
+                menu
+                    .offset(y: -56)   // sit above the button row, leaving + / × visible
+                    .transition(.scale(scale: 0.3, anchor: .bottomTrailing).combined(with: .opacity))
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .frame(width: 220)
-            .presentationCompactAdaptation(.popover)
-            .navigationTransition(.zoom(sourceID: "report-menu", in: ns))
         }
+    }
+
+    private var menu: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            ForEach(ReportKind.allCases) { kind in
+                Button {
+                    withAnimation(.easeOut(duration: 0.2)) { isOpen = false }
+                    onReport(kind)
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: kind.icon)
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .frame(width: 32, height: 32)
+                            .background(kind.color, in: Circle())
+                        Text(kind.rawValue)
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(.primary)
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.vertical, 5)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("report-\(kind.rawValue)")
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .frame(width: 220)
+        .glassEffect(.regular, in: .rect(cornerRadius: 26))
     }
 }

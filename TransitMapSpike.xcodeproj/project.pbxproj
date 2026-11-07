@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		10C4D3F3F8B7AE0449CFE47D /* RideScreenUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 015041680631E474EA606CB3 /* RideScreenUITests.swift */; };
+		17D5C9390A5CE55DD3885F8C /* TurnBanners.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B4490D1A779EA24F95737D /* TurnBanners.swift */; };
 		193EB51656FD7BA5BD02EA4E /* Pothole.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74C1183ECFBE0B949BC5AEEA /* Pothole.swift */; };
 		4699FD17060A73B5F7E41879 /* Walk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E857914D4C93697368D9732 /* Walk.swift */; };
 		5866C8F70E65C2D40238919B /* GlassCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E9999F64D4FF9ABBE3FC010 /* GlassCards.swift */; };
@@ -45,6 +46,7 @@
 		92BCCFCF565CD0AA6701F289 /* WalkCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalkCards.swift; sourceTree = "<group>"; };
 		9E857914D4C93697368D9732 /* Walk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Walk.swift; sourceTree = "<group>"; };
 		A914AECE5C70DCFD5272E513 /* TransitMapSpike.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TransitMapSpike.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B1B4490D1A779EA24F95737D /* TurnBanners.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurnBanners.swift; sourceTree = "<group>"; };
 		CF698504AE145E46B5AD4A26 /* Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -60,6 +62,7 @@
 				139FAE6B1FDB8D0119200DBE /* TransitMapView.swift */,
 				15587B430F928FA150A98B6B /* Trip.swift */,
 				2CC5A71234DE55D3BF2FA747 /* TripCard.swift */,
+				B1B4490D1A779EA24F95737D /* TurnBanners.swift */,
 				9E857914D4C93697368D9732 /* Walk.swift */,
 				92BCCFCF565CD0AA6701F289 /* WalkCards.swift */,
 				3D3997B67CF1B11F8708B1B4 /* WalkMapView.swift */,
@@ -178,6 +181,7 @@
 				DBD7F7F9E97E8D487B2A16A2 /* TransitMapView.swift in Sources */,
 				D53D6AA64357B43DAA936156 /* Trip.swift in Sources */,
 				B2DA3040117ED450674628CE /* TripCard.swift in Sources */,
+				17D5C9390A5CE55DD3885F8C /* TurnBanners.swift in Sources */,
 				4699FD17060A73B5F7E41879 /* Walk.swift in Sources */,
 				8E9ED09AAAE101A8CD5F8E01 /* WalkCards.swift in Sources */,
 				743F0BD5E36010890A55B2AE /* WalkMapView.swift in Sources */,

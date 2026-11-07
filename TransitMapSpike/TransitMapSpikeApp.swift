@@ -16,7 +16,6 @@ struct RideScreen: View {
     @ObservedObject var trip: Trip
     @ObservedObject var walk: Walk
     @State private var cardTop: CGFloat = 0
-    @State private var showPotholeSheet = false
     @State private var showReportMenu = false
     @State private var toast: String?
 
@@ -51,10 +50,20 @@ struct RideScreen: View {
         ZStack(alignment: .bottom) {
             TransitMapView(trip: trip, cardTop: cardTop)
                 .ignoresSafeArea()
+            if showReportMenu {
+                // Tap anywhere else to close the report menu.
+                Color.clear.contentShape(Rectangle()).ignoresSafeArea()
+                    .onTapGesture { withAnimation(.easeOut(duration: 0.2)) { showReportMenu = false } }
+            }
             VStack(alignment: .trailing, spacing: 10) {
-                // Pothole is its own button; everything else lives behind "+".
                 HStack(spacing: 8) {
-                    PotholeButton { showPotholeSheet = true }
+                    if let (_, metres) = trip.potholeAhead() {
+                        PotholeAheadPill(metres: metres)
+                            .transition(.scale.combined(with: .opacity))
+                    }
+                    Spacer(minLength: 0)
+                    // Pothole is its own one-tap button; everything else lives behind "+".
+                    PotholeButton { reportPothole() }
                     ReportMenuButton(isOpen: $showReportMenu) { kind in
                         showToast("\(kind.rawValue) reported. Thanks!")
                     }
@@ -66,36 +75,45 @@ struct RideScreen: View {
             .padding(.bottom, 4)
         }
         .overlay(alignment: .top) {
-            if let toast {
-                ReportToast(text: toast)
-                    .padding(.top, 8)
-                    .transition(.move(edge: .top).combined(with: .opacity))
+            VStack(spacing: 8) {
+                turnBanner
+                if let toast {
+                    ReportToast(text: toast)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                }
             }
-        }
-        .sheet(isPresented: $showPotholeSheet) {
-            PotholeReportSheet(
-                location: "Central Park West near \(trip.route.stops[trip.nextStop].name.replacingOccurrences(of: "CPW / ", with: ""))",
-                onCancel: { showPotholeSheet = false },
-                onReport: {
-                    showPotholeSheet = false
-                    showToast("Pothole reported. Thanks!")
-                })
-            .presentationDetents([.height(360)])
+            .padding(.horizontal, 10)
         }
         .onAppear {
-            showPotholeSheet = trip.startPotholeSheet
-            if trip.startPotholeToast { toast = "Pothole reported. Thanks!" }
+            if trip.startPotholeTap { reportPothole(keepToast: true) }
             if trip.startReportMenu {
                 Task {
                     try? await Task.sleep(for: .seconds(1.5))
-                    showReportMenu = true
+                    withAnimation(.spring(response: 0.32, dampingFraction: 0.8)) { showReportMenu = true }
                 }
             }
         }
     }
 
-    private func showToast(_ text: String) {
+    /// Turn-by-turn banner in the chosen design (4 lives inside the card instead).
+    @ViewBuilder private var turnBanner: some View {
+        switch trip.turnStyle {
+        case 1: TurnBannerClassic(trip: trip)
+        case 2: TurnBannerLanes(trip: trip)
+        case 3: TurnBannerIsland(trip: trip)
+        case 5: TurnBannerThen(trip: trip)
+        default: EmptyView()
+        }
+    }
+
+    private func reportPothole(keepToast: Bool = false) {
+        trip.reportPothole()
+        showToast("Pothole reported for all riders", keep: keepToast)
+    }
+
+    private func showToast(_ text: String, keep: Bool = false) {
         withAnimation(.spring) { toast = text }
+        guard !keep else { return }
         Task {
             try? await Task.sleep(for: .seconds(3))
             withAnimation(.easeOut) { if toast == text { toast = nil } }

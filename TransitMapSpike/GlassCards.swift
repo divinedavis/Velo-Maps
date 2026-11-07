@@ -262,6 +262,7 @@ struct GlassHeroCard: View {
                 .accessibilityAddTraits(.isButton)
                 .accessibilityIdentifier("card-grabber")
                 .onTapGesture { toggle() }
+            if trip.turnStyle == 4 { TurnRowInCard(trip: trip) }
             // .lastTextBaseline puts "9 min" on the same line as the "10 aboard" row.
             HStack(alignment: .lastTextBaseline) {
                 HStack(alignment: .firstTextBaseline, spacing: 6) {

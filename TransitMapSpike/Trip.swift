@@ -1,6 +1,14 @@
 import Foundation
 import CoreLocation
 
+/// A reported pothole: where it is and how far along the route.
+struct Pothole: Identifiable {
+    let id = UUID()
+    let coordinate: CLLocationCoordinate2D
+    let at: CLLocationDistance
+    let mine: Bool
+}
+
 /// Simulated ride along the route. The map's display link advances `distance` every frame;
 /// the card reads the coarse values below, which are published a few times a second.
 @MainActor
@@ -19,11 +27,12 @@ final class Trip: ObservableObject {
     let cardStyle: Int
     /// -mode walk -walkStyle 1…5 opens straight onto a walking design.
     let walkStyle: Int
-    /// Preview states: -expanded YES (card swiped up), -pothole YES (report sheet open),
-    /// -potholeDone YES (confirmation showing).
+    /// Preview states: -expanded YES (card swiped up), -potholeTapped YES (pothole button
+    /// pressed once at launch), -turnStyle 1…5 (turn banner design), -turnAhead 120 (start
+    /// the bus this many metres before the next turn).
     let startExpanded: Bool
-    let startPotholeSheet: Bool
-    let startPotholeToast: Bool
+    let startPotholeTap: Bool
+    let turnStyle: Int
     /// -reportMenu YES opens the "+" report menu ~1.5 s after launch (for screenshots/video).
     let startReportMenu: Bool
     let night: Bool
@@ -58,12 +67,38 @@ final class Trip: ObservableObject {
         night = defaults.bool(forKey: "night")
         walking = defaults.string(forKey: "mode") == "walk"
         startExpanded = defaults.bool(forKey: "expanded")
-        startPotholeSheet = defaults.bool(forKey: "pothole")
-        startPotholeToast = defaults.bool(forKey: "potholeDone")
+        startPotholeTap = defaults.bool(forKey: "potholeTapped")
+        // Lanes (2) chosen by the owner 11/7.
+        turnStyle = defaults.number("turnStyle").map(Int.init) ?? 2
         startReportMenu = defaults.bool(forKey: "reportMenu")
         // Glance (4) chosen by the owner 11/7 for the walking leg.
         walkStyle = defaults.number("walkStyle").map(Int.init) ?? 4
+        if let ahead = defaults.number("turnAhead"), let turn = route.maneuvers.first {
+            distance = max(0, turn.at - ahead)
+        }
+        // Reports other riders already made on this route (demo data; the real app would load
+        // these from a shared server).
+        potholes = [700, 1450].map { Pothole(coordinate: route.position(at: $0).0, at: $0, mine: false) }
         publish(force: true)
+    }
+
+    // MARK: Potholes
+
+    @Published private(set) var potholes: [Pothole] = []
+
+    /// One tap: drop a pothole where the bus is right now.
+    func reportPothole() {
+        let (coord, _) = route.position(at: distance)
+        potholes.append(Pothole(coordinate: coord, at: distance, mine: true))
+    }
+
+    /// Closest pothole still ahead on the route, if within `range` metres.
+    func potholeAhead(within range: Double = 250) -> (Pothole, Double)? {
+        let d = progress * route.length
+        return potholes
+            .map { ($0, $0.at - d) }
+            .filter { $0.1 > 5 && $0.1 <= range }
+            .min { $0.1 < $1.1 }
     }
 
     func advance(by dt: TimeInterval) {

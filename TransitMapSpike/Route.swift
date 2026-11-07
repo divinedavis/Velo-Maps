@@ -11,21 +11,32 @@ struct Stop: Identifiable, Hashable {
     func hash(into h: inout Hasher) { h.combine(id) }
 }
 
+/// A turn at a point on the line.
+struct TurnSpec {
+    let coordinate: CLLocationCoordinate2D
+    let icon: String
+    let verb: String
+    let street: String
+}
+
 /// A route line plus the stops on it. Distances are cumulative metres along the line.
 struct Route {
     let line: String
     let destination: String
     let stops: [Stop]
+    let turns: [TurnSpec]
     private(set) var points: [CLLocationCoordinate2D]
     private(set) var cumulative: [CLLocationDistance] = []
     private(set) var stopDistances: [CLLocationDistance] = []
 
     var length: CLLocationDistance { cumulative.last ?? 0 }
 
-    init(line: String, destination: String, stops: [Stop], points: [CLLocationCoordinate2D]) {
+    init(line: String, destination: String, stops: [Stop], turns: [TurnSpec] = [],
+         points: [CLLocationCoordinate2D]) {
         self.line = line
         self.destination = destination
         self.stops = stops
+        self.turns = turns
         self.points = points
         recompute()
     }
@@ -76,6 +87,23 @@ struct Route {
         return deg < 0 ? deg + 360 : deg
     }
 
+    /// Turns along the route plus the final arrival, in order.
+    var maneuvers: [Maneuver] {
+        var out: [Maneuver] = turns.enumerated().map { i, t in
+            let v = points.indices.min { points[$0].distance(to: t.coordinate) < points[$1].distance(to: t.coordinate) } ?? 0
+            return Maneuver(id: i, at: cumulative[v], icon: t.icon, verb: t.verb, street: t.street)
+        }
+        out.append(Maneuver(id: out.count, at: length, icon: "mappin.circle.fill", verb: "Arrive at", street: destination))
+        return out
+    }
+
+    /// Lanes on the approach to the next turn (demo data for the lane-guidance design).
+    var lanesAtNextTurn: [Lane] {
+        [Lane(id: 0, icon: "arrow.turn.up.left", active: true),
+         Lane(id: 1, icon: "arrow.up", active: false),
+         Lane(id: 2, icon: "arrow.up", active: false)]
+    }
+
     /// Index of the next stop the bus has not yet passed.
     func nextStopIndex(at distance: CLLocationDistance) -> Int {
         stopDistances.firstIndex { $0 > distance + 5 } ?? (stops.count - 1)
@@ -103,7 +131,7 @@ extension Route {
     /// intersections; the line is the avenue's real centreline.
     static let m10 = Route(
         line: "M10",
-        destination: "CPW / W 96 St",
+        destination: "Columbus Av / W 96 St",
         stops: [
             Stop(id: 0, name: "CPW / W 72 St", coordinate: .init(latitude: 40.77630, longitude: -73.97620)),
             Stop(id: 1, name: "CPW / W 77 St", coordinate: .init(latitude: 40.77955, longitude: -73.97383)),
@@ -111,6 +139,11 @@ extension Route {
             Stop(id: 3, name: "CPW / W 86 St", coordinate: .init(latitude: 40.78530, longitude: -73.96965)),
             Stop(id: 4, name: "CPW / W 90 St", coordinate: .init(latitude: 40.78790, longitude: -73.96778)),
             Stop(id: 5, name: "CPW / W 96 St", coordinate: .init(latitude: 40.79165, longitude: -73.96505)),
+            Stop(id: 6, name: "Columbus Av / W 96 St", coordinate: .init(latitude: 40.7928760, longitude: -73.9675451)),
+        ],
+        turns: [
+            TurnSpec(coordinate: .init(latitude: 40.7916758, longitude: -73.9646940),
+                     icon: "arrow.turn.up.left", verb: "Turn left onto", street: "W 96 St"),
         ],
         // Central Park West centreline from OpenStreetMap (© OpenStreetMap contributors, ODbL).
         points: [
@@ -195,8 +228,11 @@ extension Route {
             .init(latitude: 40.7910513, longitude: -73.9651495),
             .init(latitude: 40.7915874, longitude: -73.9647609),
             .init(latitude: 40.7916758, longitude: -73.9646940),
-            .init(latitude: 40.7917586, longitude: -73.9646332),
-            .init(latitude: 40.7920130, longitude: -73.9644503),
+            // Left onto W 96 St, west to Columbus Av (OpenStreetMap way 5672068).
+            .init(latitude: 40.7917254, longitude: -73.9648118),
+            .init(latitude: 40.7927485, longitude: -73.9672421),
+            .init(latitude: 40.7928147, longitude: -73.9673993),
+            .init(latitude: 40.7928760, longitude: -73.9675451),
         ]
     )
 }
