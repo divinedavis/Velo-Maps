@@ -4,3 +4,5 @@ DerivedData/
 *.xcresult
 xcuserdata/
 DerivedData27/
+scripts/asc-config.env
+build.nosync/

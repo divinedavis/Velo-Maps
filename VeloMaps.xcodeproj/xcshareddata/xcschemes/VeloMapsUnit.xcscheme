@@ -15,10 +15,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "F9D02ED0BB6A5EB9F3B39860"
-               BuildableName = "TransitMapSpike.app"
-               BlueprintName = "TransitMapSpike"
-               ReferencedContainer = "container:TransitMapSpike.xcodeproj">
+               BlueprintIdentifier = "FC00F94EB1F92B3D74E51FBA"
+               BuildableName = "VeloMaps.app"
+               BlueprintName = "VeloMaps"
+               ReferencedContainer = "container:VeloMaps.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -29,10 +29,10 @@
             buildForAnalyzing = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "74385ABC49A30227085D7EF1"
-               BuildableName = "TransitMapSpikeUITests.xctest"
-               BlueprintName = "TransitMapSpikeUITests"
-               ReferencedContainer = "container:TransitMapSpike.xcodeproj">
+               BlueprintIdentifier = "B3FC7B2192A6E13FD7DE3CA3"
+               BuildableName = "VeloMapsTests.xctest"
+               BlueprintName = "VeloMapsTests"
+               ReferencedContainer = "container:VeloMaps.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -46,10 +46,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "F9D02ED0BB6A5EB9F3B39860"
-            BuildableName = "TransitMapSpike.app"
-            BlueprintName = "TransitMapSpike"
-            ReferencedContainer = "container:TransitMapSpike.xcodeproj">
+            BlueprintIdentifier = "FC00F94EB1F92B3D74E51FBA"
+            BuildableName = "VeloMaps.app"
+            BlueprintName = "VeloMaps"
+            ReferencedContainer = "container:VeloMaps.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -58,10 +58,10 @@
             parallelizable = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "74385ABC49A30227085D7EF1"
-               BuildableName = "TransitMapSpikeUITests.xctest"
-               BlueprintName = "TransitMapSpikeUITests"
-               ReferencedContainer = "container:TransitMapSpike.xcodeproj">
+               BlueprintIdentifier = "B3FC7B2192A6E13FD7DE3CA3"
+               BuildableName = "VeloMapsTests.xctest"
+               BlueprintName = "VeloMapsTests"
+               ReferencedContainer = "container:VeloMaps.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -82,10 +82,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "F9D02ED0BB6A5EB9F3B39860"
-            BuildableName = "TransitMapSpike.app"
-            BlueprintName = "TransitMapSpike"
-            ReferencedContainer = "container:TransitMapSpike.xcodeproj">
+            BlueprintIdentifier = "FC00F94EB1F92B3D74E51FBA"
+            BuildableName = "VeloMaps.app"
+            BlueprintName = "VeloMaps"
+            ReferencedContainer = "container:VeloMaps.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -99,10 +99,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "F9D02ED0BB6A5EB9F3B39860"
-            BuildableName = "TransitMapSpike.app"
-            BlueprintName = "TransitMapSpike"
-            ReferencedContainer = "container:TransitMapSpike.xcodeproj">
+            BlueprintIdentifier = "FC00F94EB1F92B3D74E51FBA"
+            BuildableName = "VeloMaps.app"
+            BlueprintName = "VeloMaps"
+            ReferencedContainer = "container:VeloMaps.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

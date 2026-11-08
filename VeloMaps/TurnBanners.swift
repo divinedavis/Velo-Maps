@@ -38,18 +38,18 @@ struct TurnBannerClassic: View {
         if let m = trip.nextManeuver {
             HStack(spacing: 16) {
                 Image(systemName: m.icon)
-                    .font(.system(size: 40, weight: .bold))
+                    .scaledFont(40, .bold)
                     .foregroundStyle(Color.tripRed(scheme))
                     .frame(width: 56)
                 VStack(alignment: .leading, spacing: 0) {
                     Text(walkDistance(trip.metresToManeuver))
-                        .font(.system(size: 34, weight: .bold, design: .rounded)).monospacedDigit()
-                    Text(m.street).font(.system(size: 22, weight: .semibold))
+                        .scaledFont(34, .bold, .rounded).monospacedDigit()
+                    Text(m.street).scaledFont(22, .semibold)
                 }
                 Spacer(minLength: 0)
             }
             .padding(.horizontal, 18).padding(.vertical, 14)
-            .glassEffect(.regular, in: .rect(cornerRadius: 30))
+            .readableGlass(in: .rect(cornerRadius: 30))
             .accessibilityElement(children: .combine)
             .accessibilityIdentifier("turn-banner")
         }
@@ -67,21 +67,21 @@ struct TurnBannerLanes: View {
             VStack(spacing: 12) {
                 HStack(spacing: 14) {
                     Image(systemName: m.icon)
-                        .font(.system(size: 34, weight: .bold))
+                        .scaledFont(34, .bold)
                         .foregroundStyle(.white)
                         .frame(width: 58, height: 58)
                         .background(Color.tripRed(scheme), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                     VStack(alignment: .leading, spacing: 0) {
                         Text(walkDistance(trip.metresToManeuver))
-                            .font(.system(size: 30, weight: .bold, design: .rounded)).monospacedDigit()
-                        Text(m.instruction).font(.system(size: 16, weight: .semibold))
+                            .scaledFont(30, .bold, .rounded).monospacedDigit()
+                        Text(m.instruction).scaledFont(16, .semibold)
                     }
                     Spacer(minLength: 0)
                 }
                 HStack(spacing: 6) {
                     ForEach(trip.route.lanesAtNextTurn) { lane in
                         Image(systemName: lane.icon)
-                            .font(.system(size: 20, weight: .bold))
+                            .scaledFont(20, .bold)
                             .foregroundStyle(lane.active ? Color.white : Color.secondary.opacity(0.5))
                             .frame(maxWidth: .infinity, minHeight: 40)
                             .background(lane.active ? Color.tripRed(scheme) : Color.secondary.opacity(0.12),
@@ -90,7 +90,7 @@ struct TurnBannerLanes: View {
                 }
             }
             .padding(14)
-            .glassEffect(.regular, in: .rect(cornerRadius: 30))
+            .readableGlass(in: .rect(cornerRadius: 30))
             .accessibilityElement(children: .combine)
             .accessibilityIdentifier("turn-banner")
         }
@@ -107,19 +107,19 @@ struct TurnBannerIsland: View {
         if let m = trip.nextManeuver {
             HStack(spacing: 12) {
                 Image(systemName: m.icon)
-                    .font(.system(size: 18, weight: .bold))
+                    .scaledFont(18, .bold)
                     .foregroundStyle(.white)
                     .frame(width: 38, height: 38)
                     .background(Color.tripRed(scheme), in: Circle())
                 VStack(alignment: .leading, spacing: 0) {
                     Text(walkDistance(trip.metresToManeuver))
-                        .font(.system(size: 18, weight: .bold, design: .rounded)).monospacedDigit()
-                    Text(m.street).font(.system(size: 13, weight: .medium)).opacity(0.75)
+                        .scaledFont(18, .bold, .rounded).monospacedDigit()
+                    Text(m.street).scaledFont(13, .medium).opacity(0.75)
                 }
                 .foregroundStyle(.white)
                 Spacer(minLength: 0)
                 Text("\(trip.minutesLeft) min")
-                    .font(.system(size: 15, weight: .semibold)).monospacedDigit()
+                    .scaledFont(15, .semibold).monospacedDigit()
                     .foregroundStyle(.white.opacity(0.8))
                     .padding(.trailing, 8)
             }
@@ -142,18 +142,18 @@ struct TurnRowInCard: View {
         if let m = trip.nextManeuver {
             HStack(spacing: 12) {
                 Image(systemName: m.icon)
-                    .font(.system(size: 18, weight: .bold))
+                    .scaledFont(18, .bold)
                     .foregroundStyle(.white)
                     .frame(width: 40, height: 40)
                     .background(Color.tripRed(scheme), in: Circle())
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(m.instruction).font(.system(size: 16, weight: .bold))
+                    Text(m.instruction).scaledFont(16, .bold)
                     Text("then \(trip.followingManeuver?.instruction ?? "arrive")")
-                        .font(.system(size: 12, weight: .medium)).foregroundStyle(.secondary).lineLimit(1)
+                        .scaledFont(12, .medium).foregroundStyle(.secondary).lineLimit(1)
                 }
                 Spacer(minLength: 0)
                 Text(walkDistance(trip.metresToManeuver))
-                    .font(.system(size: 22, weight: .bold, design: .rounded)).monospacedDigit()
+                    .scaledFont(22, .bold, .rounded).monospacedDigit()
             }
             .padding(10)
             .background(Color.tripRed(scheme).opacity(0.10), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
@@ -171,17 +171,17 @@ struct TurnBannerThen: View {
 
     var body: some View {
         if let m = trip.nextManeuver {
-            GlassEffectContainer(spacing: 6) {
+            Group {   // no GlassEffectContainer: it draws merged glass over readableGlass text
                 VStack(alignment: .leading, spacing: 6) {
                     VStack(alignment: .leading, spacing: 10) {
                         HStack(spacing: 14) {
                             Image(systemName: m.icon)
-                                .font(.system(size: 38, weight: .heavy))
+                                .scaledFont(38, .heavy)
                                 .frame(width: 52)
                             VStack(alignment: .leading, spacing: 0) {
                                 Text(walkDistance(trip.metresToManeuver))
-                                    .font(.system(size: 32, weight: .bold, design: .rounded)).monospacedDigit()
-                                Text(m.street).font(.system(size: 20, weight: .semibold))
+                                    .scaledFont(32, .bold, .rounded).monospacedDigit()
+                                Text(m.street).scaledFont(20, .semibold)
                             }
                             Spacer(minLength: 0)
                         }
@@ -201,12 +201,12 @@ struct TurnBannerThen: View {
 
                     if let then = trip.followingManeuver {
                         HStack(spacing: 8) {
-                            Text("Then").font(.system(size: 14, weight: .semibold)).foregroundStyle(.secondary)
-                            Image(systemName: then.icon).font(.system(size: 14, weight: .bold))
-                            Text(then.instruction).font(.system(size: 14, weight: .semibold)).lineLimit(1)
+                            Text("Then").scaledFont(14, .semibold).foregroundStyle(.secondary)
+                            Image(systemName: then.icon).scaledFont(14, .bold)
+                            Text(then.instruction).scaledFont(14, .semibold).lineLimit(1)
                         }
-                        .padding(.horizontal, 14).frame(height: 38)
-                        .glassEffect(.regular, in: .capsule)
+                        .padding(.horizontal, 14).frame(minHeight: 38)
+                        .readableGlass(in: .capsule)
                     }
                 }
             }

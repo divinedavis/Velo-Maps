@@ -1,9 +1,11 @@
 import SwiftUI
 
 @main
-struct TransitMapSpikeApp: App {
+struct VeloMapsApp: App {
     @StateObject private var trip = Trip()
     @StateObject private var walk = Walk()
+
+    init() { Metrics.shared.start() }
 
     var body: some Scene {
         WindowGroup {
@@ -24,6 +26,7 @@ struct RideScreen: View {
             if trip.walking { walkScreen } else { rideScreen }
         }
         .preferredColorScheme(trip.night ? .dark : .light)
+        .dynamicTypeSize(...maxTextSize)
     }
 
     private var walkScreen: some View {

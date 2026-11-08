@@ -11,14 +11,17 @@ struct PotholeButton: View {
         Button(action: action) {
             HStack(spacing: 7) {
                 Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundStyle(amber)
-                Text("Pothole")
+                    .symbolRenderingMode(.palette)
+                    .foregroundStyle(.black, amber)
+                Text("Pothole").foregroundStyle(.primary)
             }
-            .font(.system(size: 15, weight: .semibold))
-            .padding(.horizontal, 6)
-            .frame(height: 34)
+            .scaledFont(15, .semibold)
         }
-        .buttonStyle(.glass)
+        .buttonStyle(.plain)
+        .padding(.horizontal, 16)
+        .frame(minHeight: 46)
+        .readableGlass(in: .capsule, interactive: true)
+        .contentShape(Capsule())
         .accessibilityLabel("Report a pothole")
         .accessibilityIdentifier("report-pothole")
     }
@@ -34,14 +37,16 @@ struct PotholeAheadPill: View {
                 .symbolRenderingMode(.palette)
                 .foregroundStyle(.black, amber)
             VStack(alignment: .leading, spacing: 0) {
-                Text("Pothole ahead").font(.system(size: 14, weight: .bold))
-                Text(walkDistance(metres)).font(.system(size: 12, weight: .semibold)).monospacedDigit()
-                    .foregroundStyle(.secondary)
+                Text("Pothole ahead").scaledFont(14, .bold).foregroundStyle(.black)
+                Text(walkDistance(metres)).scaledFont(12, .semibold).monospacedDigit()
+                    .foregroundStyle(Color.black.opacity(0.78))
             }
         }
         .padding(.leading, 10).padding(.trailing, 14)
-        .frame(height: 46)
-        .glassEffect(.regular.tint(amber.opacity(0.35)), in: .capsule)
+        .frame(minHeight: 46)
+        .padding(.vertical, 4)
+        .background(amber, in: Capsule())
+        .fixedSize(horizontal: false, vertical: true)
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("pothole-ahead")
     }
@@ -55,10 +60,11 @@ struct ReportToast: View {
             Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
             Text(text)
         }
-        .font(.system(size: 15, weight: .semibold))
+        .scaledFont(15, .semibold)
         .padding(.horizontal, 18)
-        .frame(height: 46)
-        .glassEffect(.regular, in: .capsule)
+        .frame(minHeight: 46)
+        .fixedSize(horizontal: false, vertical: true)
+        .readableGlass(in: .capsule)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("report-toast")
     }

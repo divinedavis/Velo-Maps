@@ -49,7 +49,7 @@ private struct LineBadge: View {
     @Environment(\.colorScheme) private var scheme
     var body: some View {
         Text(line)
-            .font(.system(size: size, weight: .heavy, design: .rounded))
+            .scaledFont(size, .heavy, .rounded)
             .foregroundStyle(.white)
             .padding(.horizontal, size * 0.5).padding(.vertical, size * 0.15)
             .background(Color.tripRed(scheme), in: RoundedRectangle(cornerRadius: size * 0.4, style: .continuous))
@@ -71,14 +71,14 @@ struct GlassSheetCard: View {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 6) {
                     LineBadge(line: trip.route.line)
-                    Text("→ \(trip.route.destination)").font(.system(size: 16, weight: .bold))
+                    Text("→ \(trip.route.destination)").scaledFont(16, .bold)
                     HStack(spacing: 16) {
                         stat("clock", "\(trip.minutesLeft)", "min")
                         stat("person.2.fill", "10", "passengers")
                     }
                 }
                 Spacer()
-                Button {} label: { Image(systemName: "chevron.down").font(.system(size: 14, weight: .bold)) }
+                Button {} label: { Image(systemName: "chevron.down").scaledFont(14, .bold) }
                     .buttonStyle(.glass)
                     .buttonBorderShape(.circle)
             }
@@ -90,25 +90,25 @@ struct GlassSheetCard: View {
                     Spacer()
                     Text("Hold to end").opacity(0.9)
                 }
-                .font(.system(size: 15, weight: .semibold))
+                .scaledFont(15, .semibold)
                 .foregroundStyle(.white)
                 .padding(.horizontal, 18)
-                .frame(height: 50)
+                .frame(minHeight: 50)
                 .glassEffect(.regular.tint(Color.tripRed(scheme)).interactive(), in: .capsule)
             }
             .modifier(HoldToEnd(trip: trip))
         }
         .padding(16)
-        .glassEffect(.regular, in: .rect(cornerRadius: 34))
+        .readableGlass(in: .rect(cornerRadius: 34))
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("trip-card")
     }
 
     private func stat(_ icon: String, _ value: String, _ unit: String) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 4) {
-            Image(systemName: icon).font(.system(size: 12, weight: .semibold)).foregroundStyle(.secondary)
-            Text(value).font(.system(size: 22, weight: .bold, design: .rounded)).monospacedDigit()
-            Text(unit).font(.system(size: 12, weight: .medium)).foregroundStyle(.secondary)
+            Image(systemName: icon).scaledFont(12, .semibold).foregroundStyle(.secondary)
+            Text(value).scaledFont(22, .bold, .rounded).monospacedDigit()
+            Text(unit).scaledFont(12, .medium).foregroundStyle(.secondary)
         }
     }
 
@@ -123,7 +123,7 @@ struct GlassSheetCard: View {
                         .overlay(Circle().strokeBorder(Color.tripRed(scheme).opacity(i < next ? 0.35 : 1), lineWidth: 2))
                         .frame(width: 10, height: 10)
                     Text(trip.route.stops[i].name)
-                        .font(.system(size: 14, weight: i == next ? .bold : .medium))
+                        .scaledFont(14, i == next ? .bold : .medium)
                         .foregroundStyle(i < next ? .tertiary : .primary)
                 }
             }
@@ -138,16 +138,16 @@ struct GlassPillCard: View {
     @Environment(\.colorScheme) private var scheme
 
     var body: some View {
-        GlassEffectContainer(spacing: 10) {
+        Group {   // no GlassEffectContainer: it draws merged glass over readableGlass text
             HStack(spacing: 10) {
                 HStack(spacing: 12) {
                     LineBadge(line: trip.route.line, size: 17)
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Next · \(trip.nextStopName)")
-                            .font(.system(size: 15, weight: .bold))
+                            .scaledFont(15, .bold)
                             .lineLimit(1)
                         Text("\(trip.minutesLeft) min to \(shortDest) · 10 aboard")
-                            .font(.system(size: 12, weight: .medium))
+                            .scaledFont(12, .medium)
                             .foregroundStyle(.secondary)
                             .monospacedDigit()
                             .lineLimit(1)
@@ -155,11 +155,11 @@ struct GlassPillCard: View {
                     Spacer(minLength: 0)
                 }
                 .padding(.horizontal, 14)
-                .frame(height: 66)
-                .glassEffect(.regular, in: .capsule)
+                .frame(minHeight: 66)
+                .readableGlass(in: .capsule)
 
                 Image(systemName: "stop.fill")
-                    .font(.system(size: 20, weight: .bold))
+                    .scaledFont(20, .bold)
                     .foregroundStyle(.white)
                     .frame(width: 66, height: 66)
                     .glassEffect(.regular.tint(Color.tripRed(scheme)).interactive(), in: .circle)
@@ -183,20 +183,20 @@ struct GlassClusterCard: View {
     @Environment(\.colorScheme) private var scheme
 
     var body: some View {
-        GlassEffectContainer(spacing: 8) {
+        Group {   // no GlassEffectContainer: it draws merged glass over readableGlass text
             VStack(spacing: 8) {
                 HStack {
                     HStack(spacing: 8) {
                         LineBadge(line: trip.route.line)
-                        Text("→ \(trip.route.destination)").font(.system(size: 15, weight: .bold))
+                        Text("→ \(trip.route.destination)").scaledFont(15, .bold)
                     }
-                    .padding(.horizontal, 12).frame(height: 44)
-                    .glassEffect(.regular, in: .capsule)
+                    .padding(.horizontal, 12).frame(minHeight: 44)
+                    .readableGlass(in: .capsule)
                     Spacer()
                     Image(systemName: "chevron.down")
-                        .font(.system(size: 14, weight: .bold))
+                        .scaledFont(14, .bold)
                         .frame(width: 44, height: 44)
-                        .glassEffect(.regular.interactive(), in: .circle)
+                        .readableGlass(in: .circle, interactive: true)
                 }
                 HStack(spacing: 8) {
                     tile(title: "Next stop", value: trip.nextStopName.replacingOccurrences(of: "CPW / ", with: ""), big: false)
@@ -210,10 +210,10 @@ struct GlassClusterCard: View {
                         Spacer()
                         Text("Hold to end")
                     }
-                    .font(.system(size: 15, weight: .semibold))
+                    .scaledFont(15, .semibold)
                     .foregroundStyle(.white)
                     .padding(.horizontal, 18)
-                    .frame(height: 52)
+                    .frame(minHeight: 52)
                     .glassEffect(.regular.tint(Color.tripRed(scheme)).interactive(), in: .rect(cornerRadius: 22))
                 }
                 .modifier(HoldToEnd(trip: trip))
@@ -226,15 +226,15 @@ struct GlassClusterCard: View {
 
     private func tile(title: String, value: String, big: Bool) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(title).font(.system(size: 11, weight: .semibold)).foregroundStyle(.secondary).textCase(.uppercase)
+            Text(title).scaledFont(11, .semibold).foregroundStyle(.secondary).textCase(.uppercase)
             Text(value)
-                .font(.system(size: big ? 24 : 16, weight: .bold, design: .rounded))
+                .scaledFont(big ? 24 : 16, .bold, .rounded)
                 .monospacedDigit()
                 .lineLimit(1).minimumScaleFactor(0.7)
         }
         .frame(maxWidth: .infinity, minHeight: 64, alignment: .leading)
         .padding(.horizontal, 12)
-        .glassEffect(.regular, in: .rect(cornerRadius: 20))
+        .readableGlass(in: .rect(cornerRadius: 20))
     }
 }
 
@@ -256,8 +256,10 @@ struct GlassHeroCard: View {
             Capsule()
                 .fill(Color.secondary.opacity(0.45))
                 .frame(width: 38, height: 5)
+                .frame(width: 120, height: 44)          // 44 pt touch target (audit)
+                .contentShape(Rectangle())
                 .frame(maxWidth: .infinity)
-                .padding(.top, -6)
+                .padding(.top, -24).padding(.bottom, -14)
                 .accessibilityLabel(expanded ? "Hide navigation settings" : "Show navigation settings")
                 .accessibilityAddTraits(.isButton)
                 .accessibilityIdentifier("card-grabber")
@@ -267,32 +269,32 @@ struct GlassHeroCard: View {
             HStack(alignment: .lastTextBaseline) {
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
                     Text("\(trip.minutesLeft)")
-                        .font(.system(size: 64, weight: .bold, design: .rounded))
+                        .scaledFont(64, .bold, .rounded)
                         .monospacedDigit()
-                    Text("min").font(.system(size: 22, weight: .semibold)).foregroundStyle(.secondary)
+                    Text("min").scaledFont(22, .medium).foregroundStyle(.primary)
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 6) {
                     LineBadge(line: trip.route.line)
-                    Text("to \(trip.route.destination)").font(.system(size: 14, weight: .semibold))
+                    Text("to \(trip.route.destination)").scaledFont(14, .semibold)
                         .accessibilityIdentifier("trip-destination")
                     Label("10 aboard", systemImage: "person.2.fill")
-                        .font(.system(size: 12, weight: .medium)).foregroundStyle(.secondary)
+                        .scaledFont(12, .semibold).foregroundStyle(.primary)
                 }
             }
             Text("Next: \(trip.nextStopName)")
-                .font(.system(size: 14, weight: .bold))
+                .scaledFont(14, .bold)
                 .accessibilityIdentifier("next-stop")
             TimelineView(.periodic(from: .now, by: 1)) { _ in
                 HStack {
                     Text("Hold to end ride")
                     Spacer()
-                    Text(clock(trip.elapsed)).monospacedDigit().opacity(0.85)
+                    Text(clock(trip.elapsed)).monospacedDigit()
                 }
-                .font(.system(size: 15, weight: .semibold))
+                .scaledFont(15, .semibold)
                 .foregroundStyle(.white)
                 .padding(.horizontal, 18)
-                .frame(height: 50)
+                .frame(minHeight: 50)
                 .glassEffect(.regular.tint(Color.tripRed(scheme)).interactive(), in: .capsule)
             }
             .modifier(HoldToEnd(trip: trip))
@@ -303,7 +305,7 @@ struct GlassHeroCard: View {
             }
         }
         .padding(18)
-        .glassEffect(.regular, in: .rect(cornerRadius: 36))
+        .readableGlass(in: .rect(cornerRadius: 36))
         // Follows the finger a little while dragging, then snaps open or closed.
         .offset(y: max(-40, min(40, drag * 0.35)))
         // Simultaneous so the buttons and hold gesture inside the card don't swallow the swipe;
@@ -337,8 +339,8 @@ private struct NavSettings: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Navigation settings")
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(.secondary)
+                .scaledFont(13, .semibold)
+                .foregroundStyle(Color.primary.opacity(0.7))
                 .textCase(.uppercase)
                 .padding(.top, 4)
                 .accessibilityIdentifier("nav-settings")
@@ -353,10 +355,12 @@ private struct NavSettings: View {
                     } label: {
                         HStack(spacing: 4) {
                             Text(stopAlert)
-                            Image(systemName: "chevron.up.chevron.down").font(.system(size: 11, weight: .semibold))
+                            Image(systemName: "chevron.up.chevron.down").scaledFont(11, .semibold)
                         }
-                        .font(.system(size: 15))
-                        .foregroundStyle(.secondary)
+                        .scaledFont(15, .medium)
+                        .foregroundStyle(Color.primary.opacity(0.75))
+                        .frame(minHeight: 44)
+                        .contentShape(Rectangle())
                     }
                 }
                 Divider().padding(.leading, 44)
@@ -376,10 +380,13 @@ private struct NavSettings: View {
             .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
             Button {} label: {
                 Label("Share trip progress", systemImage: "square.and.arrow.up")
-                    .font(.system(size: 15, weight: .semibold))
-                    .frame(maxWidth: .infinity, minHeight: 34)
+                    .scaledFont(15, .semibold)
+                    .foregroundStyle(Color.tripRed(.light))
+                    .frame(maxWidth: .infinity, minHeight: 46)
+                    .background(Color.secondary.opacity(0.08), in: Capsule())
+                    .contentShape(Capsule())
             }
-            .buttonStyle(.glass)
+            .buttonStyle(.plain)
         }
         .tint(Color.tripRed(.light))
     }
@@ -387,10 +394,11 @@ private struct NavSettings: View {
     private func row<Accessory: View>(_ icon: String, _ title: String, @ViewBuilder accessory: () -> Accessory) -> some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
-                .font(.system(size: 15, weight: .semibold))
+                .scaledFont(15, .semibold)
                 .foregroundStyle(.secondary)
                 .frame(width: 22)
-            Text(title).font(.system(size: 15, weight: .medium))
+                .accessibilityHidden(true)   // decorative; the row's text says it
+            Text(title).scaledFont(15, .medium)
             Spacer(minLength: 8)
             accessory()
         }
@@ -410,13 +418,13 @@ struct GlassActivityCard: View {
             HStack(spacing: 8) {
                 LineBadge(line: trip.route.line)
                 Text(trip.route.stops.first!.name.replacingOccurrences(of: "CPW / ", with: ""))
-                    .font(.system(size: 13, weight: .medium)).foregroundStyle(.secondary)
-                Image(systemName: "arrow.right").font(.system(size: 11, weight: .bold)).foregroundStyle(.secondary)
+                    .scaledFont(13, .medium).foregroundStyle(.secondary)
+                Image(systemName: "arrow.right").scaledFont(11, .bold).foregroundStyle(.secondary)
                 Text(trip.route.destination.replacingOccurrences(of: "CPW / ", with: ""))
-                    .font(.system(size: 13, weight: .bold))
+                    .scaledFont(13, .bold)
                 Spacer()
                 Text("\(trip.minutesLeft) min")
-                    .font(.system(size: 20, weight: .bold, design: .rounded)).monospacedDigit()
+                    .scaledFont(20, .bold, .rounded).monospacedDigit()
             }
             GeometryReader { g in
                 let x = max(14, min(g.size.width - 14, g.size.width * trip.progress))
@@ -424,7 +432,7 @@ struct GlassActivityCard: View {
                     Capsule().fill(Color.secondary.opacity(0.25)).frame(height: 6)
                     Capsule().fill(red).frame(width: x, height: 6)
                     Image(systemName: "bus.fill")
-                        .font(.system(size: 13, weight: .bold))
+                        .scaledFont(13, .bold)
                         .foregroundStyle(.white)
                         .frame(width: 28, height: 28)
                         .background(red, in: Circle())
@@ -440,28 +448,28 @@ struct GlassActivityCard: View {
                 Spacer()
                 Label("10", systemImage: "person.2.fill").foregroundStyle(.secondary)
             }
-            .font(.system(size: 13))
+            .scaledFont(13)
             TimelineView(.periodic(from: .now, by: 1)) { _ in
                 HStack(spacing: 12) {
                     Image(systemName: "stop.fill")
-                        .font(.system(size: 14, weight: .bold))
+                        .scaledFont(14, .bold)
                         .foregroundStyle(.white)
                         .frame(width: 42, height: 42)
                         .background(red, in: Circle())
-                    Text("Hold to end").font(.system(size: 15, weight: .semibold))
+                    Text("Hold to end").scaledFont(15, .semibold)
                     Spacer()
-                    Text(clock(trip.elapsed)).font(.system(size: 15, weight: .semibold)).monospacedDigit()
+                    Text(clock(trip.elapsed)).scaledFont(15, .semibold).monospacedDigit()
                         .foregroundStyle(.secondary)
                         .padding(.trailing, 14)
                 }
                 .padding(4)
-                .glassEffect(.regular.interactive(), in: .capsule)
+                .readableGlass(in: .capsule, interactive: true)
             }
             .modifier(HoldToEnd(trip: trip))
             .clipShape(Capsule())
         }
         .padding(16)
-        .glassEffect(.regular, in: .rect(cornerRadius: 32))
+        .readableGlass(in: .rect(cornerRadius: 32))
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("trip-card")
     }

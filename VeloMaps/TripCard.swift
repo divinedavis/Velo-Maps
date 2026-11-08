@@ -28,12 +28,12 @@ struct TripCard: View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 6) {
                 Text(trip.route.line)
-                    .font(.system(size: 15, weight: .heavy, design: .rounded))
+                    .scaledFont(15, .heavy, .rounded)
                     .foregroundStyle(.white)
                     .padding(.horizontal, 7).padding(.vertical, 2)
                     .background(busRed, in: RoundedRectangle(cornerRadius: 5, style: .continuous))
                 Text("→ \(trip.route.destination)")
-                    .font(.system(size: 15, weight: .bold))
+                    .scaledFont(15, .bold)
                     .accessibilityIdentifier("trip-destination")
                 HStack(spacing: 14) {
                     stat(icon: "clock", value: "\(trip.minutesLeft)", unit: "min")
@@ -43,7 +43,7 @@ struct TripCard: View {
             Spacer()
             Button { withAnimation(.snappy) { expanded.toggle() } } label: {
                 Image(systemName: expanded ? "chevron.down" : "chevron.up")
-                    .font(.system(size: 13, weight: .bold))
+                    .scaledFont(13, .bold)
                     .foregroundStyle(.secondary)
                     .frame(width: 30, height: 30)
                     .background(.white.opacity(0.7), in: Circle())
@@ -55,9 +55,9 @@ struct TripCard: View {
 
     private func stat(icon: String, value: String, unit: String) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 4) {
-            Image(systemName: icon).font(.system(size: 12, weight: .semibold)).foregroundStyle(.secondary)
-            Text(value).font(.system(size: 20, weight: .bold, design: .rounded)).monospacedDigit()
-            Text(unit).font(.system(size: 11, weight: .medium)).foregroundStyle(.secondary)
+            Image(systemName: icon).scaledFont(12, .semibold).foregroundStyle(.secondary)
+            Text(value).scaledFont(20, .bold, .rounded).monospacedDigit()
+            Text(unit).scaledFont(11, .medium).foregroundStyle(.secondary)
         }
     }
 
@@ -80,14 +80,14 @@ struct TripCard: View {
     private var holdButton: some View {
         TimelineView(.periodic(from: .now, by: 1)) { _ in
             HStack {
-                Image(systemName: "stopwatch").font(.system(size: 14, weight: .semibold))
-                Text(clock(trip.elapsed)).font(.system(size: 15, weight: .semibold)).monospacedDigit()
+                Image(systemName: "stopwatch").scaledFont(14, .semibold)
+                Text(clock(trip.elapsed)).scaledFont(15, .semibold).monospacedDigit()
                 Spacer()
-                Text("Hold to end").font(.system(size: 13, weight: .semibold)).opacity(0.9)
+                Text("Hold to end").scaledFont(13, .semibold).opacity(0.9)
             }
             .foregroundStyle(.white)
             .padding(.horizontal, 14)
-            .frame(height: 46)
+            .frame(minHeight: 46)
             .background(alignment: .leading) {
                 GeometryReader { g in
                     ZStack(alignment: .leading) {
@@ -137,7 +137,7 @@ private struct StopRow: View {
             }
             .frame(width: 14, height: 20)
             Text(name)
-                .font(.system(size: 13, weight: state == .next ? .bold : .medium))
+                .scaledFont(13, state == .next ? .bold : .medium)
                 .foregroundStyle(state == .passed ? Color.secondary : Color.primary)
                 .opacity(state == .passed ? 0.6 : 1)
         }

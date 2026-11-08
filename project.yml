@@ -1,4 +1,4 @@
-name: TransitMapSpike
+name: VeloMaps
 options:
   bundleIdPrefix: com.divinedavis
   deploymentTarget:
@@ -6,35 +6,63 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "0.1"
-    CURRENT_PROJECT_VERSION: "1"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "0"
+    DEVELOPMENT_TEAM: CG89RY4W6R
+    CODE_SIGN_STYLE: Automatic
 targets:
-  TransitMapSpike:
+  VeloMaps:
     type: application
     platform: iOS
-    sources: [TransitMapSpike]
+    sources: [VeloMaps]
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.divinedavis.transitmapspike
+        PRODUCT_BUNDLE_IDENTIFIER: com.divinedavis.velomaps
+        PRODUCT_NAME: VeloMaps
         GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Velo Maps
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.navigation
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         TARGETED_DEVICE_FAMILY: "1"
-  TransitMapSpikeUITests:
-    type: bundle.ui-testing
+  VeloMapsTests:
+    type: bundle.unit-test
     platform: iOS
-    sources: [TransitMapSpikeUITests]
+    sources: [VeloMapsTests]
     dependencies:
-      - target: TransitMapSpike
+      - target: VeloMaps
     settings:
       base:
         GENERATE_INFOPLIST_FILE: YES
-        TEST_TARGET_NAME: TransitMapSpike
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/VeloMaps.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/VeloMaps"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+  VeloMapsUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [VeloMapsUITests]
+    dependencies:
+      - target: VeloMaps
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: VeloMaps
 schemes:
-  TransitMapSpike:
+  # App + UI tests (audit, perf). The app built here must NOT host the unit tests: hosting
+  # embeds XCTest frameworks + an inject dylib into the app, and on 11/7 such apps crashed in
+  # dyld_sim before main once installed over a previous build. Unit tests get their own scheme.
+  VeloMaps:
     build:
       targets:
-        TransitMapSpike: all
-        TransitMapSpikeUITests: [test]
+        VeloMaps: all
+        VeloMapsUITests: [test]
     test:
-      targets: [TransitMapSpikeUITests]
+      targets: [VeloMapsUITests]
+  VeloMapsUnit:
+    build:
+      targets:
+        VeloMaps: all
+        VeloMapsTests: [test]
+    test:
+      targets: [VeloMapsTests]

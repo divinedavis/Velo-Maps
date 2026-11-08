@@ -47,12 +47,14 @@ struct ReportMenuButton: View {
             withAnimation(.spring(response: 0.32, dampingFraction: 0.8)) { isOpen.toggle() }
         } label: {
             Image(systemName: "plus")
-                .font(.system(size: 20, weight: .semibold))
+                .scaledFont(20, .semibold)
+                .foregroundStyle(.primary)
                 .rotationEffect(.degrees(isOpen ? 45 : 0))   // + becomes ×
-                .frame(width: 34, height: 34)
         }
-        .buttonStyle(.glass)
-        .buttonBorderShape(.circle)
+        .buttonStyle(.plain)
+        .frame(width: 46, height: 46)
+        .readableGlass(in: .circle, interactive: true)
+        .contentShape(Circle())
         .accessibilityLabel(isOpen ? "Close report menu" : "Report police, accidents and more")
         .accessibilityIdentifier("report-menu")
         .overlay(alignment: .bottomTrailing) {
@@ -73,12 +75,12 @@ struct ReportMenuButton: View {
                 } label: {
                     HStack(spacing: 12) {
                         Image(systemName: kind.icon)
-                            .font(.system(size: 14, weight: .semibold))
+                            .scaledFont(14, .semibold)
                             .foregroundStyle(.white)
                             .frame(width: 32, height: 32)
                             .background(kind.color, in: Circle())
                         Text(kind.rawValue)
-                            .font(.system(size: 16, weight: .medium))
+                            .scaledFont(16, .medium)
                             .foregroundStyle(.primary)
                         Spacer(minLength: 0)
                     }
@@ -92,6 +94,7 @@ struct ReportMenuButton: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .frame(width: 220)
-        .glassEffect(.regular, in: .rect(cornerRadius: 26))
+        .fixedSize(horizontal: false, vertical: true)
+        .readableGlass(in: .rect(cornerRadius: 26))
     }
 }

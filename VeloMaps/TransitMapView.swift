@@ -81,9 +81,16 @@ struct TransitMapView: UIViewRepresentable {
             new.forEach { shownPotholes.insert($0.id) }
         }
 
+        /// Frames in a row where the bus already sat where it should; once settled while
+        /// paused, the camera stops being re-set so the map (and the glass over it) can idle.
+        private var settledFrames = 0
+        private var lastCardTop: CGFloat = -1
+
         @objc private func tick(_ link: CADisplayLink) {
             let dt = lastTick == 0 ? 0 : min(link.timestamp - lastTick, 0.1)
             lastTick = link.timestamp
+            if cardTop != lastCardTop { settledFrames = 0; lastCardTop = cardTop }
+            if trip.paused && settledFrames > 30 { return }   // nothing moving: let the map idle
             trip.advance(by: dt)
             placeCamera()
         }
@@ -110,6 +117,7 @@ struct TransitMapView: UIViewRepresentable {
             guard y.isFinite else { return }
             let error = Double((cardTop - trip.busGap) - y)
             leadMetres = min(max(leadMetres + error * 0.12, -250), 250)
+            settledFrames = abs(error) < 0.5 ? settledFrames + 1 : 0
         }
 
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {

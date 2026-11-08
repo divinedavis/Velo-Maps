@@ -6,7 +6,7 @@ private struct ETALine: View {
     @ObservedObject var walk: Walk
     var body: some View {
         Text("\(walk.minutesLeft) min · \(walkDistance(walk.metresLeft)) · Arrive \(walk.arrivalText)")
-            .font(.system(size: 13, weight: .medium))
+            .scaledFont(13, .medium)
             .foregroundStyle(.secondary)
             .monospacedDigit()
     }
@@ -15,7 +15,7 @@ private struct ETALine: View {
 private struct EndButton: View {
     var body: some View {
         Button("End") {}
-            .font(.system(size: 15, weight: .semibold))
+            .scaledFont(15, .semibold)
             .buttonStyle(.glass)
     }
 }
@@ -31,31 +31,31 @@ struct WalkTurnLayout: View {
             if let step = walk.current {
                 HStack(spacing: 14) {
                     Image(systemName: step.icon)
-                        .font(.system(size: 30, weight: .bold))
+                        .scaledFont(30, .bold)
                         .foregroundStyle(.white)
                         .frame(width: 58, height: 58)
                         .glassEffect(.regular.tint(Color.tripRed(scheme)), in: .rect(cornerRadius: 18))
                     VStack(alignment: .leading, spacing: 2) {
                         Text(walkDistance(walk.metresToTurn))
-                            .font(.system(size: 30, weight: .bold, design: .rounded)).monospacedDigit()
-                        Text(step.instruction).font(.system(size: 15, weight: .semibold)).lineLimit(2)
+                            .scaledFont(30, .bold, .rounded).monospacedDigit()
+                        Text(step.instruction).scaledFont(15, .semibold).lineLimit(2)
                     }
                     Spacer(minLength: 0)
                 }
                 .padding(12)
-                .glassEffect(.regular, in: .rect(cornerRadius: 28))
+                .readableGlass(in: .rect(cornerRadius: 28))
             }
             Spacer()
             HStack {
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(walk.destinationName).font(.system(size: 17, weight: .bold))
+                    Text(walk.destinationName).scaledFont(17, .bold)
                     ETALine(walk: walk)
                 }
                 Spacer()
                 EndButton()
             }
             .padding(.horizontal, 18).padding(.vertical, 14)
-            .glassEffect(.regular, in: .rect(cornerRadius: 30))
+            .readableGlass(in: .rect(cornerRadius: 30))
         }
     }
 }
@@ -74,38 +74,38 @@ struct WalkHandoffLayout: View {
             VStack(alignment: .leading, spacing: 16) {
                 HStack(spacing: 10) {
                     Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 26)).foregroundStyle(.green)
+                        .scaledFont(26).foregroundStyle(.green)
                     VStack(alignment: .leading, spacing: 1) {
-                        Text("You're off the \(line)").font(.system(size: 17, weight: .bold))
-                        Text("Dropped at \(stop)").font(.system(size: 13)).foregroundStyle(.secondary)
+                        Text("You're off the \(line)").scaledFont(17, .bold)
+                        Text("Dropped at \(stop)").scaledFont(13).foregroundStyle(.secondary)
                     }
                 }
                 Divider()
                 HStack(spacing: 12) {
                     Image(systemName: "figure.walk")
-                        .font(.system(size: 20, weight: .bold))
+                        .scaledFont(20, .bold)
                         .frame(width: 44, height: 44)
-                        .glassEffect(.regular, in: .circle)
+                        .readableGlass(in: .circle)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Walk to \(walk.destinationName)").font(.system(size: 16, weight: .semibold))
+                        Text("Walk to \(walk.destinationName)").scaledFont(16, .semibold)
                         ETALine(walk: walk)
                     }
                 }
                 HStack(spacing: 10) {
                     Button {} label: {
-                        Text("Not now").font(.system(size: 16, weight: .semibold)).frame(maxWidth: .infinity, minHeight: 34)
+                        Text("Not now").scaledFont(16, .semibold).frame(maxWidth: .infinity, minHeight: 34)
                     }
                     .buttonStyle(.glass)
                     Button {} label: {
                         Label("Start walking", systemImage: "figure.walk")
-                            .font(.system(size: 16, weight: .semibold)).frame(maxWidth: .infinity, minHeight: 34)
+                            .scaledFont(16, .semibold).frame(maxWidth: .infinity, minHeight: 34)
                     }
                     .buttonStyle(.glassProminent)
                     .tint(Color.tripRed(scheme))
                 }
             }
             .padding(18)
-            .glassEffect(.regular, in: .rect(cornerRadius: 34))
+            .readableGlass(in: .rect(cornerRadius: 34))
         }
     }
 }
@@ -122,13 +122,13 @@ struct WalkStepsLayout: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(alignment: .firstTextBaseline) {
                     Text("\(walk.minutesLeft) min")
-                        .font(.system(size: 28, weight: .bold, design: .rounded)).monospacedDigit()
-                    Text("walk").font(.system(size: 17, weight: .semibold)).foregroundStyle(.secondary)
+                        .scaledFont(28, .bold, .rounded).monospacedDigit()
+                    Text("walk").scaledFont(17, .semibold).foregroundStyle(.secondary)
                     Spacer()
                     EndButton()
                 }
                 Text("to \(walk.destinationName) · \(walkDistance(walk.metresLeft)) · Arrive \(walk.arrivalText)")
-                    .font(.system(size: 13, weight: .medium)).foregroundStyle(.secondary)
+                    .scaledFont(13, .medium).foregroundStyle(.secondary)
                 VStack(spacing: 4) {
                     ForEach(walk.steps.prefix(5)) { step in
                         StepRow(step: step, isCurrent: step.id == walk.current?.id,
@@ -137,7 +137,7 @@ struct WalkStepsLayout: View {
                 }
             }
             .padding(18)
-            .glassEffect(.regular, in: .rect(cornerRadius: 34))
+            .readableGlass(in: .rect(cornerRadius: 34))
         }
     }
 }
@@ -151,16 +151,16 @@ private struct StepRow: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: step.icon)
-                .font(.system(size: 15, weight: .bold))
+                .scaledFont(15, .bold)
                 .foregroundStyle(isCurrent ? .white : .primary)
                 .frame(width: 34, height: 34)
                 .background(isCurrent ? red : Color.secondary.opacity(0.15), in: Circle())
             Text(step.instruction)
-                .font(.system(size: 14, weight: isCurrent ? .bold : .medium))
+                .scaledFont(14, isCurrent ? .bold : .medium)
                 .lineLimit(1)
             Spacer()
             Text(walkDistance(step.length))
-                .font(.system(size: 13, weight: .medium)).foregroundStyle(.secondary).monospacedDigit()
+                .scaledFont(13, .medium).foregroundStyle(.secondary).monospacedDigit()
         }
         .padding(.horizontal, 8).padding(.vertical, 5)
         .opacity(isDone ? 0.4 : 1)
@@ -181,38 +181,41 @@ struct WalkGlanceLayout: View {
     var body: some View {
         VStack {
             Spacer()
-            GlassEffectContainer(spacing: 12) {
+            Group {   // no GlassEffectContainer: it draws merged glass over readableGlass text
                 VStack(spacing: 12) {
                     HStack(spacing: 18) {
                         Image(systemName: walk.current?.icon ?? "arrow.up")
-                            .font(.system(size: 54, weight: .heavy))
+                            .accessibilityHidden(true)   // the instruction text says the turn
+                            .scaledFont(54, .heavy)
                             .foregroundStyle(.white)
                             .frame(width: 104, height: 104)
                             .glassEffect(.regular.tint(Color.tripRed(scheme)), in: .circle)
                         VStack(alignment: .leading, spacing: 4) {
                             Text(walkDistance(walk.metresToTurn))
-                                .font(.system(size: 44, weight: .bold, design: .rounded)).monospacedDigit()
+                                .scaledFont(44, .bold, .rounded).monospacedDigit()
                             Text(walk.current?.instruction ?? "")
-                                .font(.system(size: 15, weight: .semibold)).lineLimit(2)
+                                .scaledFont(15, .semibold)
+                                .fixedSize(horizontal: false, vertical: true)
                             if let then = walk.following {
                                 Text("Then: \(then.instruction)")
-                                    .font(.system(size: 12, weight: .medium)).foregroundStyle(.secondary).lineLimit(1)
+                                    .scaledFont(12, .semibold).foregroundStyle(.primary)
                             }
                         }
                         Spacer(minLength: 0)
                     }
                     .padding(16)
-                    .glassEffect(.regular, in: .rect(cornerRadius: 34))
+                    .readableGlass(in: .rect(cornerRadius: 34))
 
                     HStack {
                         Image(systemName: "theatermasks.fill").foregroundStyle(Color.tripRed(scheme))
-                        Text(walk.destinationName).font(.system(size: 14, weight: .semibold))
+                            .accessibilityHidden(true)
+                        Text(walk.destinationName).scaledFont(14, .semibold)
                         Spacer()
                         Text("\(walk.minutesLeft) min · \(walk.arrivalText)")
-                            .font(.system(size: 14, weight: .semibold)).monospacedDigit()
+                            .scaledFont(14, .semibold).monospacedDigit()
                     }
-                    .padding(.horizontal, 18).frame(height: 48)
-                    .glassEffect(.regular.interactive(), in: .capsule)
+                    .padding(.horizontal, 18).frame(minHeight: 48)
+                    .readableGlass(in: .capsule, interactive: true)
                 }
             }
         }
@@ -229,28 +232,28 @@ struct WalkActivityLayout: View {
         VStack {
             HStack(spacing: 10) {
                 Image(systemName: walk.current?.icon ?? "arrow.up")
-                    .font(.system(size: 16, weight: .bold))
+                    .scaledFont(16, .bold)
                     .foregroundStyle(.white)
                     .frame(width: 34, height: 34)
                     .background(Color.tripRed(scheme), in: Circle())
                 VStack(alignment: .leading, spacing: 0) {
-                    Text(walkDistance(walk.metresToTurn)).font(.system(size: 16, weight: .bold)).monospacedDigit()
-                    Text(shortInstruction).font(.system(size: 12, weight: .medium)).foregroundStyle(.secondary).lineLimit(1)
+                    Text(walkDistance(walk.metresToTurn)).scaledFont(16, .bold).monospacedDigit()
+                    Text(shortInstruction).scaledFont(12, .medium).foregroundStyle(.secondary).lineLimit(1)
                 }
                 Spacer()
                 Image(systemName: "figure.walk").foregroundStyle(.secondary)
-                Text("\(walk.minutesLeft) min").font(.system(size: 16, weight: .bold)).monospacedDigit()
+                Text("\(walk.minutesLeft) min").scaledFont(16, .bold).monospacedDigit()
             }
-            .padding(.horizontal, 10).frame(height: 56)
-            .glassEffect(.regular, in: .capsule)
+            .padding(.horizontal, 10).frame(minHeight: 56)
+            .readableGlass(in: .capsule)
             .padding(.horizontal, 24)
             .padding(.top, 2)
             Spacer()
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
-                    Text(walk.destinationName).font(.system(size: 16, weight: .bold))
+                    Text(walk.destinationName).scaledFont(16, .bold)
                     Spacer()
-                    Text("Arrive \(walk.arrivalText)").font(.system(size: 14, weight: .semibold)).monospacedDigit()
+                    Text("Arrive \(walk.arrivalText)").scaledFont(14, .semibold).monospacedDigit()
                 }
                 GeometryReader { g in
                     let total = walk.path?.length ?? 1
@@ -262,13 +265,13 @@ struct WalkActivityLayout: View {
                 }
                 .frame(height: 6)
                 HStack {
-                    Text("\(walkDistance(walk.metresLeft)) left").font(.system(size: 13)).foregroundStyle(.secondary)
+                    Text("\(walkDistance(walk.metresLeft)) left").scaledFont(13).foregroundStyle(.secondary)
                     Spacer()
                     EndButton()
                 }
             }
             .padding(16)
-            .glassEffect(.regular, in: .rect(cornerRadius: 30))
+            .readableGlass(in: .rect(cornerRadius: 30))
         }
     }
 
