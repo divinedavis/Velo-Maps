@@ -1,0 +1,5 @@
+Every button and setting now does what it says. Voice guidance speaks each turn as it comes up, for example "In 300 feet, turn left onto W 96 St", and says "Pothole ahead" when one is coming.
+
+Stop alert tells you, on screen and out loud, when your stop is next (or two stops away, or as you arrive, depending on what you pick). Map appearance switches between Auto, Day and Night. Turning off 3D buildings gives a flat map seen from above. Turning off reported potholes hides their signs and alerts. Share trip progress opens the share sheet with your route and arrival time.
+
+Reporting Police, an accident or a closed road now puts a marker on the map, and the walking screen has an End button to go back to your ride.

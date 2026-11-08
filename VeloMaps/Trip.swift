@@ -1,6 +1,13 @@
 import Foundation
 import CoreLocation
 
+/// A Police / Accident / Road closed report dropped on the map.
+struct RoadReport: Identifiable {
+    let id = UUID()
+    let kind: ReportKind
+    let coordinate: CLLocationCoordinate2D
+}
+
 /// A reported pothole: where it is and how far along the route.
 struct Pothole: Identifiable {
     let id = UUID()
@@ -60,7 +67,18 @@ final class Trip: ObservableObject {
     private var startedAt = Date()
     private var lastPublish = Date.distantPast
 
+    /// Navigation settings (same keys the settings card writes).
+    let settings: UserDefaults
+    /// Speech output; tests swap it to record what would be said.
+    var speak: (String) -> Void = { Speaker.shared.say($0) }
+    /// Latest thing to tell the rider on screen (stop alert); the screen shows it as a toast.
+    @Published private(set) var announcement: Announcement?
+    @Published private(set) var reports: [RoadReport] = []
+    private var spokenPotholes: Set<UUID> = []
+    private var stopAlertFired = false
+
     init(route: Route? = nil, defaults: UserDefaults = .standard) {
+        self.settings = defaults
         // -demo drive: the Henry Hudson Parkway drive with highway entrance/exit signs.
         let route = route ?? (defaults.string(forKey: "demo") == "drive" ? Route.hhDrive : Route.m10)
         self.route = route
@@ -103,6 +121,12 @@ final class Trip: ObservableObject {
         // Reports other riders already made on this route (demo data; the real app would load
         // these from a shared server).
         potholes = [700, 1450].map { Pothole(coordinate: route.position(at: $0).0, at: $0, mine: false) }
+        // -demoReports YES (previews): a police and a road-closed marker just ahead.
+        if defaults.bool(forKey: "demoReports") {
+            reports = [(ReportKind.police, 60.0), (.closure, 140.0)].map {
+                RoadReport(kind: $0.0, coordinate: route.position(at: distance + $0.1).0)
+            }
+        }
         publish(force: true)
     }
 
@@ -136,8 +160,15 @@ final class Trip: ObservableObject {
         guard !paused, route.length > 0 else { return }
         distance += speed * dt
         if distance >= route.length { restart() }
-        publish(force: false)
+        // Refresh the published state every 0.25 s of *trip* time (not wall-clock), so a big
+        // step (tests, a hitch) still updates banners, alerts and voice.
+        sincePublish += dt
+        if sincePublish >= 0.25 {
+            sincePublish = 0
+            publish(force: true)
+        }
     }
+    private var sincePublish: TimeInterval = 0
 
     func endRide() { walking = true }
 
@@ -153,13 +184,74 @@ final class Trip: ObservableObject {
         let remaining = next.at - distance
         let show = remaining <= Self.bannerWindow(for: next, speed: currentSpeed)
         let wanted = show ? next : nil
-        if wanted?.id != bannerManeuver?.id { bannerManeuver = wanted }
+        if wanted?.id != bannerManeuver?.id {
+            bannerManeuver = wanted
+            // Voice guidance: say the turn once, as its banner appears.
+            if let m = wanted, settings.voiceGuidance {
+                say("In \(spokenDistance(remaining)), \(m.instruction.prefix(1).lowercased() + m.instruction.dropFirst())")
+            }
+        }
+    }
+
+    private func say(_ text: String) {
+        guard !walking, !paused else { return }   // no speech in paused previews/tests
+        speak(text)
+    }
+
+    /// Spoken "Pothole ahead" once per pothole, when its alert comes up (if potholes are shown).
+    private func announcePotholes() {
+        guard settings.showPotholes, let (p, _) = potholeAhead(), !spokenPotholes.contains(p.id) else { return }
+        spokenPotholes.insert(p.id)
+        if settings.voiceGuidance { say("Pothole ahead") }
+    }
+
+    /// Stop alert (settings): "At my stop" fires within 120 m of the last stop; "N stops
+    /// before" fires when N stops are left including yours. Once per trip, spoken + on screen.
+    private func checkStopAlert() {
+        guard !stopAlertFired, !walking, route.stops.count > 1 else { return }
+        let setting = settings.stopAlertSetting
+        guard setting != "Off" else { return }
+        let dest = route.stops.count - 1
+        let left = dest - min(nextStop, dest) + 1          // stops still to come, incl. yours
+        let toEnd = route.length - distance
+        let text: String?
+        switch setting {
+        case "At my stop": text = toEnd <= 120 ? "Arriving at your stop, \(route.destination)" : nil
+        case "2 stops before": text = left <= 2 && toEnd > 0 ? "2 stops to go. Your stop is \(route.destination)" : nil
+        default: text = left <= 1 && toEnd > 0 ? "Your stop is next: \(route.destination)" : nil
+        }
+        guard let text, route.kind == .bus || setting == "At my stop" else { return }
+        stopAlertFired = true
+        announcement = Announcement(text: text)
+        if settings.voiceGuidance { say(text) }
+    }
+
+    /// Police / Accident / Road closed: drop a marker at the vehicle's spot.
+    func report(_ kind: ReportKind) {
+        let (coord, _) = route.position(at: distance)
+        reports.append(RoadReport(kind: kind, coordinate: coord))
+    }
+
+    /// End the walking leg (walking screen's End): back to the start of the ride.
+    func endWalk() {
+        walking = false
+        restart()
+    }
+
+    /// Text for "Share trip progress".
+    var shareText: String {
+        let arrive = Date().addingTimeInterval(Double(minutesLeft) * 60).formatted(date: .omitted, time: .shortened)
+        let what = route.kind == .bus ? "on the \(route.line)" : "driving"
+        return "I'm \(what) to \(route.destination), about \(minutesLeft) min away (arriving around \(arrive)). Shared from Velo Maps."
     }
 
     /// Switch demo route (settings): start over at the beginning with fresh demo reports.
     func useRoute(_ newRoute: Route) {
         route = newRoute
         bannerManeuver = nil   // maneuver ids restart per route
+        stopAlertFired = false
+        spokenPotholes = []
+        reports = []
         distance = 0
         startedAt = Date()
         potholes = [700, 1450].map { Pothole(coordinate: newRoute.position(at: $0).0, at: $0, mine: false) }
@@ -169,6 +261,8 @@ final class Trip: ObservableObject {
     func restart() {
         distance = 0
         bannerManeuver = nil
+        stopAlertFired = false
+        spokenPotholes = []
         startedAt = Date()
         publish(force: true)
     }
@@ -185,6 +279,8 @@ final class Trip: ObservableObject {
         elapsed = now.timeIntervalSince(startedAt)
         progress = route.length > 0 ? distance / route.length : 0
         updateBanner()
+        announcePotholes()
+        checkStopAlert()
     }
 }
 

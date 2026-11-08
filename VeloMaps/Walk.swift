@@ -89,6 +89,13 @@ final class Walk: ObservableObject {
         publish(force: true)
     }
 
+    /// Back to the start of the walk (after End), keeping the loaded path.
+    func reset() {
+        guard let path else { return }
+        distance = path.length * startProgress
+        publish(force: true)
+    }
+
     func advance(by dt: TimeInterval) {
         guard !paused, let path else { return }
         distance = min(distance + speed * dt, path.length)

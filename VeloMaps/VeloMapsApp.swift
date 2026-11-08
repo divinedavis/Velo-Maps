@@ -5,7 +5,14 @@ struct VeloMapsApp: App {
     @StateObject private var trip = Trip()
     @StateObject private var walk = Walk()
 
-    init() { Metrics.shared.start() }
+    init() {
+        Metrics.shared.start()
+        // -resetSettings YES (UI tests): start from the default navigation settings.
+        if UserDefaults.standard.bool(forKey: "resetSettings") {
+            [SettingKey.voice, SettingKey.stopAlert, SettingKey.appearance, SettingKey.buildings, SettingKey.potholes]
+                .forEach { UserDefaults.standard.removeObject(forKey: $0) }
+        }
+    }
 
     var body: some Scene {
         WindowGroup {
@@ -20,21 +27,35 @@ struct RideScreen: View {
     @State private var cardTop: CGFloat = 0
     @State private var showReportMenu = false
     @State private var toast: String?
+    @AppStorage(SettingKey.appearance) private var appearance = "Auto"
+    @AppStorage(SettingKey.buildings) private var buildings3D = true
+    @AppStorage(SettingKey.potholes) private var showPotholes = true
+
+    private var scheme: ColorScheme? { resolvedScheme(appearance: appearance, forcedNight: trip.night) }
 
     var body: some View {
         Group {
             if trip.walking { walkScreen } else { rideScreen }
         }
-        .preferredColorScheme(trip.night ? .dark : .light)
+        .preferredColorScheme(scheme)
         .dynamicTypeSize(...maxTextSize)
+        .onChange(of: trip.announcement) { _, a in
+            guard let a else { return }
+            UINotificationFeedbackGenerator().notificationOccurred(.warning)
+            showToast(a.text, keep: false)
+        }
     }
 
     private var walkScreen: some View {
         ZStack {
-            WalkMapView(walk: walk, night: trip.night).ignoresSafeArea()
+            WalkMapView(walk: walk, style: scheme.uiStyle).ignoresSafeArea()
             walkLayout
                 .padding(.horizontal, 10)
                 .padding(.bottom, 4)
+        }
+        .environment(\.endWalk) {
+            walk.reset()
+            trip.endWalk()
         }
         .task { await walk.load(from: trip.route.stops.last!.coordinate) }
     }
@@ -51,7 +72,8 @@ struct RideScreen: View {
 
     private var rideScreen: some View {
         ZStack(alignment: .bottom) {
-            TransitMapView(trip: trip, cardTop: cardTop)
+            TransitMapView(trip: trip, cardTop: cardTop, style: scheme.uiStyle,
+                           buildings3D: buildings3D, showPotholes: showPotholes)
                 .ignoresSafeArea()
             if showReportMenu {
                 // Tap anywhere else to close the report menu.
@@ -65,7 +87,10 @@ struct RideScreen: View {
                     // Right edge beside the vehicle, leaving the line above the card for the road name.
                     // Everything is reported from "+", Pothole first (still one tap, no form).
                     ReportMenuButton(isOpen: $showReportMenu) { kind in
-                        if kind == .pothole { reportPothole() } else { showToast("\(kind.rawValue) reported. Thanks!") }
+                        if kind == .pothole { reportPothole() } else {
+                            trip.report(kind)
+                            showToast("\(kind.rawValue) reported for all riders")
+                        }
                     }
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     .transition(.opacity)
@@ -86,7 +111,7 @@ struct RideScreen: View {
             VStack(alignment: .leading, spacing: 8) {
                 turnBanner
                 // Reported pothole coming up: under the banner, where the eye already is.
-                if !trip.cardExpanded, let (_, metres) = trip.potholeAhead() {
+                if !trip.cardExpanded, showPotholes, let (_, metres) = trip.potholeAhead() {
                     PotholeAheadPill(metres: metres)
                         .transition(.scale.combined(with: .opacity))
                 }

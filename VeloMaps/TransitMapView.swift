@@ -7,16 +7,16 @@ struct TransitMapView: UIViewRepresentable {
     @ObservedObject var trip: Trip
     /// Screen y of the card's top edge; the camera keeps the bus a fixed gap above it.
     var cardTop: CGFloat
+    /// Settings: map appearance, 3D buildings, reported potholes.
+    var style: UIUserInterfaceStyle = .unspecified
+    var buildings3D = true
+    var showPotholes = true
 
     func makeCoordinator() -> Coordinator { Coordinator(trip: trip) }
 
     func makeUIView(context: Context) -> MKMapView {
         let map = MKMapView()
-        let config = MKStandardMapConfiguration(elevationStyle: .realistic, emphasisStyle: .default)
-        config.pointOfInterestFilter = .excludingAll
-        config.showsTraffic = false
-        map.preferredConfiguration = config
-        map.overrideUserInterfaceStyle = trip.night ? .dark : .light
+        map.overrideUserInterfaceStyle = style
         map.showsCompass = false
         map.showsScale = false
         map.isUserInteractionEnabled = false   // camera is driven by the trip
@@ -28,8 +28,11 @@ struct TransitMapView: UIViewRepresentable {
 
     func updateUIView(_ map: MKMapView, context: Context) {
         context.coordinator.cardTop = cardTop
+        if map.overrideUserInterfaceStyle != style { map.overrideUserInterfaceStyle = style }
+        context.coordinator.applyBuildings(buildings3D)
         context.coordinator.syncRoute()
-        context.coordinator.syncPotholes()
+        context.coordinator.syncPotholes(show: showPotholes)
+        context.coordinator.syncReports()
     }
 
     @MainActor
@@ -73,14 +76,51 @@ struct TransitMapView: UIViewRepresentable {
         }
 
         private var shownPotholes: Set<UUID> = []
+        private var shownReports: Set<UUID> = []
+        private var buildingsShown: Bool?
+        /// 3D buildings off = look straight down (2D). Apple keeps drawing 3D trees/landmarks in
+        /// detailed cities under a tilted camera even with flat elevation and showsBuildings off.
+        private var flatPitch = false
 
-        /// Adds a warning sign for every reported pothole not yet on the map.
-        func syncPotholes() {
+        /// 3D buildings on: Apple's realistic-elevation city; off: the flat map.
+        func applyBuildings(_ on: Bool) {
+            guard let map, buildingsShown != on else { return }
+            buildingsShown = on
+            let config = MKStandardMapConfiguration(elevationStyle: on ? .realistic : .flat, emphasisStyle: .default)
+            config.pointOfInterestFilter = .excludingAll
+            config.showsTraffic = false
+            map.preferredConfiguration = config
+            // Flat elevation alone still draws extruded buildings in detailed cities.
+            map.showsBuildings = on
+            flatPitch = !on
+            settledFrames = 0
+        }
+
+        /// Warning signs for reported potholes; all removed when the setting is off.
+        func syncPotholes(show: Bool) {
             guard let map else { return }
+            if !show {
+                let signs = map.annotations.filter { $0 is PotholeAnnotation }
+                if !signs.isEmpty { map.removeAnnotations(signs) }
+                shownPotholes = []
+                return
+            }
             let new = trip.potholes.filter { !shownPotholes.contains($0.id) }
             guard !new.isEmpty else { return }
             map.addAnnotations(new.map { PotholeAnnotation(pothole: $0) })
             new.forEach { shownPotholes.insert($0.id) }
+        }
+
+        /// Police / Accident / Road closed markers.
+        func syncReports() {
+            guard let map else { return }
+            let current = Set(trip.reports.map(\.id))
+            let stale = map.annotations.compactMap { $0 as? ReportAnnotation }.filter { !current.contains($0.id) }
+            if !stale.isEmpty { map.removeAnnotations(stale); stale.forEach { shownReports.remove($0.id) } }
+            let new = trip.reports.filter { !shownReports.contains($0.id) }
+            guard !new.isEmpty else { return }
+            map.addAnnotations(new.map { ReportAnnotation(report: $0) })
+            new.forEach { shownReports.insert($0.id) }
         }
 
         /// Frames in a row where the bus already sat where it should; once settled while
@@ -117,7 +157,7 @@ struct TransitMapView: UIViewRepresentable {
             cameraHeading = heading
             let center = coord.offset(by: leadMetres, bearing: heading)
             map.setCamera(MKMapCamera(lookingAtCenter: center, fromDistance: trip.cameraDistance,
-                                      pitch: trip.cameraPitch, heading: heading), animated: false)
+                                      pitch: flatPitch ? 0 : trip.cameraPitch, heading: heading), animated: false)
             // Screen-up is the camera heading; turn the icon by the difference.
             let iconTurn = Self.shortestTurn(from: heading, to: travel) * .pi / 180
             vehicleView?.transform = CGAffineTransform(rotationAngle: iconTurn)
@@ -164,6 +204,16 @@ struct TransitMapView: UIViewRepresentable {
         }
 
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+            if let r = annotation as? ReportAnnotation {
+                let v = mapView.dequeueReusableAnnotationView(withIdentifier: "report")
+                    ?? MKAnnotationView(annotation: annotation, reuseIdentifier: "report")
+                v.annotation = annotation
+                v.image = ReportAnnotation.image(for: r.kind)
+                v.zPriority = .defaultSelected
+                v.collisionMode = .none
+                v.accessibilityLabel = r.kind.rawValue
+                return v
+            }
             if annotation is PotholeAnnotation {
                 let v = mapView.dequeueReusableAnnotationView(withIdentifier: "pothole")
                     ?? MKAnnotationView(annotation: annotation, reuseIdentifier: "pothole")
@@ -284,4 +334,28 @@ final class PotholeAnnotation: NSObject, MKAnnotation {
             crack.stroke()
         }
     }()
+}
+
+/// A Police / Accident / Road closed report on the map: the menu's coloured icon in a ring.
+final class ReportAnnotation: NSObject, MKAnnotation {
+    let id: UUID
+    let kind: ReportKind
+    let coordinate: CLLocationCoordinate2D
+    init(report: RoadReport) { id = report.id; kind = report.kind; coordinate = report.coordinate }
+
+    @MainActor static func image(for kind: ReportKind) -> UIImage {
+        let size = CGSize(width: 34, height: 34)
+        return UIGraphicsImageRenderer(size: size).image { ctx in
+            ctx.cgContext.setShadow(offset: CGSize(width: 0, height: 2), blur: 4, color: UIColor.black.withAlphaComponent(0.3).cgColor)
+            UIColor.white.setFill()
+            UIBezierPath(ovalIn: CGRect(x: 1, y: 1, width: 32, height: 32)).fill()
+            ctx.cgContext.setShadow(offset: .zero, blur: 0, color: nil)
+            UIColor(kind.color).setFill()
+            UIBezierPath(ovalIn: CGRect(x: 4, y: 4, width: 26, height: 26)).fill()
+            let cfg = UIImage.SymbolConfiguration(pointSize: 13, weight: .bold)
+            if let glyph = UIImage(systemName: kind.icon, withConfiguration: cfg)?.withTintColor(.white, renderingMode: .alwaysOriginal) {
+                glyph.draw(at: CGPoint(x: 17 - glyph.size.width / 2, y: 17 - glyph.size.height / 2))
+            }
+        }
+    }
 }

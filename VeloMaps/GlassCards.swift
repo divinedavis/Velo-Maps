@@ -328,11 +328,11 @@ struct GlassHeroCard: View {
 /// Revealed by swiping the card up. Stored locally for the preview; not yet wired to the map.
 private struct NavSettings: View {
     @ObservedObject var trip: Trip
-    @AppStorage("voiceGuidance") private var voice = true
-    @AppStorage("stopAlert") private var stopAlert = "1 stop before"
-    @AppStorage("appearance") private var appearance = "Auto"
-    @AppStorage("buildings3D") private var buildings = true
-    @AppStorage("showPotholes") private var potholes = true
+    @AppStorage(SettingKey.voice) private var voice = true
+    @AppStorage(SettingKey.stopAlert) private var stopAlert = "1 stop before"
+    @AppStorage(SettingKey.appearance) private var appearance = "Auto"
+    @AppStorage(SettingKey.buildings) private var buildings = true
+    @AppStorage(SettingKey.potholes) private var potholes = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -354,7 +354,7 @@ private struct NavSettings: View {
                     .accessibilityIdentifier("demo-ride")
                 }
                 Divider().padding(.leading, 44)
-                row("speaker.wave.2.fill", "Voice guidance") { Toggle("", isOn: $voice).labelsHidden() }
+                row("speaker.wave.2.fill", "Voice guidance") { Toggle("Voice guidance", isOn: $voice).labelsHidden().accessibilityIdentifier("setting-voice") }
                 Divider().padding(.leading, 44)
                 row("bell.badge.fill", "Stop alert") {
                     Menu {
@@ -374,20 +374,21 @@ private struct NavSettings: View {
                 }
                 Divider().padding(.leading, 44)
                 row("circle.lefthalf.filled", "Map appearance") {
-                    Picker("", selection: $appearance) {
+                    Picker("Map appearance", selection: $appearance) {
                         ForEach(["Auto", "Day", "Night"], id: \.self) { Text($0) }
                     }
                     .pickerStyle(.segmented)
                     .frame(width: 168)
                 }
                 Divider().padding(.leading, 44)
-                row("building.2.fill", "3D buildings") { Toggle("", isOn: $buildings).labelsHidden() }
+                row("building.2.fill", "3D buildings") { Toggle("3D buildings", isOn: $buildings).labelsHidden().accessibilityIdentifier("setting-buildings") }
                 Divider().padding(.leading, 44)
-                row("exclamationmark.triangle.fill", "Show reported potholes") { Toggle("", isOn: $potholes).labelsHidden() }
+                row("exclamationmark.triangle.fill", "Show reported potholes") { Toggle("Show reported potholes", isOn: $potholes).labelsHidden().accessibilityIdentifier("setting-potholes") }
             }
             .padding(.horizontal, 12)
             .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-            Button {} label: {
+            // The iPhone share sheet with the route, minutes left and arrival time.
+            ShareLink(item: trip.shareText) {
                 Label("Share trip progress", systemImage: "square.and.arrow.up")
                     .scaledFont(15, .semibold)
                     .foregroundStyle(Color.tripRed(.light))
@@ -396,6 +397,7 @@ private struct NavSettings: View {
                     .contentShape(Capsule())
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("share-trip")
         }
         .tint(Color.tripRed(.light))
     }

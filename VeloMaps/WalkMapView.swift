@@ -5,7 +5,7 @@ import MapKit
 /// chase camera that follows the walker.
 struct WalkMapView: UIViewRepresentable {
     @ObservedObject var walk: Walk
-    let night: Bool
+    var style: UIUserInterfaceStyle = .unspecified
 
     func makeCoordinator() -> Coordinator { Coordinator(walk: walk) }
 
@@ -14,7 +14,7 @@ struct WalkMapView: UIViewRepresentable {
         let config = MKStandardMapConfiguration(elevationStyle: .realistic, emphasisStyle: .default)
         config.pointOfInterestFilter = .excludingAll
         map.preferredConfiguration = config
-        map.overrideUserInterfaceStyle = night ? .dark : .light
+        map.overrideUserInterfaceStyle = style
         map.showsCompass = false
         map.showsScale = false
         map.isUserInteractionEnabled = false
@@ -24,7 +24,10 @@ struct WalkMapView: UIViewRepresentable {
         return map
     }
 
-    func updateUIView(_ map: MKMapView, context: Context) { context.coordinator.syncPath() }
+    func updateUIView(_ map: MKMapView, context: Context) {
+        if map.overrideUserInterfaceStyle != style { map.overrideUserInterfaceStyle = style }
+        context.coordinator.syncPath()
+    }
 
     @MainActor
     final class Coordinator: NSObject, MKMapViewDelegate {

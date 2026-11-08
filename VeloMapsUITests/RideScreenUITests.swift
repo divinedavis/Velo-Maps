@@ -44,7 +44,7 @@ final class RideScreenUITests: XCTestCase {
     /// Pothole lives in the "+" menu (first item) and reports straight away, no form.
     func testPotholeIsReportedFromThePlusMenu() {
         let app = XCUIApplication()
-        app.launchArguments += ["-paused", "YES", "-progress", "0.25"]
+        app.launchArguments += ["-paused", "YES", "-progress", "0.25", "-resetSettings", "YES"]
         app.launch()
 
         // At 25% a demo report from another rider is ~140 m ahead: the alert is up.
@@ -159,5 +159,47 @@ final class RideScreenUITests: XCTestCase {
             }
             app.terminate()
         }
+    }
+
+    /// Turning off "Show reported potholes" removes the Pothole-ahead alert.
+    func testShowReportedPotholesToggleWorks() {
+        let app = XCUIApplication()
+        app.launchArguments += ["-paused", "YES", "-progress", "0.25", "-resetSettings", "YES"]
+        app.launch()
+        let ahead = app.descendants(matching: .any)["pothole-ahead"]
+        XCTAssertTrue(ahead.waitForExistence(timeout: 10))
+        let grabber = app.descendants(matching: .any)["card-grabber"]
+        grabber.tap()
+        let toggle = app.switches["setting-potholes"]
+        XCTAssertTrue(toggle.waitForExistence(timeout: 3))
+        toggle.switches.firstMatch.exists ? toggle.switches.firstMatch.tap() : toggle.tap()
+        grabber.tap()
+        XCTAssertFalse(ahead.waitForExistence(timeout: 2), "alert should be gone with the setting off")
+        app.terminate()
+        // Leave the simulator on default settings for other tests.
+        let reset = XCUIApplication(); reset.launchArguments += ["-paused", "YES", "-resetSettings", "YES"]; reset.launch(); reset.terminate()
+    }
+
+    /// The walking screen's End returns to the ride.
+    func testEndWalkReturnsToTheRide() {
+        let app = XCUIApplication()
+        app.launchArguments += ["-paused", "YES", "-mode", "walk"]
+        app.launch()
+        let end = app.buttons["end-walk"]
+        XCTAssertTrue(end.waitForExistence(timeout: 10))
+        end.tap()
+        XCTAssertTrue(app.staticTexts["next-stop"].waitForExistence(timeout: 5))
+    }
+
+    /// Share trip progress opens the iPhone share sheet.
+    func testShareTripProgressOpensTheShareSheet() {
+        let app = XCUIApplication()
+        app.launchArguments += ["-paused", "YES", "-expanded", "YES"]
+        app.launch()
+        let share = app.buttons["share-trip"]
+        XCTAssertTrue(share.waitForExistence(timeout: 10))
+        share.tap()
+        XCTAssertTrue(app.otherElements["ActivityListView"].waitForExistence(timeout: 5)
+                      || app.buttons["Copy"].waitForExistence(timeout: 2), "share sheet did not open")
     }
 }

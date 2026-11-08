@@ -12,11 +12,14 @@ private struct ETALine: View {
     }
 }
 
+/// Ends the walk and returns to the ride.
 private struct EndButton: View {
+    @Environment(\.endWalk) private var endWalk
     var body: some View {
-        Button("End") {}
+        Button("End") { endWalk() }
             .scaledFont(15, .semibold)
             .buttonStyle(.glass)
+            .accessibilityIdentifier("end-walk")
     }
 }
 
@@ -67,6 +70,7 @@ struct WalkHandoffLayout: View {
     let line: String
     let stop: String
     @Environment(\.colorScheme) private var scheme
+    @Environment(\.endWalk) private var endWalk
 
     var body: some View {
         VStack {
@@ -92,7 +96,7 @@ struct WalkHandoffLayout: View {
                     }
                 }
                 HStack(spacing: 10) {
-                    Button {} label: {
+                    Button { endWalk() } label: {
                         Text("Not now").scaledFont(16, .semibold).frame(maxWidth: .infinity, minHeight: 34)
                     }
                     .buttonStyle(.glass)
@@ -213,8 +217,9 @@ struct WalkGlanceLayout: View {
                         Spacer()
                         Text("\(walk.minutesLeft) min · \(walk.arrivalText)")
                             .scaledFont(14, .semibold).monospacedDigit()
+                        EndButton()
                     }
-                    .padding(.horizontal, 18).frame(minHeight: 48)
+                    .padding(.leading, 18).padding(.trailing, 6).frame(minHeight: 48)
                     .readableGlass(in: .capsule, interactive: true)
                 }
             }
