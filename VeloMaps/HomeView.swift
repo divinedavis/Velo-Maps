@@ -220,6 +220,8 @@ struct HomeView: View {
             guard let item else { error = "Couldn't find that place"; return }
             let to = item.location.coordinate
             let route = try await Router.drive(from: from, to: to, name: item.name ?? completion.title)
+            // Warm the speed-limit cache while the rider looks at the preview.
+            Task.detached(priority: .utility) { _ = await SpeedLimits.lookup(route) }
             withAnimation {
                 preview = route
                 camera = .rect(MKPolyline(coordinates: route.points, count: route.points.count).boundingMapRect

@@ -1,0 +1,3 @@
+Speed limits are now saved on your phone. Once the limits for an area have been looked up, they are kept for 30 days, so roads you drive again show the sign right away without asking the map server again.
+
+The lookup also starts as soon as you see the route preview, before you tap Start, and it tries again a couple of times if the server is busy.

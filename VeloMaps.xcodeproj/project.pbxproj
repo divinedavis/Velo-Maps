@@ -34,6 +34,7 @@
 		5B3454E05C93F19B200E6DB8 /* cue-in-300-feet.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 639C9DAE501F204B83E1FA96 /* cue-in-300-feet.mp3 */; };
 		5B67C5F05913D5B1F61B21FC /* voice_cues.json in Resources */ = {isa = PBXBuildFile; fileRef = 8C1B3DB863EB563F650C63B7 /* voice_cues.json */; };
 		636735F11441A21259148A94 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6E9F700D58E702F1719CC20 /* HomeView.swift */; };
+		6A1A5DD6EB3103FEFEF22427 /* SpeedLimitCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EC3CAA5A571431A6A62E66 /* SpeedLimitCacheTests.swift */; };
 		6B2E893094E883663F5777E0 /* cue-in-1-mile.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = ECA723F42416421F6CCC8733 /* cue-in-1-mile.mp3 */; };
 		6CEC3C6F9DBAE7F13A360A07 /* PerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32573F74E4AD75883BFA8502 /* PerformanceTests.swift */; };
 		6D2B7E058E85744DCC80C0EB /* VeloMapsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7493EAB4777B9A09368449F8 /* VeloMapsApp.swift */; };
@@ -83,6 +84,7 @@
 		E1A13977925E5312B8515824 /* cue-in-600-feet.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 3D55D42539394B2F4ED64301 /* cue-in-600-feet.mp3 */; };
 		E3B26BD9EA4B8BEE2FC8308E /* cue-turn-right-onto-west-72nd-street.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = B52417DE787BF88ED7B6F105 /* cue-turn-right-onto-west-72nd-street.mp3 */; };
 		E56EF6424EF30B28A7CB921E /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD48A387561B5C9BA8A43F2E /* Settings.swift */; };
+		E80AFF314EE51D908F61DAEB /* SpeedLimitCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E2739A749881708B3B6DC03 /* SpeedLimitCache.swift */; };
 		E9F25F5F6DDA46FE3A987EC3 /* VoiceCueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF40C3B07DE63DD8561EC4C7 /* VoiceCueTests.swift */; };
 		EC23C54C85E2C355F28120F3 /* cue-in-1-9-miles.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 64D6C5F6CEFADA2DCD6149A9 /* cue-in-1-9-miles.mp3 */; };
 		EDAA7E27CCFFE2E103B67F68 /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9EA014A1B1A9F1B89B4E58F /* Router.swift */; };
@@ -120,6 +122,7 @@
 		2472BFD92AE37F3B96F0BD10 /* HomeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeUITests.swift; sourceTree = "<group>"; };
 		2508B8D1102329ADD59647AD /* ReportMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportMenu.swift; sourceTree = "<group>"; };
 		2CAC166C8F17C07E8B45B5B2 /* cue-turn-left-onto-riverside-drive.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-turn-left-onto-riverside-drive.mp3"; sourceTree = "<group>"; };
+		2E2739A749881708B3B6DC03 /* SpeedLimitCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedLimitCache.swift; sourceTree = "<group>"; };
 		2E57576A11A5A55041C49DF1 /* SpeedLimitSign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedLimitSign.swift; sourceTree = "<group>"; };
 		32573F74E4AD75883BFA8502 /* PerformanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceTests.swift; sourceTree = "<group>"; };
 		35690661AC6F1D578D8F5BF4 /* Readability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Readability.swift; sourceTree = "<group>"; };
@@ -134,6 +137,7 @@
 		4A9FF142C594E6A0D9C4E123 /* RideScreenUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RideScreenUITests.swift; sourceTree = "<group>"; };
 		5052917378725D57D45990D2 /* cue-in-900-feet.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-900-feet.mp3"; sourceTree = "<group>"; };
 		52C78F2EDB521CAD8D838F81 /* Walk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Walk.swift; sourceTree = "<group>"; };
+		52EC3CAA5A571431A6A62E66 /* SpeedLimitCacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedLimitCacheTests.swift; sourceTree = "<group>"; };
 		546BA85AB85E847E54F0DD13 /* cue-take-the-exit-to-west-96th-street.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-take-the-exit-to-west-96th-street.mp3"; sourceTree = "<group>"; };
 		548C30603940B864098BD707 /* TripCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripCard.swift; sourceTree = "<group>"; };
 		5B7FDFAD3586C5C50FFD920C /* LiveNavigationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveNavigationTests.swift; sourceTree = "<group>"; };
@@ -227,6 +231,7 @@
 				B3C7EDF41AAB6727C6F5296F /* RouteTests.swift */,
 				FF344E6EB1755D45BD406969 /* SettingsTests.swift */,
 				194AC502DDF0944439775788 /* SmoothTurnTests.swift */,
+				52EC3CAA5A571431A6A62E66 /* SpeedLimitCacheTests.swift */,
 				6A9AC6978F33601402643A5B /* SpeedLimitTests.swift */,
 				FF40C3B07DE63DD8561EC4C7 /* VoiceCueTests.swift */,
 			);
@@ -261,6 +266,7 @@
 				E59DFE1A61C6B95197EE6035 /* Route.swift */,
 				A9EA014A1B1A9F1B89B4E58F /* Router.swift */,
 				DD48A387561B5C9BA8A43F2E /* Settings.swift */,
+				2E2739A749881708B3B6DC03 /* SpeedLimitCache.swift */,
 				232859A67D56746938C1074F /* SpeedLimits.swift */,
 				2E57576A11A5A55041C49DF1 /* SpeedLimitSign.swift */,
 				8F7FCBDD2BC9B08B84DA3AF2 /* TransitMapView.swift */,
@@ -521,6 +527,7 @@
 				5B2D53144797D934220E9E5E /* Route.swift in Sources */,
 				EDAA7E27CCFFE2E103B67F68 /* Router.swift in Sources */,
 				E56EF6424EF30B28A7CB921E /* Settings.swift in Sources */,
+				E80AFF314EE51D908F61DAEB /* SpeedLimitCache.swift in Sources */,
 				804BAA36E7EF6CBBCB27F613 /* SpeedLimitSign.swift in Sources */,
 				705A7261D655A93638D4BAF0 /* SpeedLimits.swift in Sources */,
 				25E20747E92EFCD0022D5F21 /* TransitMapView.swift in Sources */,
@@ -545,6 +552,7 @@
 				9A67867BBDE7505EB1B3E2D4 /* RouteTests.swift in Sources */,
 				7BE3F1575CAB06A746D96ED6 /* SettingsTests.swift in Sources */,
 				7FE8889554A24FA74924A4B0 /* SmoothTurnTests.swift in Sources */,
+				6A1A5DD6EB3103FEFEF22427 /* SpeedLimitCacheTests.swift in Sources */,
 				1AF21EBDCC2910776ADAF6C5 /* SpeedLimitTests.swift in Sources */,
 				E9F25F5F6DDA46FE3A987EC3 /* VoiceCueTests.swift in Sources */,
 			);

@@ -1,28 +1,43 @@
 import Foundation
 import CoreLocation
 
-/// Posted speed limits along a live route, from OpenStreetMap `maxspeed` tags (Overpass API):
-/// one request per route (Start / reroute). Each 30 m of the route takes the limit of the
+/// Posted speed limits along a live route, from OpenStreetMap `maxspeed` tags (Overpass API),
+/// cached on the phone by ~1 km tile for 30 days (SpeedLimitCache) so roads already driven
+/// need no request. Each 30 m of the route takes the limit of the
 /// tagged road within 18 m that runs the same way (so a cross street at an intersection
 /// doesn't count). Where OSM has no limit, nothing is shown. The public Overpass servers are
 /// sometimes at capacity — then the sign just stays hidden.
 enum SpeedLimits {
     static let endpoint = URL(string: "https://overpass-api.de/api/interpreter")!
 
-    static func lookup(_ route: Route) async -> [(start: Double, mph: Int)] {
-        let samples = stride(from: 0.0, through: route.length, by: 150).map { route.position(at: $0).0 }
-            + [route.position(at: route.length).0]
-        let line = samples.map { String(format: "%.5f,%.5f", $0.latitude, $0.longitude) }.joined(separator: ",")
-        let query = "[out:json][timeout:20];way[highway][maxspeed](around:20,\(line));out tags geom;"
-        var req = URLRequest(url: endpoint)
-        req.httpMethod = "POST"
-        req.setValue("VeloMaps/1.0 (iOS navigation prototype)", forHTTPHeaderField: "User-Agent")
-        req.httpBody = "data=\(query.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? "")".data(using: .utf8)
-        req.timeoutInterval = 25
-        guard let (data, resp) = try? await URLSession.shared.data(for: req),
-              (resp as? HTTPURLResponse)?.statusCode == 200,
-              let json = try? JSONDecoder().decode(OverpassResponse.self, from: data) else { return [] }
-        return match(route, ways: json.elements)
+    static func lookup(_ route: Route, cache: SpeedLimitCache = .shared) async -> [(start: Double, mph: Int)] {
+        let ways = await cache.ways(along: route) { tiles in await fetch(tiles) }
+        return match(route, ways: ways)
+    }
+
+    /// One Overpass request for a batch of tiles; up to 3 tries (2 s, 5 s backoff) because the
+    /// public servers are often "at capacity". nil = gave up (those tiles stay uncached).
+    static func fetch(_ tiles: [SpeedLimitCache.Tile]) async -> [OverpassWay]? {
+        let parts = tiles.map { t in
+            let b = t.bounds
+            return String(format: "way[highway][maxspeed](%.5f,%.5f,%.5f,%.5f);", b.south, b.west, b.north, b.east)
+        }.joined()
+        let query = "[out:json][timeout:25];(\(parts));out tags geom;"
+        for (attempt, wait) in [0.0, 2, 5].enumerated() {
+            if wait > 0 { try? await Task.sleep(for: .seconds(wait)) }
+            var req = URLRequest(url: endpoint)
+            req.httpMethod = "POST"
+            req.setValue("VeloMaps/1.0 (iOS navigation prototype)", forHTTPHeaderField: "User-Agent")
+            req.httpBody = "data=\(query.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? "")".data(using: .utf8)
+            req.timeoutInterval = 30
+            if let (data, resp) = try? await URLSession.shared.data(for: req),
+               (resp as? HTTPURLResponse)?.statusCode == 200,
+               let json = try? JSONDecoder().decode(OverpassResponse.self, from: data) {
+                return json.elements
+            }
+            _ = attempt
+        }
+        return nil
     }
 
     /// Route + tagged ways → limit changes along the route. Separate for tests.
@@ -72,8 +87,8 @@ enum SpeedLimits {
 }
 
 struct OverpassResponse: Decodable { let elements: [OverpassWay] }
-struct OverpassWay: Decodable {
+struct OverpassWay: Codable {
     let tags: [String: String]
     let geometry: [OverpassPoint]?
 }
-struct OverpassPoint: Decodable { let lat: Double; let lon: Double }
+struct OverpassPoint: Codable { let lat: Double; let lon: Double }
