@@ -1,0 +1,3 @@
+Voice guidance has a new voice, Rene. Every turn, highway ramp and exit, pothole warning and stop alert is now spoken in her voice.
+
+The voice is built into the app, so it works without a data connection and still lowers your music while it speaks. You can turn it off in the settings card.

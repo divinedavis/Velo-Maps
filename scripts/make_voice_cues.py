@@ -18,8 +18,8 @@ import json, os, re, subprocess, sys, time, urllib.error, urllib.request
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "..", "VeloMaps", "VoiceCues")
 MANIFEST = os.path.join(OUT, "voice_cues.json")
-VOICE_ID = "EXAVITQu4vr4xnSDxMaL"       # Sarah (same voice as Milepost)
-VOICE_NAME = "Sarah"
+VOICE_ID = "YYsXMvvITqnbq9AYpUDk"       # Rene (ElevenLabs voice library; owner pick 11/8)
+VOICE_NAME = "Rene"
 MODEL_ID = "eleven_flash_v2_5"          # 0.5 credits/char
 OUTPUT_FORMAT = "mp3_22050_32"
 MAX_CHARS_PER_RUN = 3000
