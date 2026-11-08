@@ -217,4 +217,21 @@ final class RideScreenUITests: XCTestCase {
             app.terminate()
         }
     }
+
+    /// The speed-limit sign stays put whether or not a turn banner is showing (owner, 11/8).
+    func testSpeedLimitSignDoesNotMoveWithTheBanner() {
+        var tops: [CGFloat] = []
+        for args in [["-turnAhead", "60"], ["-turnAhead", "600"], ["-demo", "drive", "-signAhead", "60", "-signIndex", "1"]] {
+            let app = XCUIApplication()
+            app.launchArguments += ["-demo", "bus", "-paused", "YES"] + args
+            app.launch()
+            let sign = app.descendants(matching: .any)["speed-limit"]
+            XCTAssertTrue(sign.waitForExistence(timeout: 10))
+            let banner = app.descendants(matching: .any)["turn-banner"]
+            if banner.exists { XCTAssertGreaterThanOrEqual(sign.frame.minY, banner.frame.maxY, "sign under the banner") }
+            tops.append(sign.frame.minY)
+            app.terminate()
+        }
+        XCTAssertEqual(Set(tops.map { Int($0.rounded()) }).count, 1, "sign moved: \(tops)")
+    }
 }

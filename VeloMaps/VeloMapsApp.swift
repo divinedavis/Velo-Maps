@@ -132,17 +132,23 @@ struct RideScreen: View {
             .padding(.horizontal, 10)
             .padding(.bottom, 4)
         }
+        // Speed limit (and the pothole alert beside it) at a FIXED spot top-left, just below
+        // where the tallest turn banner (highway sign) ends, so it never jumps when a banner
+        // appears or goes away (owner, 11/8).
+        .overlay(alignment: .topLeading) {
+            HStack(alignment: .top, spacing: 8) {
+                if trip.speedStyle > 0 { SpeedLimitView(trip: trip, style: trip.speedStyle) }
+                if !trip.cardExpanded, showPotholes, let (_, metres) = trip.potholeAhead() {
+                    PotholeAheadPill(metres: metres)
+                        .transition(.scale.combined(with: .opacity))
+                }
+            }
+            .padding(.leading, 12)
+            .padding(.top, speedSignTop)
+        }
         .overlay(alignment: .top) {
             VStack(alignment: .leading, spacing: 8) {
                 turnBanner
-                // Speed limit top-left under the banner (owner, 11/8), the pothole alert beside it.
-                HStack(alignment: .top, spacing: 8) {
-                    if trip.speedStyle > 0 { SpeedLimitView(trip: trip, style: trip.speedStyle) }
-                    if !trip.cardExpanded, showPotholes, let (_, metres) = trip.potholeAhead() {
-                        PotholeAheadPill(metres: metres)
-                            .transition(.scale.combined(with: .opacity))
-                    }
-                }
                 if let toast {
                     ReportToast(text: toast)
                         .frame(maxWidth: .infinity)
@@ -161,6 +167,9 @@ struct RideScreen: View {
             }
         }
     }
+
+    /// Below the tallest banner (the highway sign: ~200 pt incl. Dynamic Type headroom).
+    @ScaledMetric(relativeTo: .body) private var speedSignTop: CGFloat = 212
 
     /// Turn-by-turn banner in the chosen design (4 lives inside the card instead).
     @ViewBuilder private var turnBanner: some View {
