@@ -12,6 +12,7 @@
 		078C22E685A2CFB1BFF06641 /* VoiceCues.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E12007D71FDBD8907D738A /* VoiceCues.swift */; };
 		0D6E19FCD6AFBBA9FF3D4709 /* cue-in-500-feet.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 69F884E6910F55D7F12C3CE8 /* cue-in-500-feet.mp3 */; };
 		0D8F6628C859A1B4263127A0 /* DemoDrive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7308FE227F042D1390486D35 /* DemoDrive.swift */; };
+		1D31132F0A4B3BDA45B8CC17 /* HomeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2472BFD92AE37F3B96F0BD10 /* HomeUITests.swift */; };
 		219A2B169E36999219A361E7 /* cue-your-stop-is-next-columbus-av-w-96-st.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7C2C4B93EF1229644CD747E0 /* cue-your-stop-is-next-columbus-av-w-96-st.mp3 */; };
 		25E20747E92EFCD0022D5F21 /* TransitMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F7FCBDD2BC9B08B84DA3AF2 /* TransitMapView.swift */; };
 		2FA536E6050EDC8CCC358ED0 /* TurnBanners.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB637C58A466E35D35C74FF /* TurnBanners.swift */; };
@@ -30,9 +31,11 @@
 		5B2D53144797D934220E9E5E /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = E59DFE1A61C6B95197EE6035 /* Route.swift */; };
 		5B3454E05C93F19B200E6DB8 /* cue-in-300-feet.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 639C9DAE501F204B83E1FA96 /* cue-in-300-feet.mp3 */; };
 		5B67C5F05913D5B1F61B21FC /* voice_cues.json in Resources */ = {isa = PBXBuildFile; fileRef = 8C1B3DB863EB563F650C63B7 /* voice_cues.json */; };
+		636735F11441A21259148A94 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6E9F700D58E702F1719CC20 /* HomeView.swift */; };
 		6B2E893094E883663F5777E0 /* cue-in-1-mile.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = ECA723F42416421F6CCC8733 /* cue-in-1-mile.mp3 */; };
 		6CEC3C6F9DBAE7F13A360A07 /* PerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32573F74E4AD75883BFA8502 /* PerformanceTests.swift */; };
 		6D2B7E058E85744DCC80C0EB /* VeloMapsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7493EAB4777B9A09368449F8 /* VeloMapsApp.swift */; };
+		70B280E5D957F89E3CEC3980 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E200645BF3E0302A4E0E73B /* LocationService.swift */; };
 		70FFC7DEE97DBFD14BA1F5A6 /* cue-in-0-9-miles.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 5FF4CB7B970A006FB2296FB0 /* cue-in-0-9-miles.mp3 */; };
 		7BE3F1575CAB06A746D96ED6 /* SettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF344E6EB1755D45BD406969 /* SettingsTests.swift */; };
 		7DA49142EAFAB916799EA408 /* HighwaySignView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87AFCC98A0845629A124D3BB /* HighwaySignView.swift */; };
@@ -43,6 +46,7 @@
 		8B62C0A754AC10D5920B1714 /* cue-in-0-8-miles.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 8F8CB80ABF5E91477657E6B7 /* cue-in-0-8-miles.mp3 */; };
 		8FA8E535E711D5E48ECC86A6 /* cue-in-0-4-miles.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 48A6551BD55FF51C02A8D172 /* cue-in-0-4-miles.mp3 */; };
 		94F29F2FAFB5A13D2A1933A9 /* cue-take-the-ramp-to-ny-9a-north.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 901075BFF9A32C15BBDDE4B2 /* cue-take-the-ramp-to-ny-9a-north.mp3 */; };
+		950264D9179E612DB4FF11BE /* LiveNavigationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7FDFAD3586C5C50FFD920C /* LiveNavigationTests.swift */; };
 		951D0E01BFA8312C40C4FC18 /* cue-in-0-5-miles.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 00DEE13CF178E984942AB9C1 /* cue-in-0-5-miles.mp3 */; };
 		968BB5776EDE98782F62025A /* LaneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99BEBC3D3926117767BDEC8F /* LaneTests.swift */; };
 		9A67867BBDE7505EB1B3E2D4 /* RouteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3C7EDF41AAB6727C6F5296F /* RouteTests.swift */; };
@@ -58,6 +62,7 @@
 		C5BA92DB7A908483E687DE21 /* cue-in-900-feet.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 5052917378725D57D45990D2 /* cue-in-900-feet.mp3 */; };
 		C5BABDE3021A298CC023D688 /* cue-in-1000-feet.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 69A88E0FEAB6D131D7553405 /* cue-in-1000-feet.mp3 */; };
 		C967FF71B5805E49C71DB991 /* cue-in-0-6-miles.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1146FBC262F700E216D2499C /* cue-in-0-6-miles.mp3 */; };
+		CFFE978F06B90F6B58D19DB5 /* osrm_hh_drive.json in Resources */ = {isa = PBXBuildFile; fileRef = DBEB995E61137D62ADCC561E /* osrm_hh_drive.json */; };
 		D085146A65901C12CE5FB1DB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5F99356A7357375F7B849983 /* Assets.xcassets */; };
 		D1394C0F77765941E050D3D3 /* Walk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C78F2EDB521CAD8D838F81 /* Walk.swift */; };
 		D178532501EBAFC92F985CA7 /* cue-turn-left-onto-w-96-st.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 846FC60B82C48A7B243D2F62 /* cue-turn-left-onto-w-96-st.mp3 */; };
@@ -70,6 +75,7 @@
 		E3B26BD9EA4B8BEE2FC8308E /* cue-turn-right-onto-west-72nd-street.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = B52417DE787BF88ED7B6F105 /* cue-turn-right-onto-west-72nd-street.mp3 */; };
 		E56EF6424EF30B28A7CB921E /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD48A387561B5C9BA8A43F2E /* Settings.swift */; };
 		E9F25F5F6DDA46FE3A987EC3 /* VoiceCueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF40C3B07DE63DD8561EC4C7 /* VoiceCueTests.swift */; };
+		EDAA7E27CCFFE2E103B67F68 /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9EA014A1B1A9F1B89B4E58F /* Router.swift */; };
 		EDD9340B0BC420E8645A20CE /* ReportMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2508B8D1102329ADD59647AD /* ReportMenu.swift */; };
 		FCFF17518389098CB3EF78A0 /* AccessibilityAuditTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F83616889070531F0DC14C2 /* AccessibilityAuditTests.swift */; };
 /* End PBXBuildFile section */
@@ -99,6 +105,7 @@
 		194AC502DDF0944439775788 /* SmoothTurnTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmoothTurnTests.swift; sourceTree = "<group>"; };
 		1F83616889070531F0DC14C2 /* AccessibilityAuditTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityAuditTests.swift; sourceTree = "<group>"; };
 		22552EE8A53F8F11C97F75F5 /* VeloMapsTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = VeloMapsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		2472BFD92AE37F3B96F0BD10 /* HomeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeUITests.swift; sourceTree = "<group>"; };
 		2508B8D1102329ADD59647AD /* ReportMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportMenu.swift; sourceTree = "<group>"; };
 		2CAC166C8F17C07E8B45B5B2 /* cue-turn-left-onto-riverside-drive.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-turn-left-onto-riverside-drive.mp3"; sourceTree = "<group>"; };
 		32573F74E4AD75883BFA8502 /* PerformanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceTests.swift; sourceTree = "<group>"; };
@@ -115,6 +122,7 @@
 		52C78F2EDB521CAD8D838F81 /* Walk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Walk.swift; sourceTree = "<group>"; };
 		546BA85AB85E847E54F0DD13 /* cue-take-the-exit-to-west-96th-street.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-take-the-exit-to-west-96th-street.mp3"; sourceTree = "<group>"; };
 		548C30603940B864098BD707 /* TripCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripCard.swift; sourceTree = "<group>"; };
+		5B7FDFAD3586C5C50FFD920C /* LiveNavigationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveNavigationTests.swift; sourceTree = "<group>"; };
 		5F99356A7357375F7B849983 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5FF4CB7B970A006FB2296FB0 /* cue-in-0-9-miles.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-0-9-miles.mp3"; sourceTree = "<group>"; };
 		639C9DAE501F204B83E1FA96 /* cue-in-300-feet.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-300-feet.mp3"; sourceTree = "<group>"; };
@@ -127,6 +135,8 @@
 		7493EAB4777B9A09368449F8 /* VeloMapsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VeloMapsApp.swift; sourceTree = "<group>"; };
 		79FDAEF3917C62AA16561C1F /* cue-arrive-at-west-96th-street.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-arrive-at-west-96th-street.mp3"; sourceTree = "<group>"; };
 		7C2C4B93EF1229644CD747E0 /* cue-your-stop-is-next-columbus-av-w-96-st.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-your-stop-is-next-columbus-av-w-96-st.mp3"; sourceTree = "<group>"; };
+		7C708CC86B357FBB2401F335 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		7E200645BF3E0302A4E0E73B /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
 		834F24D4A80C6B4EA334CF85 /* cue-in-200-feet.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-200-feet.mp3"; sourceTree = "<group>"; };
 		846FC60B82C48A7B243D2F62 /* cue-turn-left-onto-w-96-st.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-turn-left-onto-w-96-st.mp3"; sourceTree = "<group>"; };
 		868B047B581941CA3316D432 /* Pothole.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pothole.swift; sourceTree = "<group>"; };
@@ -144,6 +154,7 @@
 		9EDD3D5A530A44E8A75D7CAF /* HighwaySignTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighwaySignTests.swift; sourceTree = "<group>"; };
 		A25FABAB48003BEACFB6F5D0 /* cue-2-stops-to-go-your-stop-is-columbus-av-w-96-st.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-2-stops-to-go-your-stop-is-columbus-av-w-96-st.mp3"; sourceTree = "<group>"; };
 		A7E12007D71FDBD8907D738A /* VoiceCues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceCues.swift; sourceTree = "<group>"; };
+		A9EA014A1B1A9F1B89B4E58F /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
 		ADC96B3BB067C9588F6935DC /* cue-in-1-1-miles.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-1-1-miles.mp3"; sourceTree = "<group>"; };
 		B3C7EDF41AAB6727C6F5296F /* RouteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteTests.swift; sourceTree = "<group>"; };
 		B3E33F3FAF4A874440BDC5F6 /* cue-in-1-3-miles.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-1-3-miles.mp3"; sourceTree = "<group>"; };
@@ -152,12 +163,14 @@
 		C803D127340667FB58AAFF5D /* cue-in-700-feet.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-700-feet.mp3"; sourceTree = "<group>"; };
 		D1BC7B13218AB2AC8E6AE7F4 /* GlassCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassCards.swift; sourceTree = "<group>"; };
 		DA6D319A13C80806F384F7FB /* cue-turn-left-onto-west-79th-street.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-turn-left-onto-west-79th-street.mp3"; sourceTree = "<group>"; };
+		DBEB995E61137D62ADCC561E /* osrm_hh_drive.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = osrm_hh_drive.json; sourceTree = "<group>"; };
 		DD48A387561B5C9BA8A43F2E /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		DE1F27481046F152E05410B1 /* cue-arriving-at-your-stop-columbus-av-w-96-st.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-arriving-at-your-stop-columbus-av-w-96-st.mp3"; sourceTree = "<group>"; };
 		DEDE76D5B14EF54133611354 /* cue-arrive-at-columbus-av-w-96-st.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-arrive-at-columbus-av-w-96-st.mp3"; sourceTree = "<group>"; };
 		E59DFE1A61C6B95197EE6035 /* Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route.swift; sourceTree = "<group>"; };
 		E92A7B1D48DEE15BD4AD46A0 /* cue-in-100-feet.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-100-feet.mp3"; sourceTree = "<group>"; };
 		ECA723F42416421F6CCC8733 /* cue-in-1-mile.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-1-mile.mp3"; sourceTree = "<group>"; };
+		F6E9F700D58E702F1719CC20 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		FF344E6EB1755D45BD406969 /* SettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTests.swift; sourceTree = "<group>"; };
 		FF40C3B07DE63DD8561EC4C7 /* VoiceCueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceCueTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -177,6 +190,7 @@
 			isa = PBXGroup;
 			children = (
 				1F83616889070531F0DC14C2 /* AccessibilityAuditTests.swift */,
+				2472BFD92AE37F3B96F0BD10 /* HomeUITests.swift */,
 				32573F74E4AD75883BFA8502 /* PerformanceTests.swift */,
 				4A9FF142C594E6A0D9C4E123 /* RideScreenUITests.swift */,
 			);
@@ -188,6 +202,8 @@
 			children = (
 				9EDD3D5A530A44E8A75D7CAF /* HighwaySignTests.swift */,
 				99BEBC3D3926117767BDEC8F /* LaneTests.swift */,
+				5B7FDFAD3586C5C50FFD920C /* LiveNavigationTests.swift */,
+				DBEB995E61137D62ADCC561E /* osrm_hh_drive.json */,
 				B3C7EDF41AAB6727C6F5296F /* RouteTests.swift */,
 				FF344E6EB1755D45BD406969 /* SettingsTests.swift */,
 				194AC502DDF0944439775788 /* SmoothTurnTests.swift */,
@@ -214,11 +230,15 @@
 				7308FE227F042D1390486D35 /* DemoDrive.swift */,
 				D1BC7B13218AB2AC8E6AE7F4 /* GlassCards.swift */,
 				87AFCC98A0845629A124D3BB /* HighwaySignView.swift */,
+				F6E9F700D58E702F1719CC20 /* HomeView.swift */,
+				7C708CC86B357FBB2401F335 /* Info.plist */,
+				7E200645BF3E0302A4E0E73B /* LocationService.swift */,
 				41813ECBD67C820C8DF8CF98 /* Metrics.swift */,
 				868B047B581941CA3316D432 /* Pothole.swift */,
 				35690661AC6F1D578D8F5BF4 /* Readability.swift */,
 				2508B8D1102329ADD59647AD /* ReportMenu.swift */,
 				E59DFE1A61C6B95197EE6035 /* Route.swift */,
+				A9EA014A1B1A9F1B89B4E58F /* Router.swift */,
 				DD48A387561B5C9BA8A43F2E /* Settings.swift */,
 				8F7FCBDD2BC9B08B84DA3AF2 /* TransitMapView.swift */,
 				0CD8CAD55B97849D3C6F5C96 /* Trip.swift */,
@@ -285,6 +305,7 @@
 			buildConfigurationList = BAAB1FA33858951A8DA6F346 /* Build configuration list for PBXNativeTarget "VeloMapsTests" */;
 			buildPhases = (
 				0CCCF694106A171FAA815FE1 /* Sources */,
+				EB9CA558F78480BE9B7B6EA1 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -424,6 +445,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EB9CA558F78480BE9B7B6EA1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CFFE978F06B90F6B58D19DB5 /* osrm_hh_drive.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -432,6 +461,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FCFF17518389098CB3EF78A0 /* AccessibilityAuditTests.swift in Sources */,
+				1D31132F0A4B3BDA45B8CC17 /* HomeUITests.swift in Sources */,
 				6CEC3C6F9DBAE7F13A360A07 /* PerformanceTests.swift in Sources */,
 				C116C162B6ED7B90AC005CA2 /* RideScreenUITests.swift in Sources */,
 			);
@@ -445,11 +475,14 @@
 				0D8F6628C859A1B4263127A0 /* DemoDrive.swift in Sources */,
 				37D805EC75CC7948B3DB56F7 /* GlassCards.swift in Sources */,
 				7DA49142EAFAB916799EA408 /* HighwaySignView.swift in Sources */,
+				636735F11441A21259148A94 /* HomeView.swift in Sources */,
+				70B280E5D957F89E3CEC3980 /* LocationService.swift in Sources */,
 				58BF47D8EE63F7963E3F76F3 /* Metrics.swift in Sources */,
 				A91822C3F7C5B20CA5489BFB /* Pothole.swift in Sources */,
 				9D6DCD8AEC54781AC30AD822 /* Readability.swift in Sources */,
 				EDD9340B0BC420E8645A20CE /* ReportMenu.swift in Sources */,
 				5B2D53144797D934220E9E5E /* Route.swift in Sources */,
+				EDAA7E27CCFFE2E103B67F68 /* Router.swift in Sources */,
 				E56EF6424EF30B28A7CB921E /* Settings.swift in Sources */,
 				25E20747E92EFCD0022D5F21 /* TransitMapView.swift in Sources */,
 				5A913936D21DD59C0A8677C5 /* Trip.swift in Sources */,
@@ -469,6 +502,7 @@
 			files = (
 				ABD81535D9E70B423548E466 /* HighwaySignTests.swift in Sources */,
 				968BB5776EDE98782F62025A /* LaneTests.swift in Sources */,
+				950264D9179E612DB4FF11BE /* LiveNavigationTests.swift in Sources */,
 				9A67867BBDE7505EB1B3E2D4 /* RouteTests.swift in Sources */,
 				7BE3F1575CAB06A746D96ED6 /* SettingsTests.swift in Sources */,
 				7FE8889554A24FA74924A4B0 /* SmoothTurnTests.swift in Sources */,
@@ -633,9 +667,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = VeloMaps/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Velo Maps";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.navigation";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Velo Maps uses your location to show where you are and give turn-by-turn directions while you drive.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -715,9 +751,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = VeloMaps/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Velo Maps";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.navigation";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Velo Maps uses your location to show where you are and give turn-by-turn directions while you drive.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (

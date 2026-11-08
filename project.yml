@@ -15,9 +15,14 @@ targets:
     type: application
     platform: iOS
     sources: [VeloMaps]
+    info:
+      path: VeloMaps/Info.plist
+      properties:
+        UIBackgroundModes: [location, audio]
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.divinedavis.velomaps
+        INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: "Velo Maps uses your location to show where you are and give turn-by-turn directions while you drive."
         PRODUCT_NAME: VeloMaps
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: Velo Maps

@@ -79,8 +79,23 @@ final class Trip: ObservableObject {
     private var spokenPotholes: Set<UUID> = []
     private var stopAlertFired = false
 
-    init(route: Route? = nil, defaults: UserDefaults = .standard) {
+    /// Live navigation from real GPS (the default app); false = the scripted demo used by tests
+    /// and previews (`-demo bus|drive`).
+    let live: Bool
+    /// Live: GPS speed (m/s) and the snapped distance the display catches up to.
+    private(set) var liveSpeed: Double = 0
+    private var targetDistance: CLLocationDistance = 0
+    private var offRouteFixes = 0
+    private var lastGoodFix: Date?
+    /// Live: the rider has left the route (3 fixes in a row well off the line) → reroute.
+    @Published private(set) var offRoute = false
+    /// Live: the trip is over (arrived and ended, or "Hold to end").
+    @Published private(set) var ended = false
+    private var arrived = false
+
+    init(route: Route? = nil, defaults: UserDefaults = .standard, live: Bool = false) {
         self.settings = defaults
+        self.live = live
         // -demo drive: the Henry Hudson Parkway drive with highway entrance/exit signs.
         let route = route ?? (defaults.string(forKey: "demo") == "drive" ? Route.hhDrive : Route.m10)
         self.route = route
@@ -123,8 +138,13 @@ final class Trip: ObservableObject {
             distance = max(0, signs[i].at - ahead)
         }
         // Reports other riders already made on this route (demo data; the real app would load
-        // these from a shared server).
-        potholes = [700, 1450].map { Pothole(coordinate: route.position(at: $0).0, at: $0, mine: false) }
+        // these from a shared server). Live trips start clean, at the start of the route.
+        if live {
+            distance = 0
+            paused = false
+        } else {
+            potholes = [700, 1450].map { Pothole(coordinate: route.position(at: $0).0, at: $0, mine: false) }
+        }
         // -demoReports YES (previews): a police and a road-closed marker just ahead.
         if defaults.bool(forKey: "demoReports") {
             reports = [(ReportKind.police, 60.0), (.closure, 140.0)].map {
@@ -162,8 +182,18 @@ final class Trip: ObservableObject {
 
     func advance(by dt: TimeInterval) {
         guard !paused, route.length > 0 else { return }
-        distance += speed * dt
-        if distance >= route.length { restart() }
+        if live {
+            // Between GPS fixes, carry on at the GPS speed; ease toward each new fix so the
+            // vehicle glides instead of jumping once a second.
+            // Only coast while the last fix was on the route: off it, the vehicle must not keep
+            // gliding down the planned road (seen 11/8 in a simulated drive).
+            if !arrived, offRouteFixes == 0 { targetDistance = min(route.length, targetDistance + liveSpeed * dt) }
+            distance += (targetDistance - distance) * (1 - exp(-dt / 0.5))
+            if !arrived, route.length - targetDistance < 20 { arrive() }
+        } else {
+            distance += speed * dt
+            if distance >= route.length { restart() }
+        }
         // Refresh the published state every 0.25 s of *trip* time (not wall-clock), so a big
         // step (tests, a hitch) still updates banners, alerts and voice.
         sincePublish += dt
@@ -174,7 +204,59 @@ final class Trip: ObservableObject {
     }
     private var sincePublish: TimeInterval = 0
 
-    func endRide() { walking = true }
+    func endRide() {
+        if live { ended = true; return }
+        walking = true
+    }
+
+    /// Live: a new GPS fix. Snaps it to the route, takes its speed, and flags leaving the route.
+    func update(fix: CLLocation) {
+        guard live, !arrived else { return }
+        if fix.speed >= 0 { liveSpeed = fix.speed }
+        let tolerance = max(35, fix.horizontalAccuracy * 1.5)
+        // Only accept a point on the route we could actually have driven to since the last good
+        // fix: a nearby stretch of the same route (Riverside Drive beside the parkway) must not
+        // pull the vehicle down the road, in the search window or beyond it.
+        let since = lastGoodFix.map { fix.timestamp.timeIntervalSince($0) } ?? .infinity
+        let reach = 200 + max(liveSpeed, 15) * since * 1.5
+        func plausible(_ c: (distance: CLLocationDistance, offBy: Double)) -> Bool {
+            c.offBy <= tolerance && c.distance >= targetDistance - 50 && c.distance - targetDistance <= reach
+        }
+        var snap = route.snap(fix.coordinate, near: targetDistance)
+        if !plausible(snap) {
+            // A gap in fixes (tunnel, first fix after Start) can put us past the search window.
+            snap = route.snap(fix.coordinate, near: targetDistance, behind: .infinity, ahead: .infinity)
+        }
+        if !plausible(snap) {
+            offRouteFixes += 1
+            if offRouteFixes >= 3, !offRoute { offRoute = true }
+        } else {
+            offRouteFixes = 0
+            targetDistance = snap.distance
+            lastGoodFix = fix.timestamp
+        }
+    }
+
+    /// Live: swap in a fresh route from where the rider is now (after leaving the route).
+    func reroute(_ newRoute: Route) {
+        route = newRoute
+        distance = 0
+        targetDistance = 0
+        offRouteFixes = 0
+        lastGoodFix = nil
+        offRoute = false
+        bannerManeuver = nil
+        potholes = []          // positions were along the old line
+        publish(force: true)
+    }
+
+    private func arrive() {
+        arrived = true
+        targetDistance = route.length
+        let text = "You have arrived at \(route.destination)"
+        announcement = Announcement(text: text)
+        if settings.voiceGuidance { speak(VoiceCues.line(text)) }
+    }
 
     /// The turn banner appears when the next maneuver is within its time window at the current
     /// speed, stays up until that maneuver is passed (no flicker if the vehicle slows), and goes
@@ -212,7 +294,7 @@ final class Trip: ObservableObject {
     /// Stop alert (settings): "At my stop" fires within 120 m of the last stop; "N stops
     /// before" fires when N stops are left including yours. Once per trip, spoken + on screen.
     private func checkStopAlert() {
-        guard !stopAlertFired, !walking, route.stops.count > 1 else { return }
+        guard !live, !stopAlertFired, !walking, route.stops.count > 1 else { return }
         let setting = settings.stopAlertSetting
         guard setting != "Off" else { return }
         let dest = route.stops.count - 1
@@ -278,7 +360,9 @@ final class Trip: ObservableObject {
         let next = route.nextStopIndex(at: distance)
         if next != nextStop { nextStop = next }
         // Real buses average ~3–4 m/s in Manhattan including stops; use that for the ETA, not the demo speed.
-        let mins = Int(((route.length - distance) / route.etaSpeed / 60).rounded(.up))
+        let remaining = max(0, route.length - distance)
+        let seconds = route.duration.map { $0 * remaining / max(route.length, 1) } ?? remaining / route.etaSpeed
+        let mins = Int((seconds / 60).rounded(.up))
         if mins != minutesLeft { minutesLeft = mins }
         elapsed = now.timeIntervalSince(startedAt)
         progress = route.length > 0 ? distance / route.length : 0

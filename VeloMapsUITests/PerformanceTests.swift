@@ -7,14 +7,14 @@ final class PerformanceTests: XCTestCase {
     func testLaunch() throws {
         let opts = XCTMeasureOptions(); opts.iterationCount = 5
         measure(metrics: [XCTApplicationLaunchMetric(waitUntilResponsive: true)], options: opts) {
-            let app = XCUIApplication(); app.launchArguments = ["-paused", "YES"]
+            let app = XCUIApplication(); app.launchArguments = ["-demo", "bus", "-paused", "YES"]
             app.launch()
         }
     }
 
     /// Launch until the ride card shows the next stop: the wait a rider actually sees.
     func testLaunchToRideReady() throws {
-        let app = XCUIApplication(); app.launchArguments = ["-paused", "YES"]
+        let app = XCUIApplication(); app.launchArguments = ["-demo", "bus", "-paused", "YES"]
         let opts = XCTMeasureOptions(); opts.iterationCount = 5
         measure(metrics: [XCTClockMetric()], options: opts) {
             app.launch()

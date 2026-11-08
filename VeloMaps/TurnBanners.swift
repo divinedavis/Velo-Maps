@@ -8,9 +8,11 @@ struct Maneuver: Identifiable {
     let verb: String        // "Turn left onto"
     let street: String      // "W 96 St"
     var sign: HighwaySign? = nil
-    var instruction: String { sign?.instruction ?? "\(verb) \(street)" }
+    var instruction: String {
+        sign?.instruction ?? [verb, street].filter { !$0.isEmpty }.joined(separator: " ")
+    }
     /// Short name for compact banners: the sign's first shield/destination, else the street.
-    var title: String { sign.map { $0.shields.first ?? $0.destinations.first ?? "" } ?? street }
+    var title: String { sign.map { $0.shields.first ?? $0.destinations.first ?? "" } ?? (street.isEmpty ? verb : street) }
 }
 
 /// Lane arrows for the lane-guidance design. `active` lanes are the ones to be in.
@@ -25,7 +27,7 @@ extension Trip {
 
     /// Speed used to time the turn banner. Demo: the playback speed; the real app would use
     /// the GPS speed (CLLocation.speed).
-    var currentSpeed: Double { speed }
+    var currentSpeed: Double { live ? liveSpeed : speed }
 
     /// How far ahead of a maneuver its banner appears: a fixed lead *time* at the current speed,
     /// never less than a minimum distance. Highway ramps get more time (lane changes at speed).

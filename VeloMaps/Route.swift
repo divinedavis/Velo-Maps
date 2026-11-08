@@ -104,6 +104,9 @@ struct Route {
     private(set) var stopDistances: [CLLocationDistance] = []
     /// Where each road starts along the line.
     private(set) var roadStarts: [CLLocationDistance] = []
+    private(set) var maneuverList: [Maneuver] = []
+    /// Expected travel time for the whole route (seconds), from the router; nil = estimate.
+    var duration: Double?
     /// Lateral offset (metres right of the OSM line) of the lane to drive in, every 4 m.
     private(set) var laneOffsets: [Double] = []
     static let laneSpacing = 4.0
@@ -194,14 +197,9 @@ struct Route {
             total += points[i - 1].distance(to: points[i])
             cumulative.append(total)
         }
-        stopDistances = stops.map { stop in
-            // Distance along the line of the vertex nearest to the stop.
-            let nearest = points.indices.min { points[$0].distance(to: stop.coordinate) < points[$1].distance(to: stop.coordinate) } ?? 0
-            return cumulative[nearest]
-        }
-        roadStarts = roads.map { r in
-            cumulative[points.indices.min { points[$0].distance(to: r.coordinate) < points[$1].distance(to: r.coordinate) } ?? 0]
-        }
+        stopDistances = stops.map { distanceAlong(nearest: $0.coordinate) }
+        roadStarts = roads.map { distanceAlong(nearest: $0.coordinate) }
+        maneuverList = computeManeuvers()
         laneOffsets = computeLaneOffsets()
     }
 
@@ -285,8 +283,10 @@ struct Route {
     /// Position and travel heading at `distance` metres along the route.
     func position(at distance: CLLocationDistance) -> (CLLocationCoordinate2D, CLLocationDirection) {
         let d = min(max(distance, 0), length)
-        var i = cumulative.firstIndex { $0 >= d } ?? (points.count - 1)
-        i = max(i, 1)
+        // First index with cumulative >= d (binary search: live routes have thousands of points).
+        var lo = 0, hi = cumulative.count - 1
+        while lo < hi { let mid = (lo + hi) / 2; if cumulative[mid] < d { lo = mid + 1 } else { hi = mid } }
+        let i = max(lo, 1)
         let a = points[i - 1], b = points[i]
         let seg = cumulative[i] - cumulative[i - 1]
         let t = seg > 0 ? (d - cumulative[i - 1]) / seg : 0
@@ -309,13 +309,49 @@ struct Route {
     }
 
     /// Turns along the route plus the final arrival, in order.
-    var maneuvers: [Maneuver] {
+    var maneuvers: [Maneuver] { maneuverList }
+
+    private func computeManeuvers() -> [Maneuver] {
         var out: [Maneuver] = turns.enumerated().map { i, t in
-            let v = points.indices.min { points[$0].distance(to: t.coordinate) < points[$1].distance(to: t.coordinate) } ?? 0
-            return Maneuver(id: i, at: cumulative[v], icon: t.icon, verb: t.verb, street: t.street, sign: t.sign)
+            Maneuver(id: i, at: distanceAlong(nearest: t.coordinate), icon: t.icon, verb: t.verb, street: t.street, sign: t.sign)
         }
+        out.sort { $0.at < $1.at }
+        out = out.enumerated().map { i, m in Maneuver(id: i, at: m.at, icon: m.icon, verb: m.verb, street: m.street, sign: m.sign) }
         out.append(Maneuver(id: out.count, at: length, icon: "mappin.circle.fill", verb: "Arrive at", street: destination))
         return out
+    }
+
+    /// Live GPS → route: the closest point on the line within a window around the last known
+    /// distance (so a route that doubles back can't jump), and how far off the line the fix is.
+    func snap(_ c: CLLocationCoordinate2D, near last: CLLocationDistance,
+              behind: Double = 150, ahead: Double = 600) -> (distance: CLLocationDistance, offBy: Double) {
+        let mx = 111_320 * cos(c.latitude * .pi / 180), my = 110_540.0
+        var best = (d: last, off: Double.infinity)
+        for i in 1..<points.count {
+            if cumulative[i] < last - behind { continue }
+            if cumulative[i - 1] > last + ahead { break }
+            let a = points[i - 1], b = points[i]
+            let ax = (a.longitude - c.longitude) * mx, ay = (a.latitude - c.latitude) * my
+            let bx = (b.longitude - c.longitude) * mx, by = (b.latitude - c.latitude) * my
+            let vx = bx - ax, vy = by - ay, len2 = vx * vx + vy * vy
+            let t = len2 > 0 ? max(0, min(1, -(ax * vx + ay * vy) / len2)) : 0
+            let px = ax + vx * t, py = ay + vy * t
+            let off = (px * px + py * py).squareRoot()
+            if off < best.off { best = (cumulative[i - 1] + (cumulative[i] - cumulative[i - 1]) * t, off) }
+        }
+        return (best.d, best.off)
+    }
+
+    /// Distance along the line of the vertex nearest to `c`.
+    func distanceAlong(nearest c: CLLocationCoordinate2D) -> CLLocationDistance {
+        let cosLat = cos(c.latitude * .pi / 180)
+        var best = 0, bestD = Double.infinity
+        for (i, p) in points.enumerated() {
+            let dy = p.latitude - c.latitude, dx = (p.longitude - c.longitude) * cosLat
+            let d = dx * dx + dy * dy
+            if d < bestD { bestD = d; best = i }
+        }
+        return cumulative[best]
     }
 
     /// Lane arrows for a plain turn (illustrative: left/right lane highlighted). Ramps show

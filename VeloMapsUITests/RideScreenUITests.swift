@@ -4,7 +4,7 @@ final class RideScreenUITests: XCTestCase {
     /// The ride screen (Hero card) shows the map, destination, next stop, and the hold button.
     func testRideScreenShowsMapCardAndHoldButton() {
         let app = XCUIApplication()
-        app.launchArguments += ["-paused", "YES"]
+        app.launchArguments += ["-demo", "bus", "-paused", "YES"]
         app.launch()
 
         XCTAssertTrue(app.otherElements["transit-map"].waitForExistence(timeout: 10) || app.maps.firstMatch.exists)
@@ -18,7 +18,7 @@ final class RideScreenUITests: XCTestCase {
     /// Opening straight onto the walking handoff shows the drop-off and the walk offer.
     func testWalkHandoffOffersWalkingDirections() {
         let app = XCUIApplication()
-        app.launchArguments += ["-paused", "YES", "-mode", "walk", "-walkStyle", "2"]
+        app.launchArguments += ["-demo", "bus", "-paused", "YES", "-mode", "walk", "-walkStyle", "2"]
         app.launch()
 
         XCTAssertTrue(app.staticTexts["You're off the M10"].waitForExistence(timeout: 10))
@@ -28,7 +28,7 @@ final class RideScreenUITests: XCTestCase {
     /// Swiping the ride card up reveals navigation settings.
     func testSwipeUpCardShowsNavigationSettings() {
         let app = XCUIApplication()
-        app.launchArguments += ["-paused", "YES"]
+        app.launchArguments += ["-demo", "bus", "-paused", "YES"]
         app.launch()
 
         let next = app.staticTexts["next-stop"]
@@ -44,7 +44,7 @@ final class RideScreenUITests: XCTestCase {
     /// Pothole lives in the "+" menu (first item) and reports straight away, no form.
     func testPotholeIsReportedFromThePlusMenu() {
         let app = XCUIApplication()
-        app.launchArguments += ["-paused", "YES", "-progress", "0.25", "-resetSettings", "YES"]
+        app.launchArguments += ["-demo", "bus", "-paused", "YES", "-progress", "0.25", "-resetSettings", "YES"]
         app.launch()
 
         // At 25% a demo report from another rider is ~140 m ahead: the alert is up.
@@ -64,7 +64,7 @@ final class RideScreenUITests: XCTestCase {
     /// Approaching the turn shows the turn banner with the street name.
     func testTurnBannerShowsUpcomingTurn() {
         let app = XCUIApplication()
-        app.launchArguments += ["-paused", "YES", "-turnAhead", "60", "-turnStyle", "1"]
+        app.launchArguments += ["-demo", "bus", "-paused", "YES", "-turnAhead", "60", "-turnStyle", "1"]
         app.launch()
 
         let banner = app.descendants(matching: .any)["turn-banner"]
@@ -75,7 +75,7 @@ final class RideScreenUITests: XCTestCase {
     /// The "+" button opens the report menu (police, accident, …) and confirms a report.
     func testPlusMenuReportsPolice() {
         let app = XCUIApplication()
-        app.launchArguments += ["-paused", "YES"]
+        app.launchArguments += ["-demo", "bus", "-paused", "YES"]
         app.launch()
 
         let plus = app.buttons["report-menu"]
@@ -126,7 +126,7 @@ final class RideScreenUITests: XCTestCase {
         for (args, expected) in [(["-progress", "0.25"], "Now on Central Park West"),
                                  (["-demo", "drive", "-progress", "0.6"], "Now on Henry Hudson Parkway")] {
             let app = XCUIApplication()
-            app.launchArguments += ["-paused", "YES"] + args
+            app.launchArguments += ["-demo", "bus", "-paused", "YES"] + args
             app.launch()
             let road = app.descendants(matching: .any)["current-road"]
             XCTAssertTrue(road.waitForExistence(timeout: 10))
@@ -148,7 +148,7 @@ final class RideScreenUITests: XCTestCase {
         ]
         for (args, visible, why) in cases {
             let app = XCUIApplication()
-            app.launchArguments += ["-paused", "YES"] + args
+            app.launchArguments += ["-demo", "bus", "-paused", "YES"] + args
             app.launch()
             XCTAssertTrue(app.staticTexts["next-stop"].waitForExistence(timeout: 10))
             let banner = app.descendants(matching: .any)["turn-banner"]
@@ -164,7 +164,7 @@ final class RideScreenUITests: XCTestCase {
     /// Turning off "Show reported potholes" removes the Pothole-ahead alert.
     func testShowReportedPotholesToggleWorks() {
         let app = XCUIApplication()
-        app.launchArguments += ["-paused", "YES", "-progress", "0.25", "-resetSettings", "YES"]
+        app.launchArguments += ["-demo", "bus", "-paused", "YES", "-progress", "0.25", "-resetSettings", "YES"]
         app.launch()
         let ahead = app.descendants(matching: .any)["pothole-ahead"]
         XCTAssertTrue(ahead.waitForExistence(timeout: 10))
@@ -177,13 +177,13 @@ final class RideScreenUITests: XCTestCase {
         XCTAssertFalse(ahead.waitForExistence(timeout: 2), "alert should be gone with the setting off")
         app.terminate()
         // Leave the simulator on default settings for other tests.
-        let reset = XCUIApplication(); reset.launchArguments += ["-paused", "YES", "-resetSettings", "YES"]; reset.launch(); reset.terminate()
+        let reset = XCUIApplication(); reset.launchArguments += ["-demo", "bus", "-paused", "YES", "-resetSettings", "YES"]; reset.launch(); reset.terminate()
     }
 
     /// The walking screen's End returns to the ride.
     func testEndWalkReturnsToTheRide() {
         let app = XCUIApplication()
-        app.launchArguments += ["-paused", "YES", "-mode", "walk"]
+        app.launchArguments += ["-demo", "bus", "-paused", "YES", "-mode", "walk"]
         app.launch()
         let end = app.buttons["end-walk"]
         XCTAssertTrue(end.waitForExistence(timeout: 10))
@@ -194,7 +194,7 @@ final class RideScreenUITests: XCTestCase {
     /// Share trip progress opens the iPhone share sheet.
     func testShareTripProgressOpensTheShareSheet() {
         let app = XCUIApplication()
-        app.launchArguments += ["-paused", "YES", "-expanded", "YES"]
+        app.launchArguments += ["-demo", "bus", "-paused", "YES", "-expanded", "YES"]
         app.launch()
         let share = app.buttons["share-trip"]
         XCTAssertTrue(share.waitForExistence(timeout: 10))

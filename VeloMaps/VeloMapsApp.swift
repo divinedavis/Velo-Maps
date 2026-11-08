@@ -2,8 +2,7 @@ import SwiftUI
 
 @main
 struct VeloMapsApp: App {
-    @StateObject private var trip = Trip()
-    @StateObject private var walk = Walk()
+    @StateObject private var model = AppModel()
 
     init() {
         Metrics.shared.start()
@@ -16,14 +15,39 @@ struct VeloMapsApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RideScreen(trip: trip, walk: walk)
+            RootView(model: model)
         }
+    }
+}
+
+/// Home ("Where to?") until a trip starts; the navigation screen while one runs.
+struct RootView: View {
+    @ObservedObject var model: AppModel
+    @ObservedObject var location: LocationService
+
+    init(model: AppModel) {
+        self.model = model
+        self.location = model.location
+    }
+
+    var body: some View {
+        Group {
+            if let trip = model.trip {
+                RideScreen(trip: trip, walk: model.walk) { model.end() }
+                    .id(ObjectIdentifier(trip))
+            } else {
+                HomeView(model: model)
+            }
+        }
+        .onChange(of: location.fix) { _, fix in if let fix { model.handle(fix) } }
     }
 }
 
 struct RideScreen: View {
     @ObservedObject var trip: Trip
     @ObservedObject var walk: Walk
+    /// Live: the trip ended (Hold to end, or arrived) — back to "Where to?".
+    var onExit: () -> Void = {}
     @State private var cardTop: CGFloat = 0
     @State private var showReportMenu = false
     @State private var toast: String?
@@ -39,6 +63,7 @@ struct RideScreen: View {
         }
         .preferredColorScheme(scheme)
         .dynamicTypeSize(...maxTextSize)
+        .onChange(of: trip.ended) { _, ended in if ended { onExit() } }
         .onChange(of: trip.announcement) { _, a in
             guard let a else { return }
             UINotificationFeedbackGenerator().notificationOccurred(.warning)

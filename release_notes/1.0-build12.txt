@@ -1,0 +1,5 @@
+Velo Maps now navigates for real. The demo is gone: the app opens on a map at your actual location with a Where to? search at the bottom. Type a place or address, pick it, check the time and distance, and tap Start.
+
+Everything follows your real GPS position and speed, including the turn banners, highway signs, lane guidance, the street you are on and the voice. If you leave the route, it works out a new one from where you are. Press and hold End to stop and go back to search. Navigation keeps going with the screen locked.
+
+Voice note: Rene's voice is recorded for a fixed set of phrases, so on most streets the turns are read by the iPhone voice for now. Police, accident, road closed and pothole reports stay on your phone and are not shared with other drivers yet.

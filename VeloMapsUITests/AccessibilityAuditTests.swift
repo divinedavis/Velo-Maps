@@ -10,7 +10,7 @@ final class AccessibilityAuditTests: XCTestCase {
 
     private func launch(_ extra: [String] = []) -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = ["-paused", "YES", "-progress", "0.25"] + extra
+        app.launchArguments = ["-demo", "bus", "-paused", "YES", "-progress", "0.25"] + extra
         app.launch()
         return app
     }
@@ -18,6 +18,7 @@ final class AccessibilityAuditTests: XCTestCase {
     /// The screen as the audit saw it, and contrast reports it couldn't reproduce.
     private var auditShot: UIImage?
     private var unreproduced: [String] = []
+    private var retried = false
 
     private func excused(_ issue: XCUIAccessibilityAuditIssue) -> Bool {
         guard let e = issue.element else { return true }   // nothing to point at, nothing to fix
@@ -85,6 +86,13 @@ final class AccessibilityAuditTests: XCTestCase {
                 return true
             }
         } catch {
+            // -902 "Invalid target app" = the audit tool failed to attach (seen 11/8; the same
+            // screens pass on a rerun). Retry once; a second failure, or any real finding, fails.
+            if (error as NSError).code == -902, !retried {
+                retried = true
+                sleep(2)
+                return audit(app, screen)
+            }
             XCTFail("\(screen): audit could not run: \(error)")
         }
         if !unreproduced.isEmpty {
@@ -125,6 +133,15 @@ final class AccessibilityAuditTests: XCTestCase {
         XCTAssertTrue(app.descendants(matching: .any)["walk-map"].waitForExistence(timeout: 10))
         sleep(2)   // let Apple's walking directions arrive
         audit(app, "walking")
+    }
+
+    func testHomeScreen() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-mockLocation", "40.7836,-73.9800", "-resetSettings", "YES"]
+        app.launch()
+        XCTAssertTrue(app.textFields["where-to"].waitForExistence(timeout: 10))
+        sleep(2)   // map tiles
+        audit(app, "home")
     }
 
     func testHighwayExitSign() {
