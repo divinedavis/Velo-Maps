@@ -9,15 +9,42 @@ import CoreLocation
 /// sometimes at capacity — then the sign just stays hidden.
 enum SpeedLimits {
     static let endpoint = URL(string: "https://overpass-api.de/api/interpreter")!
+    /// Our own tiles (NYC, built from OSM by scripts/build_speed_limit_tiles.sh, served from
+    /// the DigitalOcean droplet). Temporary sslip.io host until Velo Maps has a domain.
+    static let tileServer = URL(string: "https://velomaps.104.236.120.144.sslip.io/speedlimits/v1/")!
 
     static func lookup(_ route: Route, cache: SpeedLimitCache = .shared) async -> [(start: Double, mph: Int)] {
         let ways = await cache.ways(along: route) { tiles in await fetch(tiles) }
         return match(route, ways: ways)
     }
 
+    /// Our tile server first (NYC); any tile it doesn't have goes to the public Overpass API.
+    static func fetch(_ tiles: [SpeedLimitCache.Tile]) async -> [SpeedLimitCache.Tile: [OverpassWay]] {
+        var out: [SpeedLimitCache.Tile: [OverpassWay]] = [:]
+        await withTaskGroup(of: (SpeedLimitCache.Tile, [OverpassWay]?).self) { group in
+            for t in tiles { group.addTask { (t, await ownTile(t)) } }
+            for await (t, ways) in group { if let ways { out[t] = ways } }
+        }
+        let rest = tiles.filter { out[$0] == nil }
+        if !rest.isEmpty, let ways = await overpass(rest) {
+            for t in rest { out[t] = ways }          // the cache keeps each tile's own roads
+        }
+        return out
+    }
+
+    /// One tile from our server: roads, [] for a covered tile with none, nil if not served.
+    static func ownTile(_ t: SpeedLimitCache.Tile) async -> [OverpassWay]? {
+        var req = URLRequest(url: tileServer.appendingPathComponent("\(t.key).json"))
+        req.timeoutInterval = 10
+        guard let (data, resp) = try? await URLSession.shared.data(for: req),
+              (resp as? HTTPURLResponse)?.statusCode == 200,
+              let json = try? JSONDecoder().decode(OverpassResponse.self, from: data) else { return nil }
+        return json.ways
+    }
+
     /// One Overpass request for a batch of tiles; up to 3 tries (2 s, 5 s backoff) because the
     /// public servers are often "at capacity". nil = gave up (those tiles stay uncached).
-    static func fetch(_ tiles: [SpeedLimitCache.Tile]) async -> [OverpassWay]? {
+    static func overpass(_ tiles: [SpeedLimitCache.Tile]) async -> [OverpassWay]? {
         let parts = tiles.map { t in
             let b = t.bounds
             return String(format: "way[highway][maxspeed](%.5f,%.5f,%.5f,%.5f);", b.south, b.west, b.north, b.east)
@@ -61,7 +88,9 @@ enum SpeedLimits {
                 }
             }
             guard let mph = best?.mph else { continue }
-            if out.last?.mph != mph { out.append((d, mph)) }
+            // The first known limit covers the route from its start (the first sample to match
+            // can be 30 m in, and a car waiting at the start showed no sign — 11/8).
+            if out.last?.mph != mph { out.append((out.isEmpty ? 0 : d, mph)) }
         }
         return out
     }
@@ -86,7 +115,17 @@ enum SpeedLimits {
     }
 }
 
-struct OverpassResponse: Decodable { let elements: [OverpassWay] }
+/// Overpass replies with {"elements": […]}; our tile server with {"ways": […]}.
+struct OverpassResponse: Decodable {
+    let ways: [OverpassWay]
+    var elements: [OverpassWay] { ways }
+    private enum Keys: String, CodingKey { case elements, ways }
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: Keys.self)
+        ways = try c.decodeIfPresent([OverpassWay].self, forKey: .elements)
+            ?? c.decode([OverpassWay].self, forKey: .ways)
+    }
+}
 struct OverpassWay: Codable {
     let tags: [String: String]
     let geometry: [OverpassPoint]?

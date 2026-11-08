@@ -27,5 +27,6 @@ struct SpeedLimitTests {
         var live = r
         live.limitChanges = SpeedLimits.match(r, ways: [cross, along])
         #expect(live.speedLimit(at: 600) == 30)
+        #expect(live.limitChanges.first?.start == 0, "first limit must cover the start of the route")
     }
 }

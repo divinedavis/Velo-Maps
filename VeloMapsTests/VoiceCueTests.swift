@@ -50,3 +50,32 @@ struct VoiceCueTests {
         #expect(missing(VoiceCues.line(text)).isEmpty, "no clip for \(text)")
     }
 }
+
+@Suite("Whole-sentence voice")
+struct WholeSentenceVoiceTests {
+    @Test(arguments: [
+        ("In 300 feet, turn left onto W 96 St", "In 300 feet, turn left onto West 96th Street."),
+        ("In 0.4 miles, take the ramp to NY 9A North", "In 0.4 miles, take the ramp to New York 9A North."),
+        ("Your stop is next: Columbus Av / W 96 St", "Your stop is next: Columbus Avenue and West 96th Street."),
+        ("In 1 mile, keep right onto I 87 North", "In 1 mile, keep right onto Interstate 87 North."),
+        ("Pothole ahead", "Pothole ahead."),
+    ])
+    func spokenTextReadsLikeASentence(_ display: String, _ spoken: String) {
+        #expect(VoiceCues.spokenText(display) == spoken)
+    }
+
+    @Test func spokenTextIsSafeForTheVoiceService() {
+        let t = VoiceCues.spokenText("Turn left onto Café Street ⚠️ " + String(repeating: "x", count: 300))
+        #expect(t.count <= 200)
+        #expect(t.unicodeScalars.allSatisfy { $0.isASCII })
+    }
+
+    @Test func voiceServiceIsOffUnderTests() {
+        #expect(!VoiceService.enabled, "tests must never call the paid voice service")
+    }
+
+    @Test func cacheFileIsStablePerSentence() {
+        #expect(VoiceService.cacheURL("Pothole ahead.") == VoiceService.cacheURL("Pothole ahead."))
+        #expect(VoiceService.cacheURL("Pothole ahead.") != VoiceService.cacheURL("Pothole ahead!"))
+    }
+}

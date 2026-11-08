@@ -1,0 +1,26 @@
+[Unit]
+Description=Velo Maps voice (ElevenLabs proxy + cache, python, 127.0.0.1:3130)
+After=network.target
+
+[Service]
+Type=simple
+User=velomaps
+Group=velomaps
+EnvironmentFile=/etc/velomaps-tts.env
+ExecStart=/usr/bin/python3 /opt/velomaps-tts/velomaps_tts.py
+StateDirectory=velomaps-tts
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+[Install]
+WantedBy=multi-user.target

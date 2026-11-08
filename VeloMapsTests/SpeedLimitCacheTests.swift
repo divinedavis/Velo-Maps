@@ -19,10 +19,13 @@ struct SpeedLimitCacheTests {
     @Test func secondLookupOnTheSameRoadsMakesNoRequest() async {
         let cache = tempCache()
         var calls = 0, tilesAsked = 0
-        let first = await cache.ways(along: .m10) { tiles in calls += 1; tilesAsked += tiles.count; return [cpwWay()] }
+        let first = await cache.ways(along: .m10) { tiles in
+            calls += 1; tilesAsked += tiles.count
+            return Dictionary(uniqueKeysWithValues: tiles.map { ($0, [cpwWay()]) })
+        }
         #expect(calls >= 1 && !first.isEmpty)
         let before = calls
-        let second = await cache.ways(along: .m10) { _ in calls += 1; return [] }
+        let second = await cache.ways(along: .m10) { _ in calls += 1; return [:] }
         #expect(calls == before, "cached tiles were fetched again")
         #expect(!second.isEmpty)
         #expect(tilesAsked == SpeedLimitCache.tiles(along: .m10).count)
@@ -37,9 +40,9 @@ struct SpeedLimitCacheTests {
 
     @Test func failedFetchLeavesTilesUncached() async {
         let cache = tempCache()
-        _ = await cache.ways(along: .m10) { _ in nil }          // server at capacity
+        _ = await cache.ways(along: .m10) { _ in [:] }          // nothing could be fetched
         var calls = 0
-        _ = await cache.ways(along: .m10) { _ in calls += 1; return [] }
+        _ = await cache.ways(along: .m10) { _ in calls += 1; return [:] }
         #expect(calls >= 1, "a failed fetch must not be cached as 'no roads'")
     }
 
@@ -48,5 +51,19 @@ struct SpeedLimitCacheTests {
         for d in stride(from: 0.0, through: Route.hhDrive.length, by: 25) {
             #expect(tiles.contains(SpeedLimitCache.Tile(Route.hhDrive.position(at: d).0)))
         }
+    }
+
+    @Test func oneTileFailingDoesNotMarkItsNeighboursEmpty() async {
+        let cache = tempCache()
+        let tiles = SpeedLimitCache.tiles(along: .m10)
+        _ = await cache.ways(along: .m10) { asked in [asked[0]: [cpwWay()]] }   // only the first came back
+        #expect(await cache.read(tiles[0]) != nil)
+        if tiles.count > 1 { #expect(await cache.read(tiles[1]) == nil) }
+    }
+
+    @Test func serverTileJSONDecodes() throws {
+        let json = #"{"ways":[{"tags":{"maxspeed":"25 mph"},"geometry":[{"lat":40.78,"lon":-73.97},{"lat":40.79,"lon":-73.96}]}]}"#
+        let r = try JSONDecoder().decode(OverpassResponse.self, from: Data(json.utf8))
+        #expect(r.ways.count == 1 && r.ways[0].tags["maxspeed"] == "25 mph")
     }
 }

@@ -12,6 +12,7 @@
 		078C22E685A2CFB1BFF06641 /* VoiceCues.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E12007D71FDBD8907D738A /* VoiceCues.swift */; };
 		0D6E19FCD6AFBBA9FF3D4709 /* cue-in-500-feet.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 69F884E6910F55D7F12C3CE8 /* cue-in-500-feet.mp3 */; };
 		0D8F6628C859A1B4263127A0 /* DemoDrive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7308FE227F042D1390486D35 /* DemoDrive.swift */; };
+		0E035AFDF5D7199F27DAEB2B /* AppSecrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE86D9C8FF96A842F35F9E66 /* AppSecrets.swift */; };
 		1AF21EBDCC2910776ADAF6C5 /* SpeedLimitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A9AC6978F33601402643A5B /* SpeedLimitTests.swift */; };
 		1D31132F0A4B3BDA45B8CC17 /* HomeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2472BFD92AE37F3B96F0BD10 /* HomeUITests.swift */; };
 		219A2B169E36999219A361E7 /* cue-your-stop-is-next-columbus-av-w-96-st.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7C2C4B93EF1229644CD747E0 /* cue-your-stop-is-next-columbus-av-w-96-st.mp3 */; };
@@ -194,6 +195,7 @@
 		E59DFE1A61C6B95197EE6035 /* Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route.swift; sourceTree = "<group>"; };
 		E92A7B1D48DEE15BD4AD46A0 /* cue-in-100-feet.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-100-feet.mp3"; sourceTree = "<group>"; };
 		ECA723F42416421F6CCC8733 /* cue-in-1-mile.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-1-mile.mp3"; sourceTree = "<group>"; };
+		EE86D9C8FF96A842F35F9E66 /* AppSecrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSecrets.swift; sourceTree = "<group>"; };
 		F6E9F700D58E702F1719CC20 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		FF344E6EB1755D45BD406969 /* SettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTests.swift; sourceTree = "<group>"; };
 		FF40C3B07DE63DD8561EC4C7 /* VoiceCueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceCueTests.swift; sourceTree = "<group>"; };
@@ -251,6 +253,7 @@
 		B492C707B703954D061238EC /* VeloMaps */ = {
 			isa = PBXGroup;
 			children = (
+				EE86D9C8FF96A842F35F9E66 /* AppSecrets.swift */,
 				5F99356A7357375F7B849983 /* Assets.xcassets */,
 				8F82542A3955B45288349195 /* CurrentRoadLabel.swift */,
 				7308FE227F042D1390486D35 /* DemoDrive.swift */,
@@ -514,6 +517,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0E035AFDF5D7199F27DAEB2B /* AppSecrets.swift in Sources */,
 				C57FCF633091E3E4CF2DB602 /* CurrentRoadLabel.swift in Sources */,
 				0D8F6628C859A1B4263127A0 /* DemoDrive.swift in Sources */,
 				37D805EC75CC7948B3DB56F7 /* GlassCards.swift in Sources */,

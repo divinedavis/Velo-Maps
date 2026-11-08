@@ -50,7 +50,9 @@ actor SpeedLimitCache {
 
     /// Tagged roads along the route: cached tiles from disk, missing/expired ones fetched in
     /// batches through `fetch` and stored.
-    func ways(along route: Route, fetch: ([Tile]) async -> [OverpassWay]?) async -> [OverpassWay] {
+    /// Tagged roads along the route: cached tiles from disk, missing/expired ones fetched in
+    /// batches through `fetch` (tile → its roads; a tile left out = couldn't get it) and stored.
+    func ways(along route: Route, fetch: ([Tile]) async -> [Tile: [OverpassWay]]) async -> [OverpassWay] {
         // One lookup at a time (actors are re-entrant across awaits): the preview prefetch and
         // Start can ask for the same tiles; the second then reads what the first stored.
         while busy { try? await Task.sleep(for: .milliseconds(100)) }
@@ -64,9 +66,8 @@ actor SpeedLimitCache {
         }
         for start in stride(from: 0, to: missing.count, by: batchSize) {
             let batch = Array(missing[start..<min(start + batchSize, missing.count)])
-            guard let fetched = await fetch(batch) else { continue }
-            for t in batch {
-                let inTile = fetched.filter { ($0.geometry ?? []).contains { t.contains($0) } }
+            for (t, got) in await fetch(batch) where batch.contains(t) {
+                let inTile = got.filter { ($0.geometry ?? []).contains { t.contains($0) } }
                 write(t, inTile)
                 ways += inTile
             }
