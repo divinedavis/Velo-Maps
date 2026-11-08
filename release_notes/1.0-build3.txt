@@ -1,0 +1,5 @@
+Highway signs have a new look. When it is time to get on or off a highway, the top banner now shows a small drawing of the ramp leaving or joining the road, next to the sign on green Liquid Glass with the same wording as the real sign.
+
+The glass panels across the app are more see-through again, so the map shows through the banner and the trip card while the text stays easy to read.
+
+To try the highway signs, swipe the bottom card up and switch Demo ride to Drive.
