@@ -1,0 +1,5 @@
+Welcome to the first build of Velo Maps. This is a preview of the ride experience: the app plays a simulated M10 bus ride up Central Park West in Manhattan, so you can try it from anywhere. It does not use your location yet.
+
+Swipe the bottom card up for navigation settings. Tap Pothole to drop a warning sign on the map at the bus's spot, and tap the + button to report police, an accident, heavy traffic, a road closure, a hazard or a crowded bus. Near the end of the ride the lane banner at the top shows the left turn onto W 96 St.
+
+Press and hold "Hold to end ride" to finish. Velo Maps then switches to walking directions from the last stop to Symphony Space. Reports stay on your phone for now and are not shared with other riders yet.

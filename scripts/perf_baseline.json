@@ -1,0 +1,14 @@
+{
+  "PerformanceTests/testLaunch() :: Duration (ApplicationFirstFramePresentationResponsive)": {
+    "history": [
+      0.9444
+    ],
+    "unit": "s"
+  },
+  "PerformanceTests/testLaunchToRideReady() :: Clock Monotonic Time": {
+    "history": [
+      4.0175
+    ],
+    "unit": "s"
+  }
+}
