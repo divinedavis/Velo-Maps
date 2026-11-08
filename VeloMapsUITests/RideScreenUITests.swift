@@ -64,7 +64,7 @@ final class RideScreenUITests: XCTestCase {
     /// Approaching the turn shows the turn banner with the street name.
     func testTurnBannerShowsUpcomingTurn() {
         let app = XCUIApplication()
-        app.launchArguments += ["-paused", "YES", "-turnAhead", "120", "-turnStyle", "1"]
+        app.launchArguments += ["-paused", "YES", "-turnAhead", "60", "-turnStyle", "1"]
         app.launch()
 
         let banner = app.descendants(matching: .any)["turn-banner"]
@@ -133,6 +133,30 @@ final class RideScreenUITests: XCTestCase {
             XCTAssertEqual(road.label, expected)
             let card = app.descendants(matching: .any)["trip-card"]
             XCTAssertLessThanOrEqual(road.frame.maxY, card.frame.minY, "road label must sit above the card")
+            app.terminate()
+        }
+    }
+
+    /// The turn banner only appears within ~12 s of a city turn at the current speed, and
+    /// goes away once the turn is made (owner, 11/7).
+    func testTurnBannerIsTimedByDistanceAndSpeed() {
+        let cases: [([String], Bool, String)] = [
+            (["-turnAhead", "400"], false, "400 m out at 9 m/s is too early"),
+            (["-turnAhead", "60"], true, "60 m out is inside the window"),
+            (["-turnAhead", "200", "-speed", "20"], true, "faster driving opens the window earlier"),
+            (["-turnPassed", "30"], false, "after the turn the banner goes away"),
+        ]
+        for (args, visible, why) in cases {
+            let app = XCUIApplication()
+            app.launchArguments += ["-paused", "YES"] + args
+            app.launch()
+            XCTAssertTrue(app.staticTexts["next-stop"].waitForExistence(timeout: 10))
+            let banner = app.descendants(matching: .any)["turn-banner"]
+            if visible {
+                XCTAssertTrue(banner.waitForExistence(timeout: 3), why)
+            } else {
+                XCTAssertFalse(banner.waitForExistence(timeout: 2), why)
+            }
             app.terminate()
         }
     }

@@ -18,6 +18,8 @@ final class Trip: ObservableObject {
     @Published private(set) var minutesLeft: Int = 0
     @Published private(set) var elapsed: TimeInterval = 0
     @Published private(set) var progress: Double = 0
+    /// The maneuver whose turn banner is showing, if any (see updateBanner()).
+    @Published private(set) var bannerManeuver: Maneuver?
     @Published var paused: Bool
     /// Ride → walk handoff: holding "end" switches to walking directions for the last leg.
     @Published private(set) var walking: Bool
@@ -88,6 +90,10 @@ final class Trip: ObservableObject {
         if let ahead = defaults.number("turnAhead"), let turn = route.maneuvers.first {
             distance = max(0, turn.at - ahead)
         }
+        // -turnPassed 30: start this far past the first turn (banner should be gone).
+        if let past = defaults.number("turnPassed"), let turn = route.maneuvers.first {
+            distance = min(route.length, turn.at + past)
+        }
         // -signAhead 150 -signIndex 0|1: start this far before a ramp with a highway sign.
         let signs = route.maneuvers.filter { $0.sign != nil }
         if let ahead = defaults.number("signAhead"), !signs.isEmpty {
@@ -135,9 +141,25 @@ final class Trip: ObservableObject {
 
     func endRide() { walking = true }
 
+    /// The turn banner appears when the next maneuver is within its time window at the current
+    /// speed, stays up until that maneuver is passed (no flicker if the vehicle slows), and goes
+    /// away once the turn is made (owner, 11/7).
+    private func updateBanner() {
+        guard let next = nextManeuver else {
+            if bannerManeuver != nil { bannerManeuver = nil }
+            return
+        }
+        if bannerManeuver?.id == next.id { return }            // already up: keep until passed
+        let remaining = next.at - distance
+        let show = remaining <= Self.bannerWindow(for: next, speed: currentSpeed)
+        let wanted = show ? next : nil
+        if wanted?.id != bannerManeuver?.id { bannerManeuver = wanted }
+    }
+
     /// Switch demo route (settings): start over at the beginning with fresh demo reports.
     func useRoute(_ newRoute: Route) {
         route = newRoute
+        bannerManeuver = nil   // maneuver ids restart per route
         distance = 0
         startedAt = Date()
         potholes = [700, 1450].map { Pothole(coordinate: newRoute.position(at: $0).0, at: $0, mine: false) }
@@ -146,6 +168,7 @@ final class Trip: ObservableObject {
 
     func restart() {
         distance = 0
+        bannerManeuver = nil
         startedAt = Date()
         publish(force: true)
     }
@@ -161,6 +184,7 @@ final class Trip: ObservableObject {
         if mins != minutesLeft { minutesLeft = mins }
         elapsed = now.timeIntervalSince(startedAt)
         progress = route.length > 0 ? distance / route.length : 0
+        updateBanner()
     }
 }
 

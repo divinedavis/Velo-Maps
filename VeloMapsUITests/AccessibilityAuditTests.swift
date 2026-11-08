@@ -100,7 +100,7 @@ final class AccessibilityAuditTests: XCTestCase {
     }
 
     func testRideScreenNearTurn() {
-        let app = launch(["-turnAhead", "120"])
+        let app = launch(["-turnAhead", "60"])
         XCTAssertTrue(app.descendants(matching: .any)["turn-banner"].waitForExistence(timeout: 10))
         audit(app, "ride near turn")
     }

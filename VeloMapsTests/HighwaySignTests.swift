@@ -1,4 +1,5 @@
 import Testing
+import Foundation
 @testable import VeloMaps
 
 @Suite("Highway signs")
@@ -61,5 +62,34 @@ struct CurrentRoadTests {
     @Test func parkwayCarriesItsRouteNumber() {
         let r = Route.hhDrive
         #expect(r.road(at: r.length * 0.6)?.ref == "NY 9A")
+    }
+}
+
+@Suite("Turn banner timing")
+@MainActor
+struct TurnBannerTimingTests {
+    private func trip(_ args: [String: String]) -> Trip {
+        let d = UserDefaults(suiteName: "velo-tests-\(UUID())")!
+        args.forEach { d.set($0.value, forKey: $0.key) }
+        return Trip(defaults: d)
+    }
+
+    @Test func windowIsLeadTimeAtSpeedWithAMinimum() {
+        let city = Route.m10.maneuvers[0], ramp = Route.hhDrive.maneuvers.first { $0.sign != nil }!
+        #expect(Trip.bannerWindow(for: city, speed: 9) == 108)    // 12 s × 9 m/s
+        #expect(Trip.bannerWindow(for: city, speed: 3) == 80)     // minimum
+        #expect(Trip.bannerWindow(for: ramp, speed: 9) == 300)    // highway minimum
+        #expect(Trip.bannerWindow(for: ramp, speed: 25) == 750)   // 30 s × 25 m/s
+    }
+
+    @Test func hiddenWhenFarShownWhenCloseGoneAfterTheTurn() {
+        #expect(trip(["turnAhead": "400"]).bannerManeuver == nil)
+        #expect(trip(["turnAhead": "60"]).bannerManeuver?.street == "W 96 St")
+        #expect(trip(["turnPassed": "30"]).bannerManeuver == nil)
+    }
+
+    @Test func fasterSpeedShowsTheBannerEarlier() {
+        #expect(trip(["turnAhead": "200", "speed": "9"]).bannerManeuver == nil)
+        #expect(trip(["turnAhead": "200", "speed": "20"]).bannerManeuver != nil)
     }
 }

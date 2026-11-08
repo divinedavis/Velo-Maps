@@ -22,6 +22,19 @@ struct Lane: Identifiable {
 
 extension Trip {
     var nextManeuver: Maneuver? { route.maneuvers.first { $0.at > distanceAlong + 1 } }
+
+    /// Speed used to time the turn banner. Demo: the playback speed; the real app would use
+    /// the GPS speed (CLLocation.speed).
+    var currentSpeed: Double { speed }
+
+    /// How far ahead of a maneuver its banner appears: a fixed lead *time* at the current speed,
+    /// never less than a minimum distance. Highway ramps get more time (lane changes at speed).
+    static func bannerWindow(for m: Maneuver, speed: Double) -> Double {
+        let ramp = m.sign != nil
+        let lead: Double = ramp ? 30 : 12          // seconds
+        let minimum: Double = ramp ? 300 : 80      // metres
+        return min(2_000, max(minimum, max(0, speed) * lead))
+    }
     var followingManeuver: Maneuver? {
         guard let n = nextManeuver else { return nil }
         return route.maneuvers.first { $0.id == n.id + 1 }
@@ -38,7 +51,7 @@ struct TurnBannerClassic: View {
     @Environment(\.colorScheme) private var scheme
 
     var body: some View {
-        if let m = trip.nextManeuver {
+        if let m = trip.bannerManeuver {
             HStack(spacing: 16) {
                 Image(systemName: m.icon)
                     .scaledFont(40, .bold)
@@ -66,7 +79,7 @@ struct TurnBannerLanes: View {
     @Environment(\.colorScheme) private var scheme
 
     var body: some View {
-        if let m = trip.nextManeuver {
+        if let m = trip.bannerManeuver {
             VStack(spacing: 12) {
                 HStack(spacing: 14) {
                     Image(systemName: m.icon)
@@ -111,7 +124,7 @@ struct TurnBannerIsland: View {
     @Environment(\.colorScheme) private var scheme
 
     var body: some View {
-        if let m = trip.nextManeuver {
+        if let m = trip.bannerManeuver {
             HStack(spacing: 12) {
                 Image(systemName: m.icon)
                     .scaledFont(18, .bold)
@@ -146,7 +159,7 @@ struct TurnRowInCard: View {
     @Environment(\.colorScheme) private var scheme
 
     var body: some View {
-        if let m = trip.nextManeuver {
+        if let m = trip.bannerManeuver {
             HStack(spacing: 12) {
                 Image(systemName: m.icon)
                     .scaledFont(18, .bold)
@@ -177,7 +190,7 @@ struct TurnBannerThen: View {
     @Environment(\.colorScheme) private var scheme
 
     var body: some View {
-        if let m = trip.nextManeuver {
+        if let m = trip.bannerManeuver {
             Group {   // no GlassEffectContainer: it draws merged glass over readableGlass text
                 VStack(alignment: .leading, spacing: 6) {
                     VStack(alignment: .leading, spacing: 10) {

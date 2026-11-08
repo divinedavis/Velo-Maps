@@ -1,0 +1,3 @@
+The turn banner at the top now appears only when you need it. It shows up based on how far away the next turn is and how fast you are going: about 12 seconds before a city turn, and about 30 seconds before a highway entrance or exit so you have time to change lanes. The faster you drive, the earlier it appears.
+
+Once you make the turn, the banner goes away and the map is clear until the next turn comes up.
