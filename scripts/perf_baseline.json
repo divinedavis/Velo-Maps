@@ -1,21 +1,21 @@
 {
   "PerformanceTests/testLaunch() :: Duration (ApplicationFirstFramePresentationResponsive)": {
     "history": [
-      0.9663,
       0.9991,
       0.9688,
       0.9861,
-      1.0168
+      1.0168,
+      0.9434
     ],
     "unit": "s"
   },
   "PerformanceTests/testLaunchToRideReady() :: Clock Monotonic Time": {
     "history": [
-      3.9852,
       3.983,
       3.9935,
       3.9818,
-      4.0509
+      4.0509,
+      4.019
     ],
     "unit": "s"
   }
