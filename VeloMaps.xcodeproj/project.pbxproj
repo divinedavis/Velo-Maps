@@ -17,6 +17,7 @@
 		6CEC3C6F9DBAE7F13A360A07 /* PerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32573F74E4AD75883BFA8502 /* PerformanceTests.swift */; };
 		6D2B7E058E85744DCC80C0EB /* VeloMapsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7493EAB4777B9A09368449F8 /* VeloMapsApp.swift */; };
 		7DA49142EAFAB916799EA408 /* HighwaySignView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87AFCC98A0845629A124D3BB /* HighwaySignView.swift */; };
+		7FE8889554A24FA74924A4B0 /* SmoothTurnTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194AC502DDF0944439775788 /* SmoothTurnTests.swift */; };
 		9A67867BBDE7505EB1B3E2D4 /* RouteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3C7EDF41AAB6727C6F5296F /* RouteTests.swift */; };
 		9D6DCD8AEC54781AC30AD822 /* Readability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35690661AC6F1D578D8F5BF4 /* Readability.swift */; };
 		9F6FFDC790C1903E4C13467D /* WalkMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C1EF73DD5A5539675F8AB84 /* WalkMapView.swift */; };
@@ -51,6 +52,7 @@
 
 /* Begin PBXFileReference section */
 		0CD8CAD55B97849D3C6F5C96 /* Trip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trip.swift; sourceTree = "<group>"; };
+		194AC502DDF0944439775788 /* SmoothTurnTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmoothTurnTests.swift; sourceTree = "<group>"; };
 		1F83616889070531F0DC14C2 /* AccessibilityAuditTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityAuditTests.swift; sourceTree = "<group>"; };
 		22552EE8A53F8F11C97F75F5 /* VeloMapsTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = VeloMapsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2508B8D1102329ADD59647AD /* ReportMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportMenu.swift; sourceTree = "<group>"; };
@@ -104,6 +106,7 @@
 			children = (
 				9EDD3D5A530A44E8A75D7CAF /* HighwaySignTests.swift */,
 				B3C7EDF41AAB6727C6F5296F /* RouteTests.swift */,
+				194AC502DDF0944439775788 /* SmoothTurnTests.swift */,
 			);
 			path = VeloMapsTests;
 			sourceTree = "<group>";
@@ -297,6 +300,7 @@
 			files = (
 				ABD81535D9E70B423548E466 /* HighwaySignTests.swift in Sources */,
 				9A67867BBDE7505EB1B3E2D4 /* RouteTests.swift in Sources */,
+				7FE8889554A24FA74924A4B0 /* SmoothTurnTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

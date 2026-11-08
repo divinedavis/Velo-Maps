@@ -1,0 +1,3 @@
+Turns are now smooth. The car and the bus follow a curved path through every corner instead of snapping at square corners, and the vehicle icon now rotates to face the way it is actually going.
+
+The camera also follows more naturally: it eases around behind the vehicle as it turns rather than swinging early and jumping, so the map no longer skips during a turn.

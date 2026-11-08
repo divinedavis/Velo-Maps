@@ -69,6 +69,7 @@ struct TransitMapView: UIViewRepresentable {
             map.addOverlay(glow, level: .aboveRoads)
             map.addOverlay(core, level: .aboveRoads)
             map.view(for: bus)?.image = BusAnnotation.image(for: trip.route.kind)   // bus or car
+            cameraHeading = nil   // new route: start facing its first heading
         }
 
         private var shownPotholes: Set<UUID> = []
@@ -93,21 +94,47 @@ struct TransitMapView: UIViewRepresentable {
             if cardTop != lastCardTop { settledFrames = 0; lastCardTop = cardTop }
             if trip.paused && settledFrames > 30 { return }   // nothing moving: let the map idle
             trip.advance(by: dt)
-            placeCamera()
+            placeCamera(dt: dt)
         }
 
-        private func placeCamera() {
+        /// Camera heading, eased toward the vehicle's heading over time (not snapped to it).
+        private var cameraHeading: CLLocationDirection?
+        private weak var vehicleView: MKAnnotationView?
+
+        /// Chase camera like Apple Maps: the vehicle drives the rounded line and its icon turns
+        /// with it; the camera eases its heading toward the vehicle's (≈0.45 s time constant),
+        /// and is centred on the vehicle, offset along the *camera* heading — following the
+        /// line instead cut corners and swung the view (owner, 11/8: "the navigation skips").
+        private func placeCamera(dt: TimeInterval = 0) {
             guard let map else { return }
-            let (coord, _) = trip.route.position(at: trip.distance)
+            let d = trip.distance
+            let (coord, _) = trip.route.position(at: d)
             bus.coordinate = coord
-            let heading = trip.route.smoothedHeading(at: trip.distance)
-            let (ahead, _) = trip.route.position(at: trip.distance + leadMetres)
-            let camera = MKMapCamera(lookingAtCenter: ahead,
-                                     fromDistance: trip.cameraDistance,
-                                     pitch: trip.cameraPitch,
-                                     heading: heading)
-            map.setCamera(camera, animated: false)
+            let travel = trip.route.vehicleHeading(at: d)
+            var heading = cameraHeading ?? travel
+            let delta = Self.shortestTurn(from: heading, to: travel)
+            heading = Self.normalised(heading + delta * (1 - exp(-dt / 0.45)))
+            cameraHeading = heading
+            let center = coord.offset(by: leadMetres, bearing: heading)
+            map.setCamera(MKMapCamera(lookingAtCenter: center, fromDistance: trip.cameraDistance,
+                                      pitch: trip.cameraPitch, heading: heading), animated: false)
+            // Screen-up is the camera heading; turn the icon by the difference.
+            let iconTurn = Self.shortestTurn(from: heading, to: travel) * .pi / 180
+            vehicleView?.transform = CGAffineTransform(rotationAngle: iconTurn)
             keepBusAboveCard(coord, in: map)
+            if abs(delta) > 0.3 { settledFrames = 0 }
+        }
+
+        nonisolated static func shortestTurn(from a: CLLocationDirection, to b: CLLocationDirection) -> Double {
+            var d = (b - a).truncatingRemainder(dividingBy: 360)
+            if d > 180 { d -= 360 }
+            if d < -180 { d += 360 }
+            return d
+        }
+
+        nonisolated static func normalised(_ h: Double) -> Double {
+            let r = h.truncatingRemainder(dividingBy: 360)
+            return r < 0 ? r + 360 : r
         }
 
         /// Measures where the bus landed on screen and moves the aim point so its centre sits
@@ -154,6 +181,7 @@ struct TransitMapView: UIViewRepresentable {
             v.annotation = annotation
             v.image = BusAnnotation.image(for: trip.route.kind)
             v.zPriority = .max
+            vehicleView = v
             v.collisionMode = .none
             return v
         }

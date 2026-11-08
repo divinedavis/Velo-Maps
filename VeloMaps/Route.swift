@@ -113,14 +113,67 @@ struct Route {
         self.stops = stops
         self.turns = turns
         self.roads = roads
-        self.points = points
+        self.points = Route.roundCorners(points)
         recompute()
     }
 
     mutating func replacePoints(_ newPoints: [CLLocationCoordinate2D]) {
         guard newPoints.count >= 2 else { return }
-        points = newPoints
+        points = Route.roundCorners(newPoints)
         recompute()
+    }
+
+    /// Street data has square corners; a vehicle drives an arc. Every vertex that turns more
+    /// than 12° becomes a circular fillet (radius up to `radius`, never more than 45% of either
+    /// neighbouring segment), so the vehicle's heading changes smoothly through a turn instead
+    /// of snapping (owner, 11/8: "the turn is not smooth, the car does not turn properly").
+    static func roundCorners(_ pts: [CLLocationCoordinate2D], radius: Double = 10) -> [CLLocationCoordinate2D] {
+        guard pts.count > 2 else { return pts }
+        var out: [CLLocationCoordinate2D] = [pts[0]]
+        for i in 1..<(pts.count - 1) {
+            let a = pts[i - 1], b = pts[i], c = pts[i + 1]
+            // Local metres around the corner.
+            let mx = 111_320 * cos(b.latitude * .pi / 180), my = 110_540.0
+            func local(_ p: CLLocationCoordinate2D) -> (Double, Double) { ((p.longitude - b.longitude) * mx, (p.latitude - b.latitude) * my) }
+            func geo(_ x: Double, _ y: Double) -> CLLocationCoordinate2D { .init(latitude: b.latitude + y / my, longitude: b.longitude + x / mx) }
+            let (ax, ay) = local(a), (cx, cy) = local(c)
+            let la = hypot(ax, ay), lc = hypot(cx, cy)
+            guard la > 0.5, lc > 0.5 else { out.append(b); continue }
+            let u1 = (ax / la, ay / la), u2 = (cx / lc, cy / lc)
+            let cosTheta = max(-1, min(1, u1.0 * u2.0 + u1.1 * u2.1))
+            let theta = acos(cosTheta)                 // interior angle at the corner
+            let turn = Double.pi - theta
+            guard turn > 12 * .pi / 180 else { out.append(b); continue }
+            var t = radius / tan(theta / 2)            // tangent length for the wanted radius
+            t = min(t, 0.45 * min(la, lc))
+            let r = t * tan(theta / 2)
+            let p1 = (u1.0 * t, u1.1 * t), p2 = (u2.0 * t, u2.1 * t)
+            let bis = (u1.0 + u2.0, u1.1 + u2.1), bl = hypot(bis.0, bis.1)
+            guard bl > 1e-6 else { out.append(b); continue }
+            let d = r / sin(theta / 2)
+            let o = (bis.0 / bl * d, bis.1 / bl * d)  // arc centre
+            let a1 = atan2(p1.1 - o.1, p1.0 - o.0)
+            let a2 = atan2(p2.1 - o.1, p2.0 - o.0)
+            var sweep = a2 - a1
+            while sweep > .pi { sweep -= 2 * .pi }
+            while sweep < -.pi { sweep += 2 * .pi }
+            let n = max(3, Int(turn * 180 / .pi / 8))
+            for k in 0...n {
+                let ang = a1 + sweep * Double(k) / Double(n)
+                out.append(geo(o.0 + r * cos(ang), o.1 + r * sin(ang)))
+            }
+        }
+        out.append(pts[pts.count - 1])
+        return out
+    }
+
+    /// The vehicle's direction of travel at `distance`: the chord across ±4 m of the (rounded)
+    /// line, so it turns continuously through a corner.
+    func vehicleHeading(at distance: CLLocationDistance) -> CLLocationDirection {
+        let d = min(max(distance, 4), max(length - 4, 4))
+        let (a, _) = position(at: d - 4)
+        let (b, _) = position(at: d + 4)
+        return a.bearing(to: b)
     }
 
     private mutating func recompute() {
@@ -200,6 +253,13 @@ struct Route {
 }
 
 extension CLLocationCoordinate2D {
+    /// The point `metres` away along compass `bearing` (flat-earth; fine for camera offsets).
+    func offset(by metres: Double, bearing: CLLocationDirection) -> CLLocationCoordinate2D {
+        let b = bearing * .pi / 180
+        return .init(latitude: latitude + metres * cos(b) / 110_540,
+                     longitude: longitude + metres * sin(b) / (111_320 * cos(latitude * .pi / 180)))
+    }
+
     func distance(to other: CLLocationCoordinate2D) -> CLLocationDistance {
         CLLocation(latitude: latitude, longitude: longitude)
             .distance(from: CLLocation(latitude: other.latitude, longitude: other.longitude))
