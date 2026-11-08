@@ -7,7 +7,10 @@ struct Maneuver: Identifiable {
     let icon: String        // SF Symbol
     let verb: String        // "Turn left onto"
     let street: String      // "W 96 St"
-    var instruction: String { "\(verb) \(street)" }
+    var sign: HighwaySign? = nil
+    var instruction: String { sign?.instruction ?? "\(verb) \(street)" }
+    /// Short name for compact banners: the sign's first shield/destination, else the street.
+    var title: String { sign.map { $0.shields.first ?? $0.destinations.first ?? "" } ?? street }
 }
 
 /// Lane arrows for the lane-guidance design. `active` lanes are the ones to be in.
@@ -44,7 +47,7 @@ struct TurnBannerClassic: View {
                 VStack(alignment: .leading, spacing: 0) {
                     Text(walkDistance(trip.metresToManeuver))
                         .scaledFont(34, .bold, .rounded).monospacedDigit()
-                    Text(m.street).scaledFont(22, .semibold)
+                    Text(m.title).scaledFont(22, .semibold)
                 }
                 Spacer(minLength: 0)
             }
@@ -78,8 +81,11 @@ struct TurnBannerLanes: View {
                     }
                     Spacer(minLength: 0)
                 }
+                if let sign = m.sign {
+                    HighwaySignView(sign: sign)
+                } else {
                 HStack(spacing: 6) {
-                    ForEach(trip.route.lanesAtNextTurn) { lane in
+                    ForEach(trip.route.lanes(for: m)) { lane in
                         Image(systemName: lane.icon)
                             .scaledFont(20, .bold)
                             .foregroundStyle(lane.active ? Color.white : Color.secondary.opacity(0.5))
@@ -87,6 +93,7 @@ struct TurnBannerLanes: View {
                             .background(lane.active ? Color.tripRed(scheme) : Color.secondary.opacity(0.12),
                                         in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                     }
+                }
                 }
             }
             .padding(14)
@@ -114,7 +121,7 @@ struct TurnBannerIsland: View {
                 VStack(alignment: .leading, spacing: 0) {
                     Text(walkDistance(trip.metresToManeuver))
                         .scaledFont(18, .bold, .rounded).monospacedDigit()
-                    Text(m.street).scaledFont(13, .medium).opacity(0.75)
+                    Text(m.title).scaledFont(13, .medium).opacity(0.75)
                 }
                 .foregroundStyle(.white)
                 Spacer(minLength: 0)
@@ -181,7 +188,7 @@ struct TurnBannerThen: View {
                             VStack(alignment: .leading, spacing: 0) {
                                 Text(walkDistance(trip.metresToManeuver))
                                     .scaledFont(32, .bold, .rounded).monospacedDigit()
-                                Text(m.street).scaledFont(20, .semibold)
+                                Text(m.title).scaledFont(20, .semibold)
                             }
                             Spacer(minLength: 0)
                         }

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0D8F6628C859A1B4263127A0 /* DemoDrive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7308FE227F042D1390486D35 /* DemoDrive.swift */; };
 		25E20747E92EFCD0022D5F21 /* TransitMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F7FCBDD2BC9B08B84DA3AF2 /* TransitMapView.swift */; };
 		2FA536E6050EDC8CCC358ED0 /* TurnBanners.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB637C58A466E35D35C74FF /* TurnBanners.swift */; };
 		37D805EC75CC7948B3DB56F7 /* GlassCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BC7B13218AB2AC8E6AE7F4 /* GlassCards.swift */; };
@@ -15,10 +16,12 @@
 		5B2D53144797D934220E9E5E /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = E59DFE1A61C6B95197EE6035 /* Route.swift */; };
 		6CEC3C6F9DBAE7F13A360A07 /* PerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32573F74E4AD75883BFA8502 /* PerformanceTests.swift */; };
 		6D2B7E058E85744DCC80C0EB /* VeloMapsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7493EAB4777B9A09368449F8 /* VeloMapsApp.swift */; };
+		7DA49142EAFAB916799EA408 /* HighwaySignView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87AFCC98A0845629A124D3BB /* HighwaySignView.swift */; };
 		9A67867BBDE7505EB1B3E2D4 /* RouteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3C7EDF41AAB6727C6F5296F /* RouteTests.swift */; };
 		9D6DCD8AEC54781AC30AD822 /* Readability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35690661AC6F1D578D8F5BF4 /* Readability.swift */; };
 		9F6FFDC790C1903E4C13467D /* WalkMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C1EF73DD5A5539675F8AB84 /* WalkMapView.swift */; };
 		A91822C3F7C5B20CA5489BFB /* Pothole.swift in Sources */ = {isa = PBXBuildFile; fileRef = 868B047B581941CA3316D432 /* Pothole.swift */; };
+		ABD81535D9E70B423548E466 /* HighwaySignTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EDD3D5A530A44E8A75D7CAF /* HighwaySignTests.swift */; };
 		C116C162B6ED7B90AC005CA2 /* RideScreenUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9FF142C594E6A0D9C4E123 /* RideScreenUITests.swift */; };
 		D085146A65901C12CE5FB1DB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5F99356A7357375F7B849983 /* Assets.xcassets */; };
 		D1394C0F77765941E050D3D3 /* Walk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C78F2EDB521CAD8D838F81 /* Walk.swift */; };
@@ -61,10 +64,13 @@
 		5F99356A7357375F7B849983 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6DB637C58A466E35D35C74FF /* TurnBanners.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurnBanners.swift; sourceTree = "<group>"; };
 		6DDD6068C1DCCDB983AA198D /* VeloMaps.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = VeloMaps.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7308FE227F042D1390486D35 /* DemoDrive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoDrive.swift; sourceTree = "<group>"; };
 		7493EAB4777B9A09368449F8 /* VeloMapsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VeloMapsApp.swift; sourceTree = "<group>"; };
 		868B047B581941CA3316D432 /* Pothole.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pothole.swift; sourceTree = "<group>"; };
+		87AFCC98A0845629A124D3BB /* HighwaySignView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighwaySignView.swift; sourceTree = "<group>"; };
 		8F7FCBDD2BC9B08B84DA3AF2 /* TransitMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitMapView.swift; sourceTree = "<group>"; };
 		9C2954C852647DC0D7FB32E1 /* VeloMapsUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = VeloMapsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9EDD3D5A530A44E8A75D7CAF /* HighwaySignTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighwaySignTests.swift; sourceTree = "<group>"; };
 		B3C7EDF41AAB6727C6F5296F /* RouteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteTests.swift; sourceTree = "<group>"; };
 		D1BC7B13218AB2AC8E6AE7F4 /* GlassCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassCards.swift; sourceTree = "<group>"; };
 		E59DFE1A61C6B95197EE6035 /* Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route.swift; sourceTree = "<group>"; };
@@ -94,6 +100,7 @@
 		32695CB6737318EF1C665238 /* VeloMapsTests */ = {
 			isa = PBXGroup;
 			children = (
+				9EDD3D5A530A44E8A75D7CAF /* HighwaySignTests.swift */,
 				B3C7EDF41AAB6727C6F5296F /* RouteTests.swift */,
 			);
 			path = VeloMapsTests;
@@ -113,7 +120,9 @@
 			isa = PBXGroup;
 			children = (
 				5F99356A7357375F7B849983 /* Assets.xcassets */,
+				7308FE227F042D1390486D35 /* DemoDrive.swift */,
 				D1BC7B13218AB2AC8E6AE7F4 /* GlassCards.swift */,
+				87AFCC98A0845629A124D3BB /* HighwaySignView.swift */,
 				41813ECBD67C820C8DF8CF98 /* Metrics.swift */,
 				868B047B581941CA3316D432 /* Pothole.swift */,
 				35690661AC6F1D578D8F5BF4 /* Readability.swift */,
@@ -259,7 +268,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0D8F6628C859A1B4263127A0 /* DemoDrive.swift in Sources */,
 				37D805EC75CC7948B3DB56F7 /* GlassCards.swift in Sources */,
+				7DA49142EAFAB916799EA408 /* HighwaySignView.swift in Sources */,
 				58BF47D8EE63F7963E3F76F3 /* Metrics.swift in Sources */,
 				A91822C3F7C5B20CA5489BFB /* Pothole.swift in Sources */,
 				9D6DCD8AEC54781AC30AD822 /* Readability.swift in Sources */,
@@ -280,6 +291,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ABD81535D9E70B423548E466 /* HighwaySignTests.swift in Sources */,
 				9A67867BBDE7505EB1B3E2D4 /* RouteTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

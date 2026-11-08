@@ -59,6 +59,9 @@ struct RideScreen: View {
                     .onTapGesture { withAnimation(.easeOut(duration: 0.2)) { showReportMenu = false } }
             }
             VStack(alignment: .trailing, spacing: 10) {
+                // Hidden while settings are open: the tall card would push them under the
+                // turn banner, and reporting isn't what you're doing in settings.
+                if !trip.cardExpanded {
                 HStack(spacing: 8) {
                     if let (_, metres) = trip.potholeAhead() {
                         PotholeAheadPill(metres: metres)
@@ -70,6 +73,8 @@ struct RideScreen: View {
                     ReportMenuButton(isOpen: $showReportMenu) { kind in
                         showToast("\(kind.rawValue) reported. Thanks!")
                     }
+                }
+                .transition(.opacity)
                 }
                 card
                     .onGeometryChange(for: CGFloat.self) { $0.frame(in: .global).minY } action: { cardTop = $0 }

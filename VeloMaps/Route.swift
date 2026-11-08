@@ -11,18 +11,78 @@ struct Stop: Identifiable, Hashable {
     func hash(into h: inout Hasher) { h.combine(id) }
 }
 
-/// A turn at a point on the line.
+/// A turn at a point on the line. Ramps carry the wording of their highway sign.
 struct TurnSpec {
     let coordinate: CLLocationCoordinate2D
     let icon: String
     let verb: String
     let street: String
+    var sign: HighwaySign? = nil
+}
+
+enum RouteKind { case bus, drive }
+
+/// The text on a highway entrance or exit sign, taken verbatim from OpenStreetMap:
+/// `junction:ref` (exit number), `destination:ref` (route shields, e.g. "NY 9A North") and
+/// `destination` (the destination lines). Nothing here is reworded; when OSM has no exit
+/// number, none is shown.
+struct HighwaySign: Equatable {
+    enum Kind { case entrance, exit }
+    let kind: Kind
+    let exitNumber: String?
+    let shields: [String]
+    let destinations: [String]
+
+    init(kind: Kind, exitNumber: String? = nil, shields: [String], destinations: [String]) {
+        self.kind = kind
+        self.exitNumber = exitNumber
+        self.shields = shields
+        self.destinations = destinations
+    }
+
+    /// OSRM's step `destinations` string: "NY 9A North: Henry Hudson Parkway" (refs before
+    /// the colon, names after; multiple values comma-separated).
+    init(kind: Kind, exitNumber: String? = nil, osrmDestinations text: String) {
+        let parts = text.components(separatedBy: ": ")
+        let refs = parts.count > 1 ? parts[0] : ""
+        let names = parts.count > 1 ? parts.dropFirst().joined(separator: ": ") : text
+        func split(_ s: String) -> [String] {
+            s.components(separatedBy: CharacterSet(charactersIn: ",;"))
+                .map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+        }
+        self.init(kind: kind, exitNumber: exitNumber, shields: split(refs), destinations: split(names))
+    }
+
+    /// Raw OSM tags on the ramp way (and its motorway_junction node's `ref`).
+    init(kind: Kind, osmTags t: [String: String]) {
+        func split(_ s: String?) -> [String] {
+            (s ?? "").split(separator: ";").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+        }
+        self.init(kind: kind, exitNumber: t["junction:ref"] ?? t["ref"],
+                  shields: split(t["destination:ref"]), destinations: split(t["destination"] ?? t["exit_to"]))
+    }
+
+    /// Banner line, built only from the sign's own words.
+    var instruction: String {
+        let to = shields.first ?? destinations.first ?? ""
+        switch kind {
+        case .entrance: return "Take the ramp to \(to)"
+        case .exit: return exitNumber.map { "Take exit \($0) to \(to)" } ?? "Take the exit to \(to)"
+        }
+    }
+
+    /// What VoiceOver reads: the sign, top to bottom.
+    var spoken: String {
+        ([exitNumber.map { "Exit \($0)" }].compactMap { $0 } + shields + destinations).joined(separator: ", ")
+    }
 }
 
 /// A route line plus the stops on it. Distances are cumulative metres along the line.
 struct Route {
     let line: String
     let destination: String
+    let kind: RouteKind
+    let via: String?
     let stops: [Stop]
     let turns: [TurnSpec]
     private(set) var points: [CLLocationCoordinate2D]
@@ -31,10 +91,16 @@ struct Route {
 
     var length: CLLocationDistance { cumulative.last ?? 0 }
 
-    init(line: String, destination: String, stops: [Stop], turns: [TurnSpec] = [],
-         points: [CLLocationCoordinate2D]) {
+    /// Average real-world speed for the ETA (not the demo playback speed): Manhattan buses
+    /// ~3.5 m/s including stops; a parkway drive with city streets ~9 m/s.
+    var etaSpeed: Double { kind == .drive ? 9 : 3.5 }
+
+    init(line: String, destination: String, kind: RouteKind = .bus, via: String? = nil,
+         stops: [Stop], turns: [TurnSpec] = [], points: [CLLocationCoordinate2D]) {
         self.line = line
         self.destination = destination
+        self.kind = kind
+        self.via = via
         self.stops = stops
         self.turns = turns
         self.points = points
@@ -91,17 +157,22 @@ struct Route {
     var maneuvers: [Maneuver] {
         var out: [Maneuver] = turns.enumerated().map { i, t in
             let v = points.indices.min { points[$0].distance(to: t.coordinate) < points[$1].distance(to: t.coordinate) } ?? 0
-            return Maneuver(id: i, at: cumulative[v], icon: t.icon, verb: t.verb, street: t.street)
+            return Maneuver(id: i, at: cumulative[v], icon: t.icon, verb: t.verb, street: t.street, sign: t.sign)
         }
         out.append(Maneuver(id: out.count, at: length, icon: "mappin.circle.fill", verb: "Arrive at", street: destination))
         return out
     }
 
-    /// Lanes on the approach to the next turn (demo data for the lane-guidance design).
-    var lanesAtNextTurn: [Lane] {
-        [Lane(id: 0, icon: "arrow.turn.up.left", active: true),
-         Lane(id: 1, icon: "arrow.up", active: false),
-         Lane(id: 2, icon: "arrow.up", active: false)]
+    /// Lane arrows for a plain turn (illustrative: left/right lane highlighted). Ramps show
+    /// their highway sign instead, so no lanes are guessed for them.
+    func lanes(for m: Maneuver) -> [Lane] {
+        if m.icon.contains("left") {
+            return [Lane(id: 0, icon: m.icon, active: true), Lane(id: 1, icon: "arrow.up", active: false), Lane(id: 2, icon: "arrow.up", active: false)]
+        }
+        if m.icon.contains("right") {
+            return [Lane(id: 0, icon: "arrow.up", active: false), Lane(id: 1, icon: "arrow.up", active: false), Lane(id: 2, icon: m.icon, active: true)]
+        }
+        return [Lane(id: 0, icon: "arrow.up", active: true)]
     }
 
     /// Index of the next stop the bus has not yet passed.

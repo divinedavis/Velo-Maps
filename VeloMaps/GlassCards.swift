@@ -243,13 +243,8 @@ struct GlassClusterCard: View {
 struct GlassHeroCard: View {
     @ObservedObject var trip: Trip
     @Environment(\.colorScheme) private var scheme
-    @State private var expanded: Bool
     @GestureState private var drag: CGFloat = 0
-
-    init(trip: Trip) {
-        self.trip = trip
-        _expanded = State(initialValue: trip.startExpanded)
-    }
+    private var expanded: Bool { trip.cardExpanded }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -278,11 +273,13 @@ struct GlassHeroCard: View {
                     LineBadge(line: trip.route.line)
                     Text("to \(trip.route.destination)").scaledFont(14, .semibold)
                         .accessibilityIdentifier("trip-destination")
-                    Label("10 aboard", systemImage: "person.2.fill")
-                        .scaledFont(12, .semibold).foregroundStyle(.primary)
+                    if trip.route.kind == .bus {
+                        Label("10 aboard", systemImage: "person.2.fill")
+                            .scaledFont(12, .semibold).foregroundStyle(.primary)
+                    }
                 }
             }
-            Text("Next: \(trip.nextStopName)")
+            Text(trip.route.kind == .drive ? "Via \(trip.route.via ?? trip.route.destination)" : "Next: \(trip.nextStopName)")
                 .scaledFont(14, .bold)
                 .accessibilityIdentifier("next-stop")
             TimelineView(.periodic(from: .now, by: 1)) { _ in
@@ -300,7 +297,7 @@ struct GlassHeroCard: View {
             .modifier(HoldToEnd(trip: trip))
             .clipShape(Capsule())
             if expanded {
-                NavSettings()
+                NavSettings(trip: trip)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
@@ -324,12 +321,13 @@ struct GlassHeroCard: View {
     }
 
     private func toggle() {
-        withAnimation(.spring(response: 0.38, dampingFraction: 0.86)) { expanded.toggle() }
+        withAnimation(.spring(response: 0.38, dampingFraction: 0.86)) { trip.cardExpanded.toggle() }
     }
 }
 
 /// Revealed by swiping the card up. Stored locally for the preview; not yet wired to the map.
 private struct NavSettings: View {
+    @ObservedObject var trip: Trip
     @AppStorage("voiceGuidance") private var voice = true
     @AppStorage("stopAlert") private var stopAlert = "1 stop before"
     @AppStorage("appearance") private var appearance = "Auto"
@@ -345,6 +343,17 @@ private struct NavSettings: View {
                 .padding(.top, 4)
                 .accessibilityIdentifier("nav-settings")
             VStack(spacing: 0) {
+                row("map.fill", "Demo ride") {
+                    Picker("Demo ride", selection: Binding(
+                        get: { trip.route.kind == .drive ? "Drive" : "Bus" },
+                        set: { trip.useRoute($0 == "Drive" ? .hhDrive : .m10) })) {
+                        ForEach(["Bus", "Drive"], id: \.self) { Text($0) }
+                    }
+                    .pickerStyle(.segmented)
+                    .frame(width: 140)
+                    .accessibilityIdentifier("demo-ride")
+                }
+                Divider().padding(.leading, 44)
                 row("speaker.wave.2.fill", "Voice guidance") { Toggle("", isOn: $voice).labelsHidden() }
                 Divider().padding(.leading, 44)
                 row("bell.badge.fill", "Stop alert") {

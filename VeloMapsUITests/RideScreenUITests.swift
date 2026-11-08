@@ -85,4 +85,17 @@ final class RideScreenUITests: XCTestCase {
         police.tap()
         XCTAssertTrue(app.staticTexts["Police reported. Thanks!"].waitForExistence(timeout: 3))
     }
+
+    /// Highway ramps show the sign's own wording (from OpenStreetMap), entrance and exit.
+    func testHighwaySignsUseTheExactSignWording() {
+        for (index, expected) in [(0, "Highway sign: NY 9A North, Henry Hudson Parkway"), (1, "Highway sign: West 96th Street")] {
+            let app = XCUIApplication()
+            app.launchArguments += ["-paused", "YES", "-demo", "drive", "-signAhead", "150", "-signIndex", "\(index)"]
+            app.launch()
+            let sign = app.descendants(matching: .any)["highway-sign"]
+            XCTAssertTrue(sign.waitForExistence(timeout: 10), "no highway sign before ramp \(index)")
+            XCTAssertEqual(sign.label, expected)
+            app.terminate()
+        }
+    }
 }

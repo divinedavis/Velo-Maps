@@ -127,6 +127,12 @@ final class AccessibilityAuditTests: XCTestCase {
         audit(app, "walking")
     }
 
+    func testHighwayExitSign() {
+        let app = launch(["-demo", "drive", "-signAhead", "150", "-signIndex", "1"])
+        XCTAssertTrue(app.descendants(matching: .any)["highway-sign"].waitForExistence(timeout: 10))
+        audit(app, "highway exit sign")
+    }
+
     func testNightRide() {
         let app = launch(["-night", "YES"])
         XCTAssertTrue(app.staticTexts["next-stop"].waitForExistence(timeout: 10))

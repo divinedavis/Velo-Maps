@@ -68,6 +68,7 @@ struct TransitMapView: UIViewRepresentable {
             let core = MKPolyline(coordinates: pts, count: pts.count)
             map.addOverlay(glow, level: .aboveRoads)
             map.addOverlay(core, level: .aboveRoads)
+            map.view(for: bus)?.image = BusAnnotation.image(for: trip.route.kind)   // bus or car
         }
 
         private var shownPotholes: Set<UUID> = []
@@ -151,7 +152,7 @@ struct TransitMapView: UIViewRepresentable {
             let v = mapView.dequeueReusableAnnotationView(withIdentifier: "bus")
                 ?? MKAnnotationView(annotation: annotation, reuseIdentifier: "bus")
             v.annotation = annotation
-            v.image = BusAnnotation.image
+            v.image = BusAnnotation.image(for: trip.route.kind)
             v.zPriority = .max
             v.collisionMode = .none
             return v
@@ -163,6 +164,28 @@ final class RouteGlow: MKPolyline {}
 
 final class BusAnnotation: NSObject, MKAnnotation {
     @objc dynamic var coordinate = CLLocationCoordinate2D()
+
+    static func image(for kind: RouteKind) -> UIImage { kind == .drive ? car : image }
+
+    /// White car seen from above: dark windscreen and rear window, front = screen-up.
+    static let car: UIImage = {
+        let size = CGSize(width: 26, height: 44)
+        return UIGraphicsImageRenderer(size: size).image { ctx in
+            let cg = ctx.cgContext
+            cg.setShadow(offset: CGSize(width: 2, height: 3), blur: 4, color: UIColor.black.withAlphaComponent(0.35).cgColor)
+            UIColor(white: 0.97, alpha: 1).setFill()
+            UIBezierPath(roundedRect: CGRect(x: 3, y: 2, width: 20, height: 40), cornerRadius: 8).fill()
+            cg.setShadow(offset: .zero, blur: 0, color: nil)
+            UIColor(white: 0.7, alpha: 1).setStroke()
+            let body = UIBezierPath(roundedRect: CGRect(x: 3, y: 2, width: 20, height: 40), cornerRadius: 8)
+            body.lineWidth = 1; body.stroke()
+            UIColor(white: 0.2, alpha: 1).setFill()
+            UIBezierPath(roundedRect: CGRect(x: 6, y: 9, width: 14, height: 7), cornerRadius: 3).fill()   // windscreen
+            UIBezierPath(roundedRect: CGRect(x: 7, y: 31, width: 12, height: 5), cornerRadius: 2).fill()  // rear window
+            UIColor(red: 0.84, green: 0.07, blue: 0.13, alpha: 1).setFill()
+            UIBezierPath(roundedRect: CGRect(x: 7, y: 18, width: 12, height: 11), cornerRadius: 2).fill() // red roof
+        }
+    }()
 
     /// White bus seen from above and behind, like the vehicle in the reference: roof with an
     /// AC unit, dark windscreen at the front (screen-up = direction of travel, since the camera

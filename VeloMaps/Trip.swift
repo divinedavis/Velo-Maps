@@ -31,6 +31,8 @@ final class Trip: ObservableObject {
     /// pressed once at launch), -turnStyle 1…5 (turn banner design), -turnAhead 120 (start
     /// the bus this many metres before the next turn).
     let startExpanded: Bool
+    /// Ride card swiped up to settings (shared so the screen can tidy around it).
+    @Published var cardExpanded = false
     let startPotholeTap: Bool
     let turnStyle: Int
     /// -reportMenu YES opens the "+" report menu ~1.5 s after launch (for screenshots/video).
@@ -52,7 +54,9 @@ final class Trip: ObservableObject {
     private var startedAt = Date()
     private var lastPublish = Date.distantPast
 
-    init(route: Route = .m10, defaults: UserDefaults = .standard) {
+    init(route: Route? = nil, defaults: UserDefaults = .standard) {
+        // -demo drive: the Henry Hudson Parkway drive with highway entrance/exit signs.
+        let route = route ?? (defaults.string(forKey: "demo") == "drive" ? Route.hhDrive : Route.m10)
         self.route = route
         let progress = defaults.number("progress") ?? 0.08
         distance = route.length * min(max(progress, 0), 1)
@@ -67,6 +71,7 @@ final class Trip: ObservableObject {
         night = defaults.bool(forKey: "night")
         walking = defaults.string(forKey: "mode") == "walk"
         startExpanded = defaults.bool(forKey: "expanded")
+        cardExpanded = startExpanded
         startPotholeTap = defaults.bool(forKey: "potholeTapped")
         // Lanes (2) chosen by the owner 11/7.
         turnStyle = defaults.number("turnStyle").map(Int.init) ?? 2
@@ -75,6 +80,12 @@ final class Trip: ObservableObject {
         walkStyle = defaults.number("walkStyle").map(Int.init) ?? 4
         if let ahead = defaults.number("turnAhead"), let turn = route.maneuvers.first {
             distance = max(0, turn.at - ahead)
+        }
+        // -signAhead 150 -signIndex 0|1: start this far before a ramp with a highway sign.
+        let signs = route.maneuvers.filter { $0.sign != nil }
+        if let ahead = defaults.number("signAhead"), !signs.isEmpty {
+            let i = min(Int(defaults.number("signIndex") ?? 0), signs.count - 1)
+            distance = max(0, signs[i].at - ahead)
         }
         // Reports other riders already made on this route (demo data; the real app would load
         // these from a shared server).
@@ -110,6 +121,15 @@ final class Trip: ObservableObject {
 
     func endRide() { walking = true }
 
+    /// Switch demo route (settings): start over at the beginning with fresh demo reports.
+    func useRoute(_ newRoute: Route) {
+        route = newRoute
+        distance = 0
+        startedAt = Date()
+        potholes = [700, 1450].map { Pothole(coordinate: newRoute.position(at: $0).0, at: $0, mine: false) }
+        publish(force: true)
+    }
+
     func restart() {
         distance = 0
         startedAt = Date()
@@ -123,7 +143,7 @@ final class Trip: ObservableObject {
         let next = route.nextStopIndex(at: distance)
         if next != nextStop { nextStop = next }
         // Real buses average ~3–4 m/s in Manhattan including stops; use that for the ETA, not the demo speed.
-        let mins = Int(((route.length - distance) / 3.5 / 60).rounded(.up))
+        let mins = Int(((route.length - distance) / route.etaSpeed / 60).rounded(.up))
         if mins != minutesLeft { minutesLeft = mins }
         elapsed = now.timeIntervalSince(startedAt)
         progress = route.length > 0 ? distance / route.length : 0
