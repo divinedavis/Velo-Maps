@@ -60,7 +60,7 @@ LINES = [
 ]
 # Spoken distances, rounded like a navigation voice (VoiceCues.distanceText in Swift).
 DISTANCES = [f"In {f} feet" for f in range(100, 1001, 100)] + \
-    [("In 1 mile" if m == 10 else f"In {m / 10:.1f} miles") for m in range(2, 14)]
+    [("In 1 mile" if m == 10 else "In 2 miles" if m == 20 else f"In {m / 10:.1f} miles") for m in range(2, 21)]
 
 
 def library():

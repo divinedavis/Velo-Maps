@@ -202,4 +202,19 @@ final class RideScreenUITests: XCTestCase {
         XCTAssertTrue(app.otherElements["ActivityListView"].waitForExistence(timeout: 5)
                       || app.buttons["Copy"].waitForExistence(timeout: 2), "share sheet did not open")
     }
+
+    /// The posted speed limit shows top-left under the turn banner (25 on CPW, 50 on the parkway).
+    func testSpeedLimitShowsThePostedLimit() {
+        for (args, expected) in [(["-demo", "bus", "-progress", "0.25"], "Speed limit 25 miles per hour"),
+                                 (["-demo", "drive", "-progress", "0.6"], "Speed limit 50 miles per hour")] {
+            let app = XCUIApplication()
+            app.launchArguments += args + ["-paused", "YES", "-speedStyle", "1"]
+            app.launch()
+            let sign = app.descendants(matching: .any)["speed-limit"]
+            XCTAssertTrue(sign.waitForExistence(timeout: 10))
+            XCTAssertEqual(sign.label, expected)
+            XCTAssertLessThan(sign.frame.midX, app.windows.firstMatch.frame.width / 2, "should be on the left")
+            app.terminate()
+        }
+    }
 }

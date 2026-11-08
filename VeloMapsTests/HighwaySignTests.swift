@@ -79,13 +79,29 @@ struct TurnBannerTimingTests {
         #expect(Trip.bannerWindow(for: city, speed: 9) == 108)    // 12 s × 9 m/s
         #expect(Trip.bannerWindow(for: city, speed: 3) == 80)     // minimum
         #expect(Trip.bannerWindow(for: ramp, speed: 9) == 300)    // highway minimum
-        #expect(Trip.bannerWindow(for: ramp, speed: 25) == 750)   // 30 s × 25 m/s
+        let mile = 1609.34
+        #expect(abs(Trip.bannerWindow(for: city, speed: 45 / 2.23694) - mile) < 1)       // 45 mph: a mile
+        #expect(abs(Trip.bannerWindow(for: ramp, speed: 55 / 2.23694) - 1.5 * mile) < 1) // 55 mph: 1.5 miles
+        #expect(abs(Trip.bannerWindow(for: city, speed: 65 / 2.23694) - 2 * mile) < 1)   // 65 mph: 2 miles
+        #expect(abs(Trip.bannerWindow(for: city, speed: 80 / 2.23694) - 2 * mile) < 1)   // faster: still 2
     }
 
     @Test func hiddenWhenFarShownWhenCloseGoneAfterTheTurn() {
         #expect(trip(["turnAhead": "400"]).bannerManeuver == nil)
         #expect(trip(["turnAhead": "60"]).bannerManeuver?.street == "W 96 St")
         #expect(trip(["turnPassed": "30"]).bannerManeuver == nil)
+    }
+
+    @Test func highwaySpeedSpeaksTwiceEarlyAndNearTheTurn() {
+        let d = UserDefaults(suiteName: "velo-tests-\(UUID())")!
+        ["demo": "drive", "signAhead": "2000", "signIndex": "1", "speed": "29"].forEach { d.set($0.value, forKey: $0.key) }
+        let trip = Trip(defaults: d)
+        var said: [String] = []
+        trip.speak = { said.append($0.fallback) }
+        for _ in 0..<(75 * 4) { trip.advance(by: 0.25) }   // 75 s at 65 mph
+        let exitLines = said.filter { $0.contains("take the exit to West 96th Street") }
+        #expect(exitLines.count == 2, "said: \(said)")
+        #expect(exitLines.first?.hasPrefix("In 1.") == true || exitLines.first?.hasPrefix("In 2") == true)
     }
 
     @Test func fasterSpeedShowsTheBannerEarlier() {

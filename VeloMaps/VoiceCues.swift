@@ -26,15 +26,17 @@ enum VoiceCues {
     }
 
     /// Distances rounded like a navigation voice: 100–1000 ft in hundreds, then tenths of a
-    /// mile up to 1.3 (the clip set the script renders).
+    /// mile up to 2 (banners now come up to 2 miles out at highway speed; clips match).
     static func distanceText(_ metres: Double) -> String {
         let feet = metres * 3.28084
         if feet < 1050 {
             let f = min(1000, max(100, Int((feet / 100).rounded()) * 100))
             return "In \(f) feet"
         }
-        let tenths = min(13, max(2, Int((metres / 1609.34 * 10).rounded())))
-        return tenths == 10 ? "In 1 mile" : String(format: "In %.1f miles", Double(tenths) / 10)
+        let tenths = min(20, max(2, Int((metres / 1609.34 * 10).rounded())))
+        if tenths == 10 { return "In 1 mile" }
+        if tenths == 20 { return "In 2 miles" }
+        return String(format: "In %.1f miles", Double(tenths) / 10)
     }
 
     static func turn(remaining metres: Double, instruction: String) -> VoiceLine {

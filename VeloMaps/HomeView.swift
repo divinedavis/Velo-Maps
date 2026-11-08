@@ -35,8 +35,19 @@ final class AppModel: ObservableObject {
 
     func start(_ route: Route) {
         location.setNavigating(true)
-        trip = Trip(route: route, live: true)
-        if let fix = location.fix { trip?.update(fix: fix) }
+        let trip = Trip(route: route, live: true)
+        self.trip = trip
+        if let fix = location.fix { trip.update(fix: fix) }
+        loadLimits(for: trip)
+    }
+
+    /// One Overpass request per route for posted speed limits (sign hidden until then).
+    private func loadLimits(for trip: Trip) {
+        let route = trip.route
+        Task {
+            let changes = await SpeedLimits.lookup(route)
+            trip.setSpeedLimits(changes, forRouteLength: route.length)
+        }
     }
 
     func end() {
@@ -56,6 +67,7 @@ final class AppModel: ObservableObject {
         Task {
             if let r = try? await Router.drive(from: fix.coordinate, to: dest, name: name), self.trip === trip {
                 trip.reroute(r)
+                loadLimits(for: trip)
             }
         }
     }
@@ -102,10 +114,12 @@ struct HomeView: View {
             .padding(.bottom, 6)
         }
         .onAppear { location.start() }
-        .onChange(of: location.fix) { _, fix in
-            guard preview == nil, let fix else { return }
-            camera = .camera(MapCamera(centerCoordinate: fix.coordinate, distance: 1500, heading: 0, pitch: 45))
+        .onChange(of: location.fix, initial: true) { _, fix in
+            guard let fix else { return }
+            // Search near the rider (a same-named place 2,900 mi away was picked on 11/8).
             search.region = MKCoordinateRegion(center: fix.coordinate, latitudinalMeters: 40_000, longitudinalMeters: 40_000)
+            guard preview == nil else { return }
+            camera = .camera(MapCamera(centerCoordinate: fix.coordinate, distance: 1500, heading: 0, pitch: 45))
         }
         .onChange(of: query) { _, q in search.query = q }
     }
@@ -197,7 +211,12 @@ struct HomeView: View {
         routing = true
         defer { routing = false }
         do {
-            let item = try await MKLocalSearch(request: MKLocalSearch.Request(completion: completion)).start().mapItems.first
+            let request = MKLocalSearch.Request(completion: completion)
+            request.region = MKCoordinateRegion(center: from, latitudinalMeters: 40_000, longitudinalMeters: 40_000)
+            let here = CLLocation(latitude: from.latitude, longitude: from.longitude)
+            // Of the matches, take the closest one.
+            let item = try await MKLocalSearch(request: request).start().mapItems
+                .min { $0.location.distance(from: here) < $1.location.distance(from: here) }
             guard let item else { error = "Couldn't find that place"; return }
             let to = item.location.coordinate
             let route = try await Router.drive(from: from, to: to, name: item.name ?? completion.title)
@@ -224,6 +243,7 @@ final class PlaceSearch: NSObject, ObservableObject, MKLocalSearchCompleterDeleg
         super.init()
         completer.delegate = self
         completer.resultTypes = [.address, .pointOfInterest]
+        completer.regionPriority = .required
     }
 
     nonisolated func completerDidUpdateResults(_ c: MKLocalSearchCompleter) {

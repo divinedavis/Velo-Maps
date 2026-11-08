@@ -135,10 +135,13 @@ struct RideScreen: View {
         .overlay(alignment: .top) {
             VStack(alignment: .leading, spacing: 8) {
                 turnBanner
-                // Reported pothole coming up: under the banner, where the eye already is.
-                if !trip.cardExpanded, showPotholes, let (_, metres) = trip.potholeAhead() {
-                    PotholeAheadPill(metres: metres)
-                        .transition(.scale.combined(with: .opacity))
+                // Speed limit top-left under the banner (owner, 11/8), the pothole alert beside it.
+                HStack(alignment: .top, spacing: 8) {
+                    if trip.speedStyle > 0 { SpeedLimitView(trip: trip, style: trip.speedStyle) }
+                    if !trip.cardExpanded, showPotholes, let (_, metres) = trip.potholeAhead() {
+                        PotholeAheadPill(metres: metres)
+                            .transition(.scale.combined(with: .opacity))
+                    }
                 }
                 if let toast {
                     ReportToast(text: toast)

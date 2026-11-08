@@ -33,6 +33,8 @@ struct RoadSpec {
     /// Two-way road: the OSM line is the middle of the road, our lanes are to its right.
     /// One-way (motorways, ramps, dual carriageways): the line is the middle of our lanes.
     var twoWay: Bool = true
+    /// Posted limit in mph (OSM maxspeed); nil = not known.
+    var speedLimit: Int? = nil
 }
 
 /// The text on a highway entrance or exit sign, taken verbatim from OpenStreetMap:
@@ -107,6 +109,16 @@ struct Route {
     private(set) var maneuverList: [Maneuver] = []
     /// Expected travel time for the whole route (seconds), from the router; nil = estimate.
     var duration: Double?
+    /// Live routes: posted limits along the route (SpeedLimits); empty = use the roads' own.
+    var limitChanges: [(start: Double, mph: Int)] = []
+
+    /// Posted speed limit (mph) at `distance`, if known.
+    func speedLimit(at distance: CLLocationDistance) -> Int? {
+        if !limitChanges.isEmpty {
+            return limitChanges.last { $0.start <= distance + 1 }?.mph
+        }
+        return road(at: distance)?.speedLimit
+    }
     /// Lateral offset (metres right of the OSM line) of the lane to drive in, every 4 m.
     private(set) var laneOffsets: [Double] = []
     static let laneSpacing = 4.0
@@ -425,8 +437,8 @@ extension Route {
                      icon: "arrow.turn.up.left", verb: "Turn left onto", street: "W 96 St"),
         ],
         roads: [   // OSM names
-            RoadSpec(coordinate: .init(latitude: 40.7762266, longitude: -73.9759630), name: "Central Park West", lanes: 2),
-            RoadSpec(coordinate: .init(latitude: 40.7917254, longitude: -73.9648118), name: "West 96th Street", lanes: 2),
+            RoadSpec(coordinate: .init(latitude: 40.7762266, longitude: -73.9759630), name: "Central Park West", lanes: 2, speedLimit: 25),
+            RoadSpec(coordinate: .init(latitude: 40.7917254, longitude: -73.9648118), name: "West 96th Street", lanes: 2, speedLimit: 25),
         ],
         // Central Park West centreline from OpenStreetMap (© OpenStreetMap contributors, ODbL).
         points: [

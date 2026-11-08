@@ -17,7 +17,7 @@ struct VoiceCueTests {
     }
 
     @Test(arguments: [(20.0, "In 100 feet"), (91.0, "In 300 feet"), (305.0, "In 1000 feet"), (330.0, "In 0.2 miles"),
-                      (1609.0, "In 1 mile"), (2000.0, "In 1.2 miles"), (5000.0, "In 1.3 miles")])
+                      (1609.0, "In 1 mile"), (2000.0, "In 1.2 miles"), (3219.0, "In 2 miles"), (5000.0, "In 2 miles")])
     func distancesRoundLikeANavigationVoice(_ m: Double, _ text: String) {
         #expect(VoiceCues.distanceText(m) == text)
     }
@@ -25,7 +25,7 @@ struct VoiceCueTests {
     @Test func everyTurnOnBothDemoRoutesHasClips() {
         for route in [Route.m10, Route.hhDrive] {
             for m in route.maneuvers {
-                for d in stride(from: 20.0, through: 2000, by: 15) {
+                for d in stride(from: 20.0, through: 3300, by: 15) {
                     let line = VoiceCues.turn(remaining: d, instruction: m.instruction)
                     #expect(missing(line).isEmpty, "\(route.line): \(line.fallback) missing \(missing(line))")
                 }

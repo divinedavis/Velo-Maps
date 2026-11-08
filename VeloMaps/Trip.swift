@@ -77,6 +77,8 @@ final class Trip: ObservableObject {
     @Published private(set) var announcement: Announcement?
     @Published private(set) var reports: [RoadReport] = []
     private var spokenPotholes: Set<UUID> = []
+    private var remindedID: Int?
+    private var firstPromptAt: Double = 0
     private var stopAlertFired = false
 
     /// Live navigation from real GPS (the default app); false = the scripted demo used by tests
@@ -153,6 +155,21 @@ final class Trip: ObservableObject {
         }
         publish(force: true)
     }
+
+    /// Posted limit (mph) where the vehicle is, and its speed in mph (speed-limit sign).
+    var speedLimitMPH: Int? { route.speedLimit(at: progress * route.length) }
+    var speedMPH: Int { Int((currentSpeed * 2.23694).rounded()) }
+
+    /// Live: posted limits for the current route arrived (SpeedLimits).
+    func setSpeedLimits(_ changes: [(start: Double, mph: Int)], forRouteLength length: Double) {
+        guard route.length == length, !changes.isEmpty else { return }
+        var r = route
+        r.limitChanges = changes
+        route = r
+    }
+
+    /// -speedStyle 0…5: speed-limit sign design under the turn banner (0 = hidden).
+    var speedStyle: Int { settings.number("speedStyle").map(Int.init) ?? 1 }
 
     /// Road the vehicle is on now, and its heading (for the current-road label).
     var currentRoad: RoadSpec? { route.road(at: progress * route.length) }
@@ -266,15 +283,24 @@ final class Trip: ObservableObject {
             if bannerManeuver != nil { bannerManeuver = nil }
             return
         }
-        if bannerManeuver?.id == next.id { return }            // already up: keep until passed
         let remaining = next.at - distance
+        if bannerManeuver?.id == next.id {                     // already up: keep until passed
+            // Banner came up early (highway speed): say it again close to the turn.
+            if remindedID != next.id, firstPromptAt - remaining > 0, firstPromptAt > Self.reminderWindow(speed: currentSpeed) * 2,
+               remaining <= Self.reminderWindow(speed: currentSpeed) {
+                remindedID = next.id
+                if settings.voiceGuidance { say(VoiceCues.turn(remaining: remaining, instruction: next.instruction)) }
+            }
+            return
+        }
         let show = remaining <= Self.bannerWindow(for: next, speed: currentSpeed)
         let wanted = show ? next : nil
         if wanted?.id != bannerManeuver?.id {
             bannerManeuver = wanted
             // Voice guidance: say the turn once, as its banner appears.
-            if let m = wanted, settings.voiceGuidance {
-                say(VoiceCues.turn(remaining: remaining, instruction: m.instruction))
+            if let m = wanted {
+                firstPromptAt = remaining
+                if settings.voiceGuidance { say(VoiceCues.turn(remaining: remaining, instruction: m.instruction)) }
             }
         }
     }

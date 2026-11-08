@@ -6,6 +6,8 @@ import SwiftUI
 struct HighwaySignView: View {
     let sign: HighwaySign
     var style: Int = 0
+    /// The ramp leaves on the left (mirrors the junction drawing).
+    var left = false
     static let green = Color(red: 0.0, green: 0.42, blue: 0.27)
 
     var body: some View {
@@ -14,7 +16,7 @@ struct HighwaySignView: View {
             case 1: GlassGuideSign(sign: sign)
             case 2: ShieldHeroSign(sign: sign)
             case 3: ChipSign(sign: sign)
-            case 4: JunctionSign(sign: sign)
+            case 4: JunctionSign(sign: sign, left: left)
             case 5: OverheadSign(sign: sign)
             default: classic
             }
@@ -186,25 +188,27 @@ struct ChipSign: View {
 /// next to the sign words on green glass.
 struct JunctionSign: View {
     let sign: HighwaySign
+    var left = false
     var body: some View {
         HStack(spacing: 10) {
+            // From the driver's seat both an entrance and an exit are "leave this road on the
+            // ramp": your road runs up from the bottom, the red ramp branches off to the side
+            // you turn (owner, 11/8: the entrance drawing showed a ramp merging *in*, wrong for
+            // turning off W 79 St onto the NY 9A ramp). Mirrored for left-hand ramps.
             Canvas { ctx, size in
                 let w = size.width, h = size.height
+                let roadX = left ? w * 0.62 : w * 0.38
+                let farX = left ? w * 0.15 : w * 0.85
                 var road = Path()
-                road.move(to: CGPoint(x: w * 0.38, y: h)); road.addLine(to: CGPoint(x: w * 0.38, y: 0))
+                road.move(to: CGPoint(x: roadX, y: h)); road.addLine(to: CGPoint(x: roadX, y: 0))
                 ctx.stroke(road, with: .color(.gray.opacity(0.55)), style: StrokeStyle(lineWidth: 14, lineCap: .round))
                 var ramp = Path()
-                if sign.kind == .exit {
-                    ramp.move(to: CGPoint(x: w * 0.38, y: h * 0.95))
-                    ramp.addLine(to: CGPoint(x: w * 0.38, y: h * 0.62))
-                    ramp.addQuadCurve(to: CGPoint(x: w * 0.85, y: h * 0.1), control: CGPoint(x: w * 0.42, y: h * 0.25))
-                } else {
-                    ramp.move(to: CGPoint(x: w * 0.85, y: h * 0.95))
-                    ramp.addQuadCurve(to: CGPoint(x: w * 0.38, y: h * 0.35), control: CGPoint(x: w * 0.45, y: h * 0.75))
-                    ramp.addLine(to: CGPoint(x: w * 0.38, y: h * 0.05))
-                }
+                ramp.move(to: CGPoint(x: roadX, y: h * 0.95))
+                ramp.addLine(to: CGPoint(x: roadX, y: h * 0.62))
+                ramp.addQuadCurve(to: CGPoint(x: farX, y: h * 0.1), control: CGPoint(x: roadX + (farX - roadX) * 0.08, y: h * 0.25))
                 ctx.stroke(ramp, with: .color(Color.tripRed(.light)), style: StrokeStyle(lineWidth: 7, lineCap: .round, lineJoin: .round))
             }
+            .accessibilityHidden(true)
             .frame(width: 66, height: 66)
             .padding(6)
             .readableGlass(in: .rect(cornerRadius: 16))

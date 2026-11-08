@@ -29,14 +29,27 @@ extension Trip {
     /// the GPS speed (CLLocation.speed).
     var currentSpeed: Double { live ? liveSpeed : speed }
 
-    /// How far ahead of a maneuver its banner appears: a fixed lead *time* at the current speed,
-    /// never less than a minimum distance. Highway ramps get more time (lane changes at speed).
+    /// How far ahead of a maneuver its banner appears, by speed (owner, 11/8): about a mile
+    /// out at 45 mph and two miles at 65 mph and up, blending linearly between; in town a lead
+    /// time (12 s for turns, min 80 m; 30 s for ramps, min 300 m), blending up to the 45 mph
+    /// mile from 25 mph.
     static func bannerWindow(for m: Maneuver, speed: Double) -> Double {
-        let ramp = m.sign != nil
-        let lead: Double = ramp ? 30 : 12          // seconds
-        let minimum: Double = ramp ? 300 : 80      // metres
-        return min(2_000, max(minimum, max(0, speed) * lead))
+        let mile = 1609.34
+        let mph = max(0, speed) * 2.23694
+        func town(_ v: Double) -> Double { m.sign != nil ? max(300, v * 30) : max(80, v * 12) }
+        if mph >= 65 { return 2 * mile }
+        if mph >= 45 { return (1 + (mph - 45) / 20) * mile }
+        if mph > 25 {
+            let at25 = town(25 / 2.23694)
+            return at25 + (mile - at25) * (mph - 25) / 20
+        }
+        return town(speed)
     }
+
+    /// Second spoken prompt close to the turn when the first came early (highway speeds):
+    /// about 10 s out, never under 80 m.
+    static func reminderWindow(speed: Double) -> Double { max(80, max(0, speed) * 10) }
+
     var followingManeuver: Maneuver? {
         guard let n = nextManeuver else { return nil }
         return route.maneuvers.first { $0.id == n.id + 1 }
@@ -97,7 +110,7 @@ struct TurnBannerLanes: View {
                     Spacer(minLength: 0)
                 }
                 if let sign = m.sign {
-                    HighwaySignView(sign: sign, style: trip.signStyle)
+                    HighwaySignView(sign: sign, style: trip.signStyle, left: m.icon.contains("left"))
                 } else {
                 HStack(spacing: 6) {
                     ForEach(trip.route.lanes(for: m)) { lane in

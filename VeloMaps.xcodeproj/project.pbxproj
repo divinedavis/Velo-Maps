@@ -12,10 +12,12 @@
 		078C22E685A2CFB1BFF06641 /* VoiceCues.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E12007D71FDBD8907D738A /* VoiceCues.swift */; };
 		0D6E19FCD6AFBBA9FF3D4709 /* cue-in-500-feet.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 69F884E6910F55D7F12C3CE8 /* cue-in-500-feet.mp3 */; };
 		0D8F6628C859A1B4263127A0 /* DemoDrive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7308FE227F042D1390486D35 /* DemoDrive.swift */; };
+		1AF21EBDCC2910776ADAF6C5 /* SpeedLimitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A9AC6978F33601402643A5B /* SpeedLimitTests.swift */; };
 		1D31132F0A4B3BDA45B8CC17 /* HomeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2472BFD92AE37F3B96F0BD10 /* HomeUITests.swift */; };
 		219A2B169E36999219A361E7 /* cue-your-stop-is-next-columbus-av-w-96-st.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7C2C4B93EF1229644CD747E0 /* cue-your-stop-is-next-columbus-av-w-96-st.mp3 */; };
 		25E20747E92EFCD0022D5F21 /* TransitMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F7FCBDD2BC9B08B84DA3AF2 /* TransitMapView.swift */; };
 		2FA536E6050EDC8CCC358ED0 /* TurnBanners.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB637C58A466E35D35C74FF /* TurnBanners.swift */; };
+		30C329C0D259D08723530352 /* cue-in-2-miles.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 133A5BBA2F2FC01F129E0294 /* cue-in-2-miles.mp3 */; };
 		322C9A15C919E217BD7FD01B /* cue-in-800-feet.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 0E628ABDDD012B1B7A0D37A3 /* cue-in-800-feet.mp3 */; };
 		37D805EC75CC7948B3DB56F7 /* GlassCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BC7B13218AB2AC8E6AE7F4 /* GlassCards.swift */; };
 		392FBB748A59FEB7AD43785D /* cue-in-200-feet.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 834F24D4A80C6B4EA334CF85 /* cue-in-200-feet.mp3 */; };
@@ -35,11 +37,15 @@
 		6B2E893094E883663F5777E0 /* cue-in-1-mile.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = ECA723F42416421F6CCC8733 /* cue-in-1-mile.mp3 */; };
 		6CEC3C6F9DBAE7F13A360A07 /* PerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32573F74E4AD75883BFA8502 /* PerformanceTests.swift */; };
 		6D2B7E058E85744DCC80C0EB /* VeloMapsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7493EAB4777B9A09368449F8 /* VeloMapsApp.swift */; };
+		705A7261D655A93638D4BAF0 /* SpeedLimits.swift in Sources */ = {isa = PBXBuildFile; fileRef = 232859A67D56746938C1074F /* SpeedLimits.swift */; };
 		70B280E5D957F89E3CEC3980 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E200645BF3E0302A4E0E73B /* LocationService.swift */; };
 		70FFC7DEE97DBFD14BA1F5A6 /* cue-in-0-9-miles.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 5FF4CB7B970A006FB2296FB0 /* cue-in-0-9-miles.mp3 */; };
+		7B66B8BF5D22AE6D5BFC2CD7 /* cue-in-1-5-miles.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 712BF56AE1A9170B2A4940D3 /* cue-in-1-5-miles.mp3 */; };
 		7BE3F1575CAB06A746D96ED6 /* SettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF344E6EB1755D45BD406969 /* SettingsTests.swift */; };
 		7DA49142EAFAB916799EA408 /* HighwaySignView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87AFCC98A0845629A124D3BB /* HighwaySignView.swift */; };
 		7FE8889554A24FA74924A4B0 /* SmoothTurnTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194AC502DDF0944439775788 /* SmoothTurnTests.swift */; };
+		80445EF9BE6C959AD523C521 /* cue-in-1-8-miles.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = BB2EA03D09BAB2FA43DD8628 /* cue-in-1-8-miles.mp3 */; };
+		804BAA36E7EF6CBBCB27F613 /* SpeedLimitSign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E57576A11A5A55041C49DF1 /* SpeedLimitSign.swift */; };
 		84ADB5313878296345B5539C /* cue-turn-left-onto-west-79th-street.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = DA6D319A13C80806F384F7FB /* cue-turn-left-onto-west-79th-street.mp3 */; };
 		88D10A68EDBC6037F285ACA5 /* cue-turn-left-onto-riverside-drive.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 2CAC166C8F17C07E8B45B5B2 /* cue-turn-left-onto-riverside-drive.mp3 */; };
 		890468D7DA458D4458EE1E8F /* cue-in-0-7-miles.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 3DEF097A90640A9518B05C5D /* cue-in-0-7-miles.mp3 */; };
@@ -56,6 +62,7 @@
 		ABD81535D9E70B423548E466 /* HighwaySignTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EDD3D5A530A44E8A75D7CAF /* HighwaySignTests.swift */; };
 		AEE2989524F6D6CF6F57291E /* cue-arriving-at-your-stop-columbus-av-w-96-st.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = DE1F27481046F152E05410B1 /* cue-arriving-at-your-stop-columbus-av-w-96-st.mp3 */; };
 		AF38B6DF9DE7F81437657ACF /* cue-in-400-feet.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 963F27CB7959F9C5E0ECEF77 /* cue-in-400-feet.mp3 */; };
+		B511CD312B0628EBB2B7561C /* cue-in-1-4-miles.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = CF5EF4817A96247E4FC4190B /* cue-in-1-4-miles.mp3 */; };
 		B8A223A737551CEA4D6748DC /* cue-pothole-ahead.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 3C838A258E403389EFC4EEA0 /* cue-pothole-ahead.mp3 */; };
 		C116C162B6ED7B90AC005CA2 /* RideScreenUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9FF142C594E6A0D9C4E123 /* RideScreenUITests.swift */; };
 		C57FCF633091E3E4CF2DB602 /* CurrentRoadLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F82542A3955B45288349195 /* CurrentRoadLabel.swift */; };
@@ -64,9 +71,11 @@
 		C967FF71B5805E49C71DB991 /* cue-in-0-6-miles.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1146FBC262F700E216D2499C /* cue-in-0-6-miles.mp3 */; };
 		CFFE978F06B90F6B58D19DB5 /* osrm_hh_drive.json in Resources */ = {isa = PBXBuildFile; fileRef = DBEB995E61137D62ADCC561E /* osrm_hh_drive.json */; };
 		D085146A65901C12CE5FB1DB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5F99356A7357375F7B849983 /* Assets.xcassets */; };
+		D093AC134E61F18CF4560B58 /* cue-in-1-6-miles.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4922BFCF3E9500D6484C4AC7 /* cue-in-1-6-miles.mp3 */; };
 		D1394C0F77765941E050D3D3 /* Walk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C78F2EDB521CAD8D838F81 /* Walk.swift */; };
 		D178532501EBAFC92F985CA7 /* cue-turn-left-onto-w-96-st.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 846FC60B82C48A7B243D2F62 /* cue-turn-left-onto-w-96-st.mp3 */; };
 		D44EBBA98A9B958E83580EF5 /* cue-in-1-2-miles.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 974099027116285AB33F43CB /* cue-in-1-2-miles.mp3 */; };
+		D4D1F5612FD1A1E7F787A24D /* cue-in-1-7-miles.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 86C38D0AC4F118CC33659B6F /* cue-in-1-7-miles.mp3 */; };
 		D52FE1FCE86ECE99EFBB0D2F /* TripCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 548C30603940B864098BD707 /* TripCard.swift */; };
 		DB2A2E7CBF53014CC126E598 /* WalkCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4258D238883C6580B906A6E5 /* WalkCards.swift */; };
 		DDCA2370E082FD5E6246DAC4 /* cue-arrive-at-columbus-av-w-96-st.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = DEDE76D5B14EF54133611354 /* cue-arrive-at-columbus-av-w-96-st.mp3 */; };
@@ -75,6 +84,7 @@
 		E3B26BD9EA4B8BEE2FC8308E /* cue-turn-right-onto-west-72nd-street.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = B52417DE787BF88ED7B6F105 /* cue-turn-right-onto-west-72nd-street.mp3 */; };
 		E56EF6424EF30B28A7CB921E /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD48A387561B5C9BA8A43F2E /* Settings.swift */; };
 		E9F25F5F6DDA46FE3A987EC3 /* VoiceCueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF40C3B07DE63DD8561EC4C7 /* VoiceCueTests.swift */; };
+		EC23C54C85E2C355F28120F3 /* cue-in-1-9-miles.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 64D6C5F6CEFADA2DCD6149A9 /* cue-in-1-9-miles.mp3 */; };
 		EDAA7E27CCFFE2E103B67F68 /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9EA014A1B1A9F1B89B4E58F /* Router.swift */; };
 		EDD9340B0BC420E8645A20CE /* ReportMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2508B8D1102329ADD59647AD /* ReportMenu.swift */; };
 		FCFF17518389098CB3EF78A0 /* AccessibilityAuditTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F83616889070531F0DC14C2 /* AccessibilityAuditTests.swift */; };
@@ -102,12 +112,15 @@
 		0CD8CAD55B97849D3C6F5C96 /* Trip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trip.swift; sourceTree = "<group>"; };
 		0E628ABDDD012B1B7A0D37A3 /* cue-in-800-feet.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-800-feet.mp3"; sourceTree = "<group>"; };
 		1146FBC262F700E216D2499C /* cue-in-0-6-miles.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-0-6-miles.mp3"; sourceTree = "<group>"; };
+		133A5BBA2F2FC01F129E0294 /* cue-in-2-miles.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-2-miles.mp3"; sourceTree = "<group>"; };
 		194AC502DDF0944439775788 /* SmoothTurnTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmoothTurnTests.swift; sourceTree = "<group>"; };
 		1F83616889070531F0DC14C2 /* AccessibilityAuditTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityAuditTests.swift; sourceTree = "<group>"; };
 		22552EE8A53F8F11C97F75F5 /* VeloMapsTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = VeloMapsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		232859A67D56746938C1074F /* SpeedLimits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedLimits.swift; sourceTree = "<group>"; };
 		2472BFD92AE37F3B96F0BD10 /* HomeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeUITests.swift; sourceTree = "<group>"; };
 		2508B8D1102329ADD59647AD /* ReportMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportMenu.swift; sourceTree = "<group>"; };
 		2CAC166C8F17C07E8B45B5B2 /* cue-turn-left-onto-riverside-drive.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-turn-left-onto-riverside-drive.mp3"; sourceTree = "<group>"; };
+		2E57576A11A5A55041C49DF1 /* SpeedLimitSign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedLimitSign.swift; sourceTree = "<group>"; };
 		32573F74E4AD75883BFA8502 /* PerformanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceTests.swift; sourceTree = "<group>"; };
 		35690661AC6F1D578D8F5BF4 /* Readability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Readability.swift; sourceTree = "<group>"; };
 		3C1EF73DD5A5539675F8AB84 /* WalkMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalkMapView.swift; sourceTree = "<group>"; };
@@ -117,6 +130,7 @@
 		41813ECBD67C820C8DF8CF98 /* Metrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Metrics.swift; sourceTree = "<group>"; };
 		4258D238883C6580B906A6E5 /* WalkCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalkCards.swift; sourceTree = "<group>"; };
 		48A6551BD55FF51C02A8D172 /* cue-in-0-4-miles.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-0-4-miles.mp3"; sourceTree = "<group>"; };
+		4922BFCF3E9500D6484C4AC7 /* cue-in-1-6-miles.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-1-6-miles.mp3"; sourceTree = "<group>"; };
 		4A9FF142C594E6A0D9C4E123 /* RideScreenUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RideScreenUITests.swift; sourceTree = "<group>"; };
 		5052917378725D57D45990D2 /* cue-in-900-feet.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-900-feet.mp3"; sourceTree = "<group>"; };
 		52C78F2EDB521CAD8D838F81 /* Walk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Walk.swift; sourceTree = "<group>"; };
@@ -126,11 +140,14 @@
 		5F99356A7357375F7B849983 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5FF4CB7B970A006FB2296FB0 /* cue-in-0-9-miles.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-0-9-miles.mp3"; sourceTree = "<group>"; };
 		639C9DAE501F204B83E1FA96 /* cue-in-300-feet.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-300-feet.mp3"; sourceTree = "<group>"; };
+		64D6C5F6CEFADA2DCD6149A9 /* cue-in-1-9-miles.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-1-9-miles.mp3"; sourceTree = "<group>"; };
 		65B2A21669B30CE375B3D013 /* cue-in-0-3-miles.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-0-3-miles.mp3"; sourceTree = "<group>"; };
 		69A88E0FEAB6D131D7553405 /* cue-in-1000-feet.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-1000-feet.mp3"; sourceTree = "<group>"; };
 		69F884E6910F55D7F12C3CE8 /* cue-in-500-feet.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-500-feet.mp3"; sourceTree = "<group>"; };
+		6A9AC6978F33601402643A5B /* SpeedLimitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedLimitTests.swift; sourceTree = "<group>"; };
 		6DB637C58A466E35D35C74FF /* TurnBanners.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurnBanners.swift; sourceTree = "<group>"; };
 		6DDD6068C1DCCDB983AA198D /* VeloMaps.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = VeloMaps.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		712BF56AE1A9170B2A4940D3 /* cue-in-1-5-miles.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-1-5-miles.mp3"; sourceTree = "<group>"; };
 		7308FE227F042D1390486D35 /* DemoDrive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoDrive.swift; sourceTree = "<group>"; };
 		7493EAB4777B9A09368449F8 /* VeloMapsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VeloMapsApp.swift; sourceTree = "<group>"; };
 		79FDAEF3917C62AA16561C1F /* cue-arrive-at-west-96th-street.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-arrive-at-west-96th-street.mp3"; sourceTree = "<group>"; };
@@ -140,6 +157,7 @@
 		834F24D4A80C6B4EA334CF85 /* cue-in-200-feet.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-200-feet.mp3"; sourceTree = "<group>"; };
 		846FC60B82C48A7B243D2F62 /* cue-turn-left-onto-w-96-st.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-turn-left-onto-w-96-st.mp3"; sourceTree = "<group>"; };
 		868B047B581941CA3316D432 /* Pothole.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pothole.swift; sourceTree = "<group>"; };
+		86C38D0AC4F118CC33659B6F /* cue-in-1-7-miles.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-1-7-miles.mp3"; sourceTree = "<group>"; };
 		87AFCC98A0845629A124D3BB /* HighwaySignView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighwaySignView.swift; sourceTree = "<group>"; };
 		87D26863B3F663318619DE0E /* cue-arriving-at-your-stop-west-96th-street.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-arriving-at-your-stop-west-96th-street.mp3"; sourceTree = "<group>"; };
 		8C1B3DB863EB563F650C63B7 /* voice_cues.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = voice_cues.json; sourceTree = "<group>"; };
@@ -159,8 +177,10 @@
 		B3C7EDF41AAB6727C6F5296F /* RouteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteTests.swift; sourceTree = "<group>"; };
 		B3E33F3FAF4A874440BDC5F6 /* cue-in-1-3-miles.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-1-3-miles.mp3"; sourceTree = "<group>"; };
 		B52417DE787BF88ED7B6F105 /* cue-turn-right-onto-west-72nd-street.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-turn-right-onto-west-72nd-street.mp3"; sourceTree = "<group>"; };
+		BB2EA03D09BAB2FA43DD8628 /* cue-in-1-8-miles.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-1-8-miles.mp3"; sourceTree = "<group>"; };
 		BE4DAE7EBC92850FEAB0FB9A /* cue-in-0-2-miles.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-0-2-miles.mp3"; sourceTree = "<group>"; };
 		C803D127340667FB58AAFF5D /* cue-in-700-feet.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-700-feet.mp3"; sourceTree = "<group>"; };
+		CF5EF4817A96247E4FC4190B /* cue-in-1-4-miles.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-1-4-miles.mp3"; sourceTree = "<group>"; };
 		D1BC7B13218AB2AC8E6AE7F4 /* GlassCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassCards.swift; sourceTree = "<group>"; };
 		DA6D319A13C80806F384F7FB /* cue-turn-left-onto-west-79th-street.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-turn-left-onto-west-79th-street.mp3"; sourceTree = "<group>"; };
 		DBEB995E61137D62ADCC561E /* osrm_hh_drive.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = osrm_hh_drive.json; sourceTree = "<group>"; };
@@ -207,6 +227,7 @@
 				B3C7EDF41AAB6727C6F5296F /* RouteTests.swift */,
 				FF344E6EB1755D45BD406969 /* SettingsTests.swift */,
 				194AC502DDF0944439775788 /* SmoothTurnTests.swift */,
+				6A9AC6978F33601402643A5B /* SpeedLimitTests.swift */,
 				FF40C3B07DE63DD8561EC4C7 /* VoiceCueTests.swift */,
 			);
 			path = VeloMapsTests;
@@ -240,6 +261,8 @@
 				E59DFE1A61C6B95197EE6035 /* Route.swift */,
 				A9EA014A1B1A9F1B89B4E58F /* Router.swift */,
 				DD48A387561B5C9BA8A43F2E /* Settings.swift */,
+				232859A67D56746938C1074F /* SpeedLimits.swift */,
+				2E57576A11A5A55041C49DF1 /* SpeedLimitSign.swift */,
 				8F7FCBDD2BC9B08B84DA3AF2 /* TransitMapView.swift */,
 				0CD8CAD55B97849D3C6F5C96 /* Trip.swift */,
 				548C30603940B864098BD707 /* TripCard.swift */,
@@ -273,7 +296,14 @@
 				ADC96B3BB067C9588F6935DC /* cue-in-1-1-miles.mp3 */,
 				974099027116285AB33F43CB /* cue-in-1-2-miles.mp3 */,
 				B3E33F3FAF4A874440BDC5F6 /* cue-in-1-3-miles.mp3 */,
+				CF5EF4817A96247E4FC4190B /* cue-in-1-4-miles.mp3 */,
+				712BF56AE1A9170B2A4940D3 /* cue-in-1-5-miles.mp3 */,
+				4922BFCF3E9500D6484C4AC7 /* cue-in-1-6-miles.mp3 */,
+				86C38D0AC4F118CC33659B6F /* cue-in-1-7-miles.mp3 */,
+				BB2EA03D09BAB2FA43DD8628 /* cue-in-1-8-miles.mp3 */,
+				64D6C5F6CEFADA2DCD6149A9 /* cue-in-1-9-miles.mp3 */,
 				ECA723F42416421F6CCC8733 /* cue-in-1-mile.mp3 */,
+				133A5BBA2F2FC01F129E0294 /* cue-in-2-miles.mp3 */,
 				E92A7B1D48DEE15BD4AD46A0 /* cue-in-100-feet.mp3 */,
 				834F24D4A80C6B4EA334CF85 /* cue-in-200-feet.mp3 */,
 				639C9DAE501F204B83E1FA96 /* cue-in-300-feet.mp3 */,
@@ -422,9 +452,16 @@
 				E1045D21BE4615D22429BB95 /* cue-in-1-1-miles.mp3 in Resources */,
 				D44EBBA98A9B958E83580EF5 /* cue-in-1-2-miles.mp3 in Resources */,
 				54DE6BF85F6F4D3E02AD76F4 /* cue-in-1-3-miles.mp3 in Resources */,
+				B511CD312B0628EBB2B7561C /* cue-in-1-4-miles.mp3 in Resources */,
+				7B66B8BF5D22AE6D5BFC2CD7 /* cue-in-1-5-miles.mp3 in Resources */,
+				D093AC134E61F18CF4560B58 /* cue-in-1-6-miles.mp3 in Resources */,
+				D4D1F5612FD1A1E7F787A24D /* cue-in-1-7-miles.mp3 in Resources */,
+				80445EF9BE6C959AD523C521 /* cue-in-1-8-miles.mp3 in Resources */,
+				EC23C54C85E2C355F28120F3 /* cue-in-1-9-miles.mp3 in Resources */,
 				6B2E893094E883663F5777E0 /* cue-in-1-mile.mp3 in Resources */,
 				4CB960966B165754B1649B86 /* cue-in-100-feet.mp3 in Resources */,
 				C5BABDE3021A298CC023D688 /* cue-in-1000-feet.mp3 in Resources */,
+				30C329C0D259D08723530352 /* cue-in-2-miles.mp3 in Resources */,
 				392FBB748A59FEB7AD43785D /* cue-in-200-feet.mp3 in Resources */,
 				5B3454E05C93F19B200E6DB8 /* cue-in-300-feet.mp3 in Resources */,
 				AF38B6DF9DE7F81437657ACF /* cue-in-400-feet.mp3 in Resources */,
@@ -484,6 +521,8 @@
 				5B2D53144797D934220E9E5E /* Route.swift in Sources */,
 				EDAA7E27CCFFE2E103B67F68 /* Router.swift in Sources */,
 				E56EF6424EF30B28A7CB921E /* Settings.swift in Sources */,
+				804BAA36E7EF6CBBCB27F613 /* SpeedLimitSign.swift in Sources */,
+				705A7261D655A93638D4BAF0 /* SpeedLimits.swift in Sources */,
 				25E20747E92EFCD0022D5F21 /* TransitMapView.swift in Sources */,
 				5A913936D21DD59C0A8677C5 /* Trip.swift in Sources */,
 				D52FE1FCE86ECE99EFBB0D2F /* TripCard.swift in Sources */,
@@ -506,6 +545,7 @@
 				9A67867BBDE7505EB1B3E2D4 /* RouteTests.swift in Sources */,
 				7BE3F1575CAB06A746D96ED6 /* SettingsTests.swift in Sources */,
 				7FE8889554A24FA74924A4B0 /* SmoothTurnTests.swift in Sources */,
+				1AF21EBDCC2910776ADAF6C5 /* SpeedLimitTests.swift in Sources */,
 				E9F25F5F6DDA46FE3A987EC3 /* VoiceCueTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

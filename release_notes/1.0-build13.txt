@@ -1,0 +1,5 @@
+Turn directions now come up based on how fast you are going: about a mile ahead at 45 mph and two miles ahead at 65 mph and above, with city timing at lower speeds. When a direction comes up early on the highway, the voice reminds you again just before the turn.
+
+The posted speed limit now shows at the top left, under the direction banner, using the limits from OpenStreetMap. Where a road has no posted limit on record, the sign stays hidden.
+
+The highway entrance drawing is fixed: it now shows the ramp leaving your road on the side you turn. Searching for a place also prefers the closest match to you.
