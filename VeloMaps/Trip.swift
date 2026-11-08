@@ -104,7 +104,8 @@ final class Trip: ObservableObject {
         // Junction (4) chosen by the owner 11/7.
         signStyle = defaults.number("signStyle").map(Int.init) ?? 4
         roadStyle = defaults.number("roadStyle").map(Int.init) ?? 1
-        laneStyle = defaults.number("laneStyle").map(Int.init) ?? 0
+        // All lanes (3) chosen by the owner 11/8.
+        laneStyle = defaults.number("laneStyle").map(Int.init) ?? 3
         startReportMenu = defaults.bool(forKey: "reportMenu")
         // Glance (4) chosen by the owner 11/7 for the walking leg.
         walkStyle = defaults.number("walkStyle").map(Int.init) ?? 4

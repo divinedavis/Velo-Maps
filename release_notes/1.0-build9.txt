@@ -1,0 +1,3 @@
+The map now shows which lane to be in. Every lane going your way is drawn faintly, and your lane is highlighted in red, so you can see how many lanes there are and where you should be.
+
+Before a left turn the red moves into the left lane, before a right turn or a highway exit it moves to the right lane, and the change happens gradually like a real lane change. Your vehicle drives in the highlighted lane.
