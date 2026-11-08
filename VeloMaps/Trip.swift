@@ -48,6 +48,8 @@ final class Trip: ObservableObject {
     let signStyle: Int
     /// -roadStyle 0…5: current-road label above the card (0 = hidden).
     let roadStyle: Int
+    /// -laneStyle 0…3: draw the route in the lane to be in (0 = road centre line).
+    let laneStyle: Int
     /// -reportMenu YES opens the "+" report menu ~1.5 s after launch (for screenshots/video).
     let startReportMenu: Bool
     let night: Bool
@@ -102,6 +104,7 @@ final class Trip: ObservableObject {
         // Junction (4) chosen by the owner 11/7.
         signStyle = defaults.number("signStyle").map(Int.init) ?? 4
         roadStyle = defaults.number("roadStyle").map(Int.init) ?? 1
+        laneStyle = defaults.number("laneStyle").map(Int.init) ?? 0
         startReportMenu = defaults.bool(forKey: "reportMenu")
         // Glance (4) chosen by the owner 11/7 for the walking leg.
         walkStyle = defaults.number("walkStyle").map(Int.init) ?? 4

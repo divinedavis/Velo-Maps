@@ -28,6 +28,11 @@ struct RoadSpec {
     let coordinate: CLLocationCoordinate2D
     let name: String
     var ref: String? = nil
+    /// Lanes in the direction of travel (OSM lanes:forward, or lanes / 2 on two-way roads).
+    var lanes: Int = 1
+    /// Two-way road: the OSM line is the middle of the road, our lanes are to its right.
+    /// One-way (motorways, ramps, dual carriageways): the line is the middle of our lanes.
+    var twoWay: Bool = true
 }
 
 /// The text on a highway entrance or exit sign, taken verbatim from OpenStreetMap:
@@ -97,6 +102,12 @@ struct Route {
     private(set) var points: [CLLocationCoordinate2D]
     private(set) var cumulative: [CLLocationDistance] = []
     private(set) var stopDistances: [CLLocationDistance] = []
+    /// Where each road starts along the line.
+    private(set) var roadStarts: [CLLocationDistance] = []
+    /// Lateral offset (metres right of the OSM line) of the lane to drive in, every 4 m.
+    private(set) var laneOffsets: [Double] = []
+    static let laneSpacing = 4.0
+    static let laneWidth = 3.3
 
     var length: CLLocationDistance { cumulative.last ?? 0 }
 
@@ -188,6 +199,87 @@ struct Route {
             let nearest = points.indices.min { points[$0].distance(to: stop.coordinate) < points[$1].distance(to: stop.coordinate) } ?? 0
             return cumulative[nearest]
         }
+        roadStarts = roads.map { r in
+            cumulative[points.indices.min { points[$0].distance(to: r.coordinate) < points[$1].distance(to: r.coordinate) } ?? 0]
+        }
+        laneOffsets = computeLaneOffsets()
+    }
+
+    /// Which lane to be in, as metres right of the OSM line, sampled every 4 m and smoothed
+    /// so lane changes are gradual S-curves. Lane choice (owner, 11/8: "show the red line in
+    /// the lane that a user is supposed to be in"): before a left turn the leftmost lane,
+    /// before a right turn or an exit/entrance ramp the rightmost; otherwise the bus keeps the
+    /// curb lane and a car the right lane in town or the middle lane on a highway.
+    private func computeLaneOffsets() -> [Double] {
+        guard !roads.isEmpty, length > 0 else { return [] }
+        let ms = maneuvers
+        let n = Int(length / Route.laneSpacing) + 1
+        var desired = [Double](repeating: 0, count: n)
+        for i in 0..<n {
+            let d = Double(i) * Route.laneSpacing
+            let r = road(at: d) ?? roads[0]
+            let fwd = max(1, r.lanes)
+            var k: Int = kind == .bus ? fwd - 1 : (r.twoWay ? fwd - 1 : fwd / 2)
+            if let next = ms.first(where: { $0.at > d }) {
+                let window: Double = next.sign != nil ? 600 : 150
+                if next.at - d <= window {
+                    if next.icon.contains("left") { k = 0 }
+                    else if next.icon.contains("right") || next.sign != nil { k = fwd - 1 }
+                }
+            }
+            let w = Route.laneWidth
+            desired[i] = r.twoWay ? (Double(k) + 0.5) * w : (Double(k) + 0.5 - Double(fwd) / 2) * w
+        }
+        // Lane changes take ~40 m: a trailing moving average turns steps into S-curves.
+        // The window starts full of the first lane, so the start doesn't swing.
+        let span = 10
+        var out = [Double](repeating: 0, count: n)
+        var sum = desired[0] * Double(span)
+        for i in 0..<n {
+            sum += desired[i] - desired[max(0, i - span)]
+            out[i] = sum / Double(span)
+        }
+        return out
+    }
+
+    /// Lateral lane offset at `distance` (metres right of the OSM line).
+    func laneOffset(at distance: CLLocationDistance) -> Double {
+        guard !laneOffsets.isEmpty else { return 0 }
+        let x = min(max(distance / Route.laneSpacing, 0), Double(laneOffsets.count - 1))
+        let i = Int(x), f = x - Double(i)
+        return i + 1 < laneOffsets.count ? laneOffsets[i] * (1 - f) + laneOffsets[i + 1] * f : laneOffsets[i]
+    }
+
+    /// Point in the chosen lane at `distance`.
+    func lanePosition(at distance: CLLocationDistance) -> CLLocationCoordinate2D {
+        let (c, _) = position(at: distance)
+        let off = laneOffset(at: distance)
+        return off == 0 ? c : c.offset(by: off, bearing: vehicleHeading(at: distance) + 90)
+    }
+
+    /// The lane path as points every 4 m (for drawing), or every lane `k` of the road for
+    /// the all-lanes design (nil where the road has fewer lanes).
+    func lanePath() -> [CLLocationCoordinate2D] {
+        stride(from: 0.0, through: length, by: Route.laneSpacing).map { lanePosition(at: $0) }
+    }
+
+    func lanePaths(allLanesUpTo maxLanes: Int = 4) -> [[CLLocationCoordinate2D]] {
+        var paths: [[CLLocationCoordinate2D]] = []
+        for k in 0..<maxLanes {
+            var current: [CLLocationCoordinate2D] = []
+            for d in stride(from: 0.0, through: length, by: Route.laneSpacing) {
+                let r = road(at: d) ?? roads[0]
+                if k < max(1, r.lanes) {
+                    let off = r.twoWay ? (Double(k) + 0.5) * Route.laneWidth
+                                       : (Double(k) + 0.5 - Double(max(1, r.lanes)) / 2) * Route.laneWidth
+                    current.append(position(at: d).0.offset(by: off, bearing: vehicleHeading(at: d) + 90))
+                } else if current.count > 1 {
+                    paths.append(current); current = []
+                } else { current = [] }
+            }
+            if current.count > 1 { paths.append(current) }
+        }
+        return paths
     }
 
     /// Position and travel heading at `distance` metres along the route.
@@ -240,10 +332,12 @@ struct Route {
 
     /// The road under the vehicle at `distance` metres along the line.
     func road(at distance: CLLocationDistance) -> RoadSpec? {
-        let starts = roads.map { r in
-            cumulative[points.indices.min { points[$0].distance(to: r.coordinate) < points[$1].distance(to: r.coordinate) } ?? 0]
+        guard !roads.isEmpty else { return nil }
+        var best: Int?
+        for (i, start) in roadStarts.enumerated() where start <= distance + 1 {
+            if best == nil || start >= roadStarts[best!] { best = i }
         }
-        return zip(roads, starts).filter { $0.1 <= distance + 1 }.max { $0.1 < $1.1 }?.0 ?? roads.first
+        return roads[best ?? 0]
     }
 
     /// Index of the next stop the bus has not yet passed.
@@ -295,8 +389,8 @@ extension Route {
                      icon: "arrow.turn.up.left", verb: "Turn left onto", street: "W 96 St"),
         ],
         roads: [   // OSM names
-            RoadSpec(coordinate: .init(latitude: 40.7762266, longitude: -73.9759630), name: "Central Park West"),
-            RoadSpec(coordinate: .init(latitude: 40.7917254, longitude: -73.9648118), name: "West 96th Street"),
+            RoadSpec(coordinate: .init(latitude: 40.7762266, longitude: -73.9759630), name: "Central Park West", lanes: 2),
+            RoadSpec(coordinate: .init(latitude: 40.7917254, longitude: -73.9648118), name: "West 96th Street", lanes: 2),
         ],
         // Central Park West centreline from OpenStreetMap (© OpenStreetMap contributors, ODbL).
         points: [

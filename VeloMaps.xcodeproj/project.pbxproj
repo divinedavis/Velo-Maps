@@ -19,6 +19,7 @@
 		7BE3F1575CAB06A746D96ED6 /* SettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF344E6EB1755D45BD406969 /* SettingsTests.swift */; };
 		7DA49142EAFAB916799EA408 /* HighwaySignView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87AFCC98A0845629A124D3BB /* HighwaySignView.swift */; };
 		7FE8889554A24FA74924A4B0 /* SmoothTurnTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194AC502DDF0944439775788 /* SmoothTurnTests.swift */; };
+		968BB5776EDE98782F62025A /* LaneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99BEBC3D3926117767BDEC8F /* LaneTests.swift */; };
 		9A67867BBDE7505EB1B3E2D4 /* RouteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3C7EDF41AAB6727C6F5296F /* RouteTests.swift */; };
 		9D6DCD8AEC54781AC30AD822 /* Readability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35690661AC6F1D578D8F5BF4 /* Readability.swift */; };
 		9F6FFDC790C1903E4C13467D /* WalkMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C1EF73DD5A5539675F8AB84 /* WalkMapView.swift */; };
@@ -75,6 +76,7 @@
 		87AFCC98A0845629A124D3BB /* HighwaySignView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighwaySignView.swift; sourceTree = "<group>"; };
 		8F7FCBDD2BC9B08B84DA3AF2 /* TransitMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitMapView.swift; sourceTree = "<group>"; };
 		8F82542A3955B45288349195 /* CurrentRoadLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentRoadLabel.swift; sourceTree = "<group>"; };
+		99BEBC3D3926117767BDEC8F /* LaneTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaneTests.swift; sourceTree = "<group>"; };
 		9C2954C852647DC0D7FB32E1 /* VeloMapsUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = VeloMapsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9EDD3D5A530A44E8A75D7CAF /* HighwaySignTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighwaySignTests.swift; sourceTree = "<group>"; };
 		B3C7EDF41AAB6727C6F5296F /* RouteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteTests.swift; sourceTree = "<group>"; };
@@ -109,6 +111,7 @@
 			isa = PBXGroup;
 			children = (
 				9EDD3D5A530A44E8A75D7CAF /* HighwaySignTests.swift */,
+				99BEBC3D3926117767BDEC8F /* LaneTests.swift */,
 				B3C7EDF41AAB6727C6F5296F /* RouteTests.swift */,
 				FF344E6EB1755D45BD406969 /* SettingsTests.swift */,
 				194AC502DDF0944439775788 /* SmoothTurnTests.swift */,
@@ -306,6 +309,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				ABD81535D9E70B423548E466 /* HighwaySignTests.swift in Sources */,
+				968BB5776EDE98782F62025A /* LaneTests.swift in Sources */,
 				9A67867BBDE7505EB1B3E2D4 /* RouteTests.swift in Sources */,
 				7BE3F1575CAB06A746D96ED6 /* SettingsTests.swift in Sources */,
 				7FE8889554A24FA74924A4B0 /* SmoothTurnTests.swift in Sources */,

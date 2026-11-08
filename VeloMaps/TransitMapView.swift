@@ -61,16 +61,31 @@ struct TransitMapView: UIViewRepresentable {
             self.link = link
         }
 
-        /// Redraw the route overlays when the geometry changes (straight → road-snapped).
+        /// Redraw the route overlays when the geometry changes. With a lane style the route is
+        /// drawn in the lane to be in (owner, 11/8) instead of down the road's centre line.
         func syncRoute() {
             guard let map, trip.route.length != drawnRouteLength else { return }
             drawnRouteLength = trip.route.length
             map.removeOverlays(map.overlays)
-            let pts = trip.route.points
-            let glow = RouteGlow(coordinates: pts, count: pts.count)
-            let core = MKPolyline(coordinates: pts, count: pts.count)
-            map.addOverlay(glow, level: .aboveRoads)
-            map.addOverlay(core, level: .aboveRoads)
+            let route = trip.route
+            let style = trip.laneStyle
+            let pts = style == 0 ? route.points : route.lanePath()
+            switch style {
+            case 2:
+                map.addOverlay(LaneRibbon(coordinates: pts, count: pts.count), level: .aboveRoads)
+                map.addOverlay(LaneDash(coordinates: pts, count: pts.count), level: .aboveRoads)
+            case 3:
+                for lane in route.lanePaths() {
+                    map.addOverlay(LaneFaint(coordinates: lane, count: lane.count), level: .aboveRoads)
+                }
+                map.addOverlay(LaneCore(coordinates: pts, count: pts.count), level: .aboveRoads)
+            case 1:
+                map.addOverlay(RouteGlow(coordinates: pts, count: pts.count), level: .aboveRoads)
+                map.addOverlay(LaneCore(coordinates: pts, count: pts.count), level: .aboveRoads)
+            default:
+                map.addOverlay(RouteGlow(coordinates: pts, count: pts.count), level: .aboveRoads)
+                map.addOverlay(MKPolyline(coordinates: pts, count: pts.count), level: .aboveRoads)
+            }
             map.view(for: bus)?.image = BusAnnotation.image(for: trip.route.kind)   // bus or car
             cameraHeading = nil   // new route: start facing its first heading
         }
@@ -148,7 +163,8 @@ struct TransitMapView: UIViewRepresentable {
         private func placeCamera(dt: TimeInterval = 0) {
             guard let map else { return }
             let d = trip.distance
-            let (coord, _) = trip.route.position(at: d)
+            // The vehicle drives in its lane when a lane style is on.
+            let coord = trip.laneStyle > 0 ? trip.route.lanePosition(at: d) : trip.route.position(at: d).0
             bus.coordinate = coord
             let travel = trip.route.vehicleHeading(at: d)
             var heading = cameraHeading ?? travel
@@ -193,6 +209,19 @@ struct TransitMapView: UIViewRepresentable {
             let r = MKPolylineRenderer(polyline: line)
             r.lineCap = .round
             r.lineJoin = .round
+            let red = UIColor(red: 0.89, green: 0.11, blue: 0.17, alpha: 1)
+            switch overlay {
+            case is LaneCore:       // a lane-width line, not the road-width one
+                r.strokeColor = red.withAlphaComponent(0.95); r.lineWidth = 9; return r
+            case is LaneRibbon:     // the whole lane lit up
+                r.strokeColor = red.withAlphaComponent(0.42); r.lineWidth = 15; return r
+            case is LaneDash:       // white dashes down the middle of the lane
+                r.strokeColor = UIColor.white.withAlphaComponent(0.95); r.lineWidth = 2.5
+                r.lineCap = .butt; r.lineDashPattern = [7, 9]; return r
+            case is LaneFaint:      // the other lanes of the road, faintly
+                r.strokeColor = UIColor.white.withAlphaComponent(0.55); r.lineWidth = 10; return r
+            default: break
+            }
             if overlay is RouteGlow {
                 r.strokeColor = UIColor(red: 0.93, green: 0.23, blue: 0.27, alpha: 0.28)
                 r.lineWidth = 26
@@ -239,6 +268,10 @@ struct TransitMapView: UIViewRepresentable {
 }
 
 final class RouteGlow: MKPolyline {}
+final class LaneCore: MKPolyline {}
+final class LaneRibbon: MKPolyline {}
+final class LaneDash: MKPolyline {}
+final class LaneFaint: MKPolyline {}
 
 final class BusAnnotation: NSObject, MKAnnotation {
     @objc dynamic var coordinate = CLLocationCoordinate2D()
