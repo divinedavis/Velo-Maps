@@ -90,6 +90,15 @@ final class RideScreenUITests: XCTestCase {
             .allElementsBoundByIndex.max { $0.frame.maxY < $1.frame.maxY }!
         XCTAssertLessThan(lowestItem.frame.maxY, card.frame.minY, "report menu overlaps the trip card")
         XCTAssertLessThan(lowestItem.frame.maxY, plus.frame.minY, "report menu covers the + / × button")
+        // ...it must stay on the right edge, clear of the road and the vehicle (owner, 11/7)...
+        let width = app.windows.firstMatch.frame.width
+        for id in ["report-Pothole", "report-Police", "report-Accident", "report-Road closed"] {
+            // The vehicle and its lane sit at the centre of the screen.
+            XCTAssertGreaterThan(app.buttons[id].frame.minX, width * 0.6, "\(id) reaches into the road")
+            XCTAssertLessThanOrEqual(app.buttons[id].frame.maxX, width, "\(id) runs off the screen")
+        }
+        XCTAssertFalse(app.buttons["report-Heavy traffic"].exists || app.buttons["report-Hazard"].exists
+                       || app.buttons["report-Crowded bus"].exists, "removed report types are back")
         // ...and its top item must be below the turn banner, not hidden under it.
         let banner = app.descendants(matching: .any)["turn-banner"]
         if banner.exists {

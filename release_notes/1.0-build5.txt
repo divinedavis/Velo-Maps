@@ -1,0 +1,3 @@
+The + menu is simpler: it now has four reports, Pothole, Police, Accident and Road closed. Heavy traffic, Hazard and Crowded bus have been removed.
+
+When you open it, the four options line up as small glass pills along the right edge of the screen, so they never cover the road you are driving on or your vehicle. Tap one to report it, or tap the x to close the menu.

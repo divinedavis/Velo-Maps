@@ -1,15 +1,13 @@
 import SwiftUI
 
 /// Things riders can report from the "+" button. Pothole is first (owner, 11/7: "put the
-/// pothole button inside the plus sign") and still reports in one tap, no form.
+/// pothole button inside the plus sign") and still reports in one tap, no form. Heavy
+/// traffic, hazard and crowded bus were removed (owner, 11/7).
 enum ReportKind: String, CaseIterable, Identifiable {
     case pothole = "Pothole"
     case police = "Police"
     case accident = "Accident"
-    case traffic = "Heavy traffic"
     case closure = "Road closed"
-    case hazard = "Hazard"
-    case crowded = "Crowded bus"
 
     var id: String { rawValue }
 
@@ -18,10 +16,7 @@ enum ReportKind: String, CaseIterable, Identifiable {
         case .pothole: "exclamationmark.triangle.fill"
         case .police: "light.beacon.max.fill"
         case .accident: "car.side.rear.and.collision.and.car.side.front"
-        case .traffic: "car.2.fill"
         case .closure: "xmark.octagon.fill"
-        case .hazard: "exclamationmark.triangle.fill"
-        case .crowded: "person.3.fill"
         }
     }
 
@@ -30,10 +25,7 @@ enum ReportKind: String, CaseIterable, Identifiable {
         case .pothole: Color(white: 0.96)
         case .police: Color(red: 0.13, green: 0.42, blue: 0.95)
         case .accident: Color(red: 0.90, green: 0.20, blue: 0.20)
-        case .traffic: Color(red: 0.97, green: 0.55, blue: 0.10)
         case .closure: Color(red: 0.55, green: 0.12, blue: 0.16)
-        case .hazard: Color(red: 0.96, green: 0.76, blue: 0.08)
-        case .crowded: Color(red: 0.52, green: 0.32, blue: 0.86)
         }
     }
 }
@@ -64,52 +56,49 @@ struct ReportMenuButton: View {
         .overlay(alignment: .bottomTrailing) {
             if isOpen {
                 menu
-                    .offset(y: -56)   // sit above the button row, leaving + / × visible
+                    .offset(y: -56)   // straight up from the button, leaving + / × visible
                     .transition(.scale(scale: 0.3, anchor: .bottomTrailing).combined(with: .opacity))
             }
         }
     }
 
-    /// Two columns so all seven fit between the turn banner and the + button (a single
-    /// column pushed Pothole, the first item, under the banner — 11/7).
+    /// Compact glass pills stacked up the right edge — label, then the coloured icon — right-
+    /// aligned with the + so the open menu never covers the road the rider is on (owner, 11/7),
+    /// and short enough to fit under the turn banner.
     private var menu: some View {
-        LazyVGrid(columns: [GridItem(.flexible(), spacing: 6, alignment: .leading),
-                            GridItem(.flexible(), spacing: 6, alignment: .leading)],
-                  alignment: .leading, spacing: 4) {
+        VStack(alignment: .trailing, spacing: 8) {
             ForEach(ReportKind.allCases) { kind in
                 Button {
                     withAnimation(.easeOut(duration: 0.2)) { isOpen = false }
                     onReport(kind)
                 } label: {
-                    HStack(spacing: 9) {
+                    HStack(spacing: 8) {
+                        Text(kind.rawValue)
+                            .scaledFont(14, .semibold)
+                            .foregroundStyle(.primary)
+                            .lineLimit(1)
+                            .fixedSize()
                         Group {
                             if kind == .pothole {
                                 // The same warning sign riders see on the map.
-                                Image(uiImage: PotholeAnnotation.sign).resizable().scaledToFit().padding(5)
+                                Image(uiImage: PotholeAnnotation.sign).resizable().scaledToFit().padding(6)
                             } else {
-                                Image(systemName: kind.icon).scaledFont(13, .semibold).foregroundStyle(.white)
+                                Image(systemName: kind.icon).scaledFont(14, .semibold).foregroundStyle(.white)
                             }
                         }
-                        .frame(width: 30, height: 30)
+                        .frame(width: 34, height: 34)
                         .background(kind.color, in: Circle())
-                        Text(kind.rawValue)
-                            .scaledFont(15, .medium)
-                            .foregroundStyle(.primary)
-                            .lineLimit(2)
-                            .minimumScaleFactor(0.85)
-                        Spacer(minLength: 0)
                     }
+                    .padding(.leading, 12).padding(.trailing, 5)
                     .frame(minHeight: 44)
-                    .contentShape(Rectangle())
+                    .readableGlass(in: .capsule, interactive: true)
+                    .contentShape(Capsule())
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("Report \(kind.rawValue.lowercased())")
                 .accessibilityIdentifier("report-\(kind.rawValue)")
             }
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
-        .frame(width: 340)
-        .fixedSize(horizontal: false, vertical: true)
-        .readableGlass(in: .rect(cornerRadius: 26))
+        .fixedSize()
     }
 }
