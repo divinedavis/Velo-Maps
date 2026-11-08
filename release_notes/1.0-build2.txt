@@ -1,0 +1,5 @@
+Highway signs now appear when you get on or off a highway. The banner shows the green guide sign with the same wording as the real sign, taken from OpenStreetMap: the route shield with its direction, the destination names and the exit number when one is mapped.
+
+To try it, swipe the bottom card up and switch Demo ride to Drive. The drive goes from Broadway and West 79th Street onto the Henry Hudson Parkway (NY 9A North) and takes the West 96th Street exit.
+
+While the settings card is open, the Pothole and + buttons now step aside so they no longer slide under the turn banner.
