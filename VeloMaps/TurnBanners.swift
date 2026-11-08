@@ -82,7 +82,7 @@ struct TurnBannerLanes: View {
                     Spacer(minLength: 0)
                 }
                 if let sign = m.sign {
-                    HighwaySignView(sign: sign)
+                    HighwaySignView(sign: sign, style: trip.signStyle)
                 } else {
                 HStack(spacing: 6) {
                     ForEach(trip.route.lanes(for: m)) { lane in

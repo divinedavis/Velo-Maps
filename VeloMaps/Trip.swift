@@ -35,6 +35,8 @@ final class Trip: ObservableObject {
     @Published var cardExpanded = false
     let startPotholeTap: Bool
     let turnStyle: Int
+    /// -signStyle 0…5: highway sign design inside the turn banner (0 = flat green sign).
+    let signStyle: Int
     /// -reportMenu YES opens the "+" report menu ~1.5 s after launch (for screenshots/video).
     let startReportMenu: Bool
     let night: Bool
@@ -75,6 +77,7 @@ final class Trip: ObservableObject {
         startPotholeTap = defaults.bool(forKey: "potholeTapped")
         // Lanes (2) chosen by the owner 11/7.
         turnStyle = defaults.number("turnStyle").map(Int.init) ?? 2
+        signStyle = defaults.number("signStyle").map(Int.init) ?? 0
         startReportMenu = defaults.bool(forKey: "reportMenu")
         // Glance (4) chosen by the owner 11/7 for the walking leg.
         walkStyle = defaults.number("walkStyle").map(Int.init) ?? 4

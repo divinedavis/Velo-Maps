@@ -25,6 +25,11 @@ extension View {
     }
 }
 
+/// How solid the frost under text on glass is. 0.9 read as flat black/white panels (owner,
+/// 11/7: "we need to use apple glass"); 0.55 keeps the see-through look, and the accessibility
+/// audit's pixel re-check confirms text contrast on the real rendering.
+let glassFrost = 0.55
+
 extension View {
     /// Liquid Glass with a solid frost under the content — light by day, dark at night — so
     /// text on it keeps contrast over a busy map (plain or tinted glass let the green park
@@ -33,7 +38,7 @@ extension View {
         // The glass is a layer *behind* the content rather than wrapped around it: content
         // inside a glass effect gets adaptive colouring from the map moving behind it, which
         // the accessibility audit measured as contrast failures on text that reads fine.
-        background(Color(uiColor: .systemBackground).opacity(0.9), in: shape)
+        background(Color(uiColor: .systemBackground).opacity(glassFrost), in: shape)
             .background(shape.fill(Color.white.opacity(0.001))
                 .glassEffect(interactive ? Glass.regular.interactive() : Glass.regular, in: shape))
     }
