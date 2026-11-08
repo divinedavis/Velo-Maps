@@ -23,6 +23,7 @@
 		A91822C3F7C5B20CA5489BFB /* Pothole.swift in Sources */ = {isa = PBXBuildFile; fileRef = 868B047B581941CA3316D432 /* Pothole.swift */; };
 		ABD81535D9E70B423548E466 /* HighwaySignTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EDD3D5A530A44E8A75D7CAF /* HighwaySignTests.swift */; };
 		C116C162B6ED7B90AC005CA2 /* RideScreenUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9FF142C594E6A0D9C4E123 /* RideScreenUITests.swift */; };
+		C57FCF633091E3E4CF2DB602 /* CurrentRoadLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F82542A3955B45288349195 /* CurrentRoadLabel.swift */; };
 		D085146A65901C12CE5FB1DB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5F99356A7357375F7B849983 /* Assets.xcassets */; };
 		D1394C0F77765941E050D3D3 /* Walk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C78F2EDB521CAD8D838F81 /* Walk.swift */; };
 		D52FE1FCE86ECE99EFBB0D2F /* TripCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 548C30603940B864098BD707 /* TripCard.swift */; };
@@ -69,6 +70,7 @@
 		868B047B581941CA3316D432 /* Pothole.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pothole.swift; sourceTree = "<group>"; };
 		87AFCC98A0845629A124D3BB /* HighwaySignView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighwaySignView.swift; sourceTree = "<group>"; };
 		8F7FCBDD2BC9B08B84DA3AF2 /* TransitMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitMapView.swift; sourceTree = "<group>"; };
+		8F82542A3955B45288349195 /* CurrentRoadLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentRoadLabel.swift; sourceTree = "<group>"; };
 		9C2954C852647DC0D7FB32E1 /* VeloMapsUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = VeloMapsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9EDD3D5A530A44E8A75D7CAF /* HighwaySignTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighwaySignTests.swift; sourceTree = "<group>"; };
 		B3C7EDF41AAB6727C6F5296F /* RouteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteTests.swift; sourceTree = "<group>"; };
@@ -120,6 +122,7 @@
 			isa = PBXGroup;
 			children = (
 				5F99356A7357375F7B849983 /* Assets.xcassets */,
+				8F82542A3955B45288349195 /* CurrentRoadLabel.swift */,
 				7308FE227F042D1390486D35 /* DemoDrive.swift */,
 				D1BC7B13218AB2AC8E6AE7F4 /* GlassCards.swift */,
 				87AFCC98A0845629A124D3BB /* HighwaySignView.swift */,
@@ -268,6 +271,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C57FCF633091E3E4CF2DB602 /* CurrentRoadLabel.swift in Sources */,
 				0D8F6628C859A1B4263127A0 /* DemoDrive.swift in Sources */,
 				37D805EC75CC7948B3DB56F7 /* GlassCards.swift in Sources */,
 				7DA49142EAFAB916799EA408 /* HighwaySignView.swift in Sources */,

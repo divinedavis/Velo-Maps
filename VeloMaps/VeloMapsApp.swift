@@ -58,23 +58,27 @@ struct RideScreen: View {
                 Color.clear.contentShape(Rectangle()).ignoresSafeArea()
                     .onTapGesture { withAnimation(.easeOut(duration: 0.2)) { showReportMenu = false } }
             }
-            VStack(alignment: .trailing, spacing: 10) {
+            VStack(spacing: 8) {
                 // Hidden while settings are open: the tall card would push them under the
                 // turn banner, and reporting isn't what you're doing in settings.
                 if !trip.cardExpanded {
-                HStack(spacing: 8) {
-                    if let (_, metres) = trip.potholeAhead() {
-                        PotholeAheadPill(metres: metres)
-                            .transition(.scale.combined(with: .opacity))
+                    // Right edge, stacked: + on top so its menu opens upward clear of Pothole;
+                    // they sit beside the vehicle, leaving the line above the card for the road name.
+                    VStack(alignment: .trailing, spacing: 10) {
+                        ReportMenuButton(isOpen: $showReportMenu) { kind in
+                            showToast("\(kind.rawValue) reported. Thanks!")
+                        }
+                        // Pothole is its own one-tap button; everything else lives behind "+".
+                        PotholeButton { reportPothole() }
                     }
-                    Spacer(minLength: 0)
-                    // Pothole is its own one-tap button; everything else lives behind "+".
-                    PotholeButton { reportPothole() }
-                    ReportMenuButton(isOpen: $showReportMenu) { kind in
-                        showToast("\(kind.rawValue) reported. Thanks!")
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .transition(.opacity)
+                    // The road the vehicle is on, centred on the route line just above the card.
+                    if trip.roadStyle > 0 {
+                        CurrentRoadLabel(trip: trip, style: trip.roadStyle)
+                            .frame(maxWidth: .infinity)
+                            .transition(.opacity)
                     }
-                }
-                .transition(.opacity)
                 }
                 card
                     .onGeometryChange(for: CGFloat.self) { $0.frame(in: .global).minY } action: { cardTop = $0 }
@@ -83,10 +87,16 @@ struct RideScreen: View {
             .padding(.bottom, 4)
         }
         .overlay(alignment: .top) {
-            VStack(spacing: 8) {
+            VStack(alignment: .leading, spacing: 8) {
                 turnBanner
+                // Reported pothole coming up: under the banner, where the eye already is.
+                if !trip.cardExpanded, let (_, metres) = trip.potholeAhead() {
+                    PotholeAheadPill(metres: metres)
+                        .transition(.scale.combined(with: .opacity))
+                }
                 if let toast {
                     ReportToast(text: toast)
+                        .frame(maxWidth: .infinity)
                         .transition(.move(edge: .top).combined(with: .opacity))
                 }
             }

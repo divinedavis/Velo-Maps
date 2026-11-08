@@ -22,6 +22,14 @@ struct TurnSpec {
 
 enum RouteKind { case bus, drive }
 
+/// Where a road starts along the line, its name and route number (from OSM via OSRM).
+/// Unnamed ramps are labelled from their own sign ("Ramp to NY 9A North").
+struct RoadSpec {
+    let coordinate: CLLocationCoordinate2D
+    let name: String
+    var ref: String? = nil
+}
+
 /// The text on a highway entrance or exit sign, taken verbatim from OpenStreetMap:
 /// `junction:ref` (exit number), `destination:ref` (route shields, e.g. "NY 9A North") and
 /// `destination` (the destination lines). Nothing here is reworded; when OSM has no exit
@@ -85,6 +93,7 @@ struct Route {
     let via: String?
     let stops: [Stop]
     let turns: [TurnSpec]
+    let roads: [RoadSpec]
     private(set) var points: [CLLocationCoordinate2D]
     private(set) var cumulative: [CLLocationDistance] = []
     private(set) var stopDistances: [CLLocationDistance] = []
@@ -96,13 +105,14 @@ struct Route {
     var etaSpeed: Double { kind == .drive ? 9 : 3.5 }
 
     init(line: String, destination: String, kind: RouteKind = .bus, via: String? = nil,
-         stops: [Stop], turns: [TurnSpec] = [], points: [CLLocationCoordinate2D]) {
+         stops: [Stop], turns: [TurnSpec] = [], roads: [RoadSpec] = [], points: [CLLocationCoordinate2D]) {
         self.line = line
         self.destination = destination
         self.kind = kind
         self.via = via
         self.stops = stops
         self.turns = turns
+        self.roads = roads
         self.points = points
         recompute()
     }
@@ -175,6 +185,14 @@ struct Route {
         return [Lane(id: 0, icon: "arrow.up", active: true)]
     }
 
+    /// The road under the vehicle at `distance` metres along the line.
+    func road(at distance: CLLocationDistance) -> RoadSpec? {
+        let starts = roads.map { r in
+            cumulative[points.indices.min { points[$0].distance(to: r.coordinate) < points[$1].distance(to: r.coordinate) } ?? 0]
+        }
+        return zip(roads, starts).filter { $0.1 <= distance + 1 }.max { $0.1 < $1.1 }?.0 ?? roads.first
+    }
+
     /// Index of the next stop the bus has not yet passed.
     func nextStopIndex(at distance: CLLocationDistance) -> Int {
         stopDistances.firstIndex { $0 > distance + 5 } ?? (stops.count - 1)
@@ -215,6 +233,10 @@ extension Route {
         turns: [
             TurnSpec(coordinate: .init(latitude: 40.7916758, longitude: -73.9646940),
                      icon: "arrow.turn.up.left", verb: "Turn left onto", street: "W 96 St"),
+        ],
+        roads: [   // OSM names
+            RoadSpec(coordinate: .init(latitude: 40.7762266, longitude: -73.9759630), name: "Central Park West"),
+            RoadSpec(coordinate: .init(latitude: 40.7917254, longitude: -73.9648118), name: "West 96th Street"),
         ],
         // Central Park West centreline from OpenStreetMap (© OpenStreetMap contributors, ODbL).
         points: [

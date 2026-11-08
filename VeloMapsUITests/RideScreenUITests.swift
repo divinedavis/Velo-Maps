@@ -98,4 +98,20 @@ final class RideScreenUITests: XCTestCase {
             app.terminate()
         }
     }
+
+    /// The road the vehicle is on shows above the card and follows the route.
+    func testCurrentRoadLabelFollowsTheRoute() {
+        for (args, expected) in [(["-progress", "0.25"], "Now on Central Park West"),
+                                 (["-demo", "drive", "-progress", "0.6"], "Now on Henry Hudson Parkway")] {
+            let app = XCUIApplication()
+            app.launchArguments += ["-paused", "YES"] + args
+            app.launch()
+            let road = app.descendants(matching: .any)["current-road"]
+            XCTAssertTrue(road.waitForExistence(timeout: 10))
+            XCTAssertEqual(road.label, expected)
+            let card = app.descendants(matching: .any)["trip-card"]
+            XCTAssertLessThanOrEqual(road.frame.maxY, card.frame.minY, "road label must sit above the card")
+            app.terminate()
+        }
+    }
 }

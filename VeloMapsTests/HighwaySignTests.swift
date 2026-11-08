@@ -43,3 +43,23 @@ struct HighwaySignTests {
         #expect(at == at.sorted() && at[0] > 0 && at[1] < Route.hhDrive.length)
     }
 }
+
+@Suite("Current road")
+struct CurrentRoadTests {
+    @Test(arguments: [(0.10, "Central Park West"), (0.995, "West 96th Street")])
+    func busRoute(_ fraction: Double, _ name: String) {
+        let r = Route.m10
+        #expect(r.road(at: r.length * fraction)?.name == name)
+    }
+
+    @Test(arguments: [(0.0, "Broadway"), (0.60, "Henry Hudson Parkway"), (0.999, "Exit to West 96th Street")])
+    func drive(_ fraction: Double, _ name: String) {
+        let r = Route.hhDrive
+        #expect(r.road(at: r.length * fraction)?.name == name)
+    }
+
+    @Test func parkwayCarriesItsRouteNumber() {
+        let r = Route.hhDrive
+        #expect(r.road(at: r.length * 0.6)?.ref == "NY 9A")
+    }
+}

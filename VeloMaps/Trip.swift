@@ -37,6 +37,8 @@ final class Trip: ObservableObject {
     let turnStyle: Int
     /// -signStyle 0…5: highway sign design inside the turn banner (0 = flat green sign, 4 = Junction, default).
     let signStyle: Int
+    /// -roadStyle 0…5: current-road label above the card (0 = hidden).
+    let roadStyle: Int
     /// -reportMenu YES opens the "+" report menu ~1.5 s after launch (for screenshots/video).
     let startReportMenu: Bool
     let night: Bool
@@ -79,6 +81,7 @@ final class Trip: ObservableObject {
         turnStyle = defaults.number("turnStyle").map(Int.init) ?? 2
         // Junction (4) chosen by the owner 11/7.
         signStyle = defaults.number("signStyle").map(Int.init) ?? 4
+        roadStyle = defaults.number("roadStyle").map(Int.init) ?? 1
         startReportMenu = defaults.bool(forKey: "reportMenu")
         // Glance (4) chosen by the owner 11/7 for the walking leg.
         walkStyle = defaults.number("walkStyle").map(Int.init) ?? 4
@@ -95,6 +98,13 @@ final class Trip: ObservableObject {
         // these from a shared server).
         potholes = [700, 1450].map { Pothole(coordinate: route.position(at: $0).0, at: $0, mine: false) }
         publish(force: true)
+    }
+
+    /// Road the vehicle is on now, and its heading (for the current-road label).
+    var currentRoad: RoadSpec? { route.road(at: progress * route.length) }
+    var compassHeading: String {
+        let h = route.smoothedHeading(at: progress * route.length, window: 40)
+        return ["N", "NE", "E", "SE", "S", "SW", "W", "NW"][Int((h + 22.5) / 45) % 8]
     }
 
     // MARK: Potholes

@@ -28,6 +28,15 @@ extension Route {
         TurnSpec(coordinate: .init(latitude: 40.7956850, longitude: -73.9767320), icon: "arrow.up.right",
                  verb: "", street: "", sign: HighwaySign(kind: .exit, osrmDestinations: "West 96th Street")),
         ],
+        roads: [   // OSRM step names / refs (OSM)
+            RoadSpec(coordinate: .init(latitude: 40.7836130, longitude: -73.9800300), name: "Broadway"),
+            RoadSpec(coordinate: .init(latitude: 40.7838080, longitude: -73.9798810), name: "West 79th Street"),
+            RoadSpec(coordinate: .init(latitude: 40.7849760, longitude: -73.9826520), name: "Riverside Drive"),
+            RoadSpec(coordinate: .init(latitude: 40.7803110, longitude: -73.9856860), name: "West 72nd Street"),
+            RoadSpec(coordinate: .init(latitude: 40.7807080, longitude: -73.9869960), name: "Ramp to NY 9A North"),
+            RoadSpec(coordinate: .init(latitude: 40.7816280, longitude: -73.9867310), name: "Henry Hudson Parkway", ref: "NY 9A"),
+            RoadSpec(coordinate: .init(latitude: 40.7956850, longitude: -73.9767320), name: "Exit to West 96th Street"),
+        ],
         points: [
             .init(latitude: 40.7836130, longitude: -73.9800300),
             .init(latitude: 40.7837110, longitude: -73.9799550),
