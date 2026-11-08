@@ -21,7 +21,7 @@ MANIFEST = os.path.join(OUT, "voice_cues.json")
 VOICE_ID = "YYsXMvvITqnbq9AYpUDk"       # Rene (ElevenLabs voice library; owner pick 11/8)
 VOICE_NAME = "Rene"
 MODEL_ID = "eleven_flash_v2_5"          # 0.5 credits/char
-OUTPUT_FORMAT = "mp3_22050_32"
+OUTPUT_FORMAT = "mp3_44100_64"     # same as the voice service
 MAX_CHARS_PER_RUN = 3000
 
 
@@ -80,8 +80,10 @@ def api_key():
 
 
 def render(key, text, previous, nxt):
-    body = {"text": text, "model_id": MODEL_ID, "previous_text": previous, "next_text": nxt,
-            "voice_settings": {"stability": 0.6, "similarity_boost": 0.8, "style": 0.0, "speed": 1.0}}
+    # Same delivery as the live voice service (owner liked it, 11/8): steadier + fixed seed.
+    body = {"text": text, "model_id": MODEL_ID, "previous_text": previous, "next_text": nxt, "seed": 7,
+            "voice_settings": {"stability": 0.75, "similarity_boost": 0.8, "style": 0.0, "speed": 1.0,
+                               "use_speaker_boost": True}}
     body = {k: v for k, v in body.items() if v is not None}
     req = urllib.request.Request(
         f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}?output_format={OUTPUT_FORMAT}",
