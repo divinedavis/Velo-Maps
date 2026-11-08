@@ -16,7 +16,7 @@ struct SettingsTests {
     @Test func voiceSpeaksTheTurnWhenItsBannerAppears() {
         let trip = Trip(defaults: defaults(["turnAhead": "200"]))
         var said: [String] = []
-        trip.speak = { said.append($0) }
+        trip.speak = { said.append($0.fallback) }
         trip.advance(by: 12)                       // 108 m at 9 m/s: now inside the 108 m window
         #expect(trip.bannerManeuver != nil)
         #expect(said.contains { $0.hasPrefix("In ") && $0.hasSuffix("turn left onto W 96 St") }, "said: \(said)")
@@ -25,7 +25,7 @@ struct SettingsTests {
     @Test func voiceOffStaysQuiet() {
         let trip = Trip(defaults: defaults(["turnAhead": "200", SettingKey.voice: false]))
         var said: [String] = []
-        trip.speak = { said.append($0) }
+        trip.speak = { said.append($0.fallback) }
         trip.advance(by: 12)
         #expect(trip.bannerManeuver != nil)
         #expect(said.isEmpty)

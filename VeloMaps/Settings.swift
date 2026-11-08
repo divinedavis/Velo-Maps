@@ -36,36 +36,10 @@ extension ColorScheme? {
     }
 }
 
-/// Spoken guidance. Uses the voice-prompt audio mode so it ducks music and plays like other
-/// navigation apps.
-@MainActor
-final class Speaker {
-    static let shared = Speaker()
-    private let synth = AVSpeechSynthesizer()
-    private var configured = false
-
-    func say(_ text: String) {
-        if !configured {
-            try? AVAudioSession.sharedInstance().setCategory(
-                .playback, mode: .voicePrompt, options: [.duckOthers, .interruptSpokenAudioAndMixWithOthers])
-            configured = true
-        }
-        try? AVAudioSession.sharedInstance().setActive(true)
-        let u = AVSpeechUtterance(string: text)
-        u.voice = AVSpeechSynthesisVoice(language: "en-US")
-        synth.speak(u)
-    }
-}
-
 /// Something the trip wants the rider to know right now (stop alert, report confirmations).
 struct Announcement: Equatable {
     let id = UUID()
     let text: String
-}
-
-/// "300 ft" → "300 feet", "0.2 mi" → "0.2 miles", for speech.
-func spokenDistance(_ metres: Double) -> String {
-    walkDistance(metres).replacingOccurrences(of: " ft", with: " feet").replacingOccurrences(of: " mi", with: " miles")
 }
 
 /// Ends the walking leg (walking screen's End buttons).

@@ -72,7 +72,7 @@ final class Trip: ObservableObject {
     /// Navigation settings (same keys the settings card writes).
     let settings: UserDefaults
     /// Speech output; tests swap it to record what would be said.
-    var speak: (String) -> Void = { Speaker.shared.say($0) }
+    var speak: (VoiceLine) -> Void = { Speaker.shared.say($0) }
     /// Latest thing to tell the rider on screen (stop alert); the screen shows it as a toast.
     @Published private(set) var announcement: Announcement?
     @Published private(set) var reports: [RoadReport] = []
@@ -192,21 +192,21 @@ final class Trip: ObservableObject {
             bannerManeuver = wanted
             // Voice guidance: say the turn once, as its banner appears.
             if let m = wanted, settings.voiceGuidance {
-                say("In \(spokenDistance(remaining)), \(m.instruction.prefix(1).lowercased() + m.instruction.dropFirst())")
+                say(VoiceCues.turn(remaining: remaining, instruction: m.instruction))
             }
         }
     }
 
-    private func say(_ text: String) {
+    private func say(_ line: VoiceLine) {
         guard !walking, !paused else { return }   // no speech in paused previews/tests
-        speak(text)
+        speak(line)
     }
 
     /// Spoken "Pothole ahead" once per pothole, when its alert comes up (if potholes are shown).
     private func announcePotholes() {
         guard settings.showPotholes, let (p, _) = potholeAhead(), !spokenPotholes.contains(p.id) else { return }
         spokenPotholes.insert(p.id)
-        if settings.voiceGuidance { say("Pothole ahead") }
+        if settings.voiceGuidance { say(VoiceCues.line("Pothole ahead")) }
     }
 
     /// Stop alert (settings): "At my stop" fires within 120 m of the last stop; "N stops
@@ -227,7 +227,7 @@ final class Trip: ObservableObject {
         guard let text, route.kind == .bus || setting == "At my stop" else { return }
         stopAlertFired = true
         announcement = Announcement(text: text)
-        if settings.voiceGuidance { say(text) }
+        if settings.voiceGuidance { say(VoiceCues.line(text)) }
     }
 
     /// Police / Accident / Road closed: drop a marker at the vehicle's spot.
