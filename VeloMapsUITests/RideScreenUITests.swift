@@ -105,7 +105,7 @@ final class RideScreenUITests: XCTestCase {
             XCTAssertGreaterThanOrEqual(app.buttons["report-Pothole"].frame.minY, banner.frame.maxY, "report menu runs under the turn banner")
         }
         police.tap()
-        XCTAssertTrue(app.staticTexts["Police reported. Thanks!"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Police reported for all riders"].waitForExistence(timeout: 3))
     }
 
     /// Highway ramps show the sign's own wording (from OpenStreetMap), entrance and exit.
