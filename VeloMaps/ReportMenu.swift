@@ -1,7 +1,9 @@
 import SwiftUI
 
-/// Things riders can report from the "+" button. Pothole has its own button.
+/// Things riders can report from the "+" button. Pothole is first (owner, 11/7: "put the
+/// pothole button inside the plus sign") and still reports in one tap, no form.
 enum ReportKind: String, CaseIterable, Identifiable {
+    case pothole = "Pothole"
     case police = "Police"
     case accident = "Accident"
     case traffic = "Heavy traffic"
@@ -13,6 +15,7 @@ enum ReportKind: String, CaseIterable, Identifiable {
 
     var icon: String {
         switch self {
+        case .pothole: "exclamationmark.triangle.fill"
         case .police: "light.beacon.max.fill"
         case .accident: "car.side.rear.and.collision.and.car.side.front"
         case .traffic: "car.2.fill"
@@ -24,6 +27,7 @@ enum ReportKind: String, CaseIterable, Identifiable {
 
     var color: Color {
         switch self {
+        case .pothole: Color(white: 0.96)
         case .police: Color(red: 0.13, green: 0.42, blue: 0.95)
         case .accident: Color(red: 0.90, green: 0.20, blue: 0.20)
         case .traffic: Color(red: 0.97, green: 0.55, blue: 0.10)
@@ -66,34 +70,45 @@ struct ReportMenuButton: View {
         }
     }
 
+    /// Two columns so all seven fit between the turn banner and the + button (a single
+    /// column pushed Pothole, the first item, under the banner — 11/7).
     private var menu: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        LazyVGrid(columns: [GridItem(.flexible(), spacing: 6, alignment: .leading),
+                            GridItem(.flexible(), spacing: 6, alignment: .leading)],
+                  alignment: .leading, spacing: 4) {
             ForEach(ReportKind.allCases) { kind in
                 Button {
                     withAnimation(.easeOut(duration: 0.2)) { isOpen = false }
                     onReport(kind)
                 } label: {
-                    HStack(spacing: 12) {
-                        Image(systemName: kind.icon)
-                            .scaledFont(14, .semibold)
-                            .foregroundStyle(.white)
-                            .frame(width: 32, height: 32)
-                            .background(kind.color, in: Circle())
+                    HStack(spacing: 9) {
+                        Group {
+                            if kind == .pothole {
+                                // The same warning sign riders see on the map.
+                                Image(uiImage: PotholeAnnotation.sign).resizable().scaledToFit().padding(5)
+                            } else {
+                                Image(systemName: kind.icon).scaledFont(13, .semibold).foregroundStyle(.white)
+                            }
+                        }
+                        .frame(width: 30, height: 30)
+                        .background(kind.color, in: Circle())
                         Text(kind.rawValue)
-                            .scaledFont(16, .medium)
+                            .scaledFont(15, .medium)
                             .foregroundStyle(.primary)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.85)
                         Spacer(minLength: 0)
                     }
-                    .padding(.vertical, 5)
+                    .frame(minHeight: 44)
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("report-\(kind.rawValue)")
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .frame(width: 220)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .frame(width: 340)
         .fixedSize(horizontal: false, vertical: true)
         .readableGlass(in: .rect(cornerRadius: 26))
     }

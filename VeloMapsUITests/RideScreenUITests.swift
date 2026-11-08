@@ -41,15 +41,23 @@ final class RideScreenUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Voice guidance"].exists)
     }
 
-    /// One tap on Pothole reports it straight away (no form) and confirms.
-    func testPotholeIsOneTap() {
+    /// Pothole lives in the "+" menu (first item) and reports straight away, no form.
+    func testPotholeIsReportedFromThePlusMenu() {
         let app = XCUIApplication()
-        app.launchArguments += ["-paused", "YES"]
+        app.launchArguments += ["-paused", "YES", "-progress", "0.25"]
         app.launch()
 
-        let button = app.buttons["report-pothole"]
-        XCTAssertTrue(button.waitForExistence(timeout: 10))
-        button.tap()
+        // At 25% a demo report from another rider is ~140 m ahead: the alert is up.
+        let ahead = app.descendants(matching: .any)["pothole-ahead"]
+        XCTAssertTrue(ahead.waitForExistence(timeout: 10))
+        XCTAssertTrue(ahead.label.hasPrefix("Pothole ahead"), "alert label was: \(ahead.label)")
+        XCTAssertFalse(app.buttons["report-pothole"].exists, "Pothole should no longer be a separate button")
+        let plus = app.buttons["report-menu"]
+        XCTAssertTrue(plus.waitForExistence(timeout: 10))
+        plus.tap()
+        let pothole = app.buttons["report-Pothole"]
+        XCTAssertTrue(pothole.waitForExistence(timeout: 3))
+        pothole.tap()
         XCTAssertTrue(app.staticTexts["Pothole reported for all riders"].waitForExistence(timeout: 3))
     }
 
@@ -70,18 +78,23 @@ final class RideScreenUITests: XCTestCase {
         app.launchArguments += ["-paused", "YES"]
         app.launch()
 
-        XCTAssertTrue(app.buttons["report-pothole"].waitForExistence(timeout: 10), "pothole button should stay separate")
         let plus = app.buttons["report-menu"]
-        XCTAssertTrue(plus.exists)
+        XCTAssertTrue(plus.waitForExistence(timeout: 10))
         plus.tap()
         let police = app.buttons["report-Police"]
         XCTAssertTrue(police.waitForExistence(timeout: 3))
         XCTAssertTrue(app.buttons["report-Accident"].exists)
         // The open menu must sit entirely above the trip card, never over it.
         let card = app.descendants(matching: .any)["trip-card"]
-        let lowestItem = app.buttons["report-Crowded bus"]
+        let lowestItem = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'report-' AND identifier != 'report-menu' AND identifier != 'report-toast'"))
+            .allElementsBoundByIndex.max { $0.frame.maxY < $1.frame.maxY }!
         XCTAssertLessThan(lowestItem.frame.maxY, card.frame.minY, "report menu overlaps the trip card")
         XCTAssertLessThan(lowestItem.frame.maxY, plus.frame.minY, "report menu covers the + / × button")
+        // ...and its top item must be below the turn banner, not hidden under it.
+        let banner = app.descendants(matching: .any)["turn-banner"]
+        if banner.exists {
+            XCTAssertGreaterThanOrEqual(app.buttons["report-Pothole"].frame.minY, banner.frame.maxY, "report menu runs under the turn banner")
+        }
         police.tap()
         XCTAssertTrue(app.staticTexts["Police reported. Thanks!"].waitForExistence(timeout: 3))
     }

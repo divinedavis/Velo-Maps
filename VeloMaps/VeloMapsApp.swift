@@ -62,14 +62,10 @@ struct RideScreen: View {
                 // Hidden while settings are open: the tall card would push them under the
                 // turn banner, and reporting isn't what you're doing in settings.
                 if !trip.cardExpanded {
-                    // Right edge, stacked: + on top so its menu opens upward clear of Pothole;
-                    // they sit beside the vehicle, leaving the line above the card for the road name.
-                    VStack(alignment: .trailing, spacing: 10) {
-                        ReportMenuButton(isOpen: $showReportMenu) { kind in
-                            showToast("\(kind.rawValue) reported. Thanks!")
-                        }
-                        // Pothole is its own one-tap button; everything else lives behind "+".
-                        PotholeButton { reportPothole() }
+                    // Right edge beside the vehicle, leaving the line above the card for the road name.
+                    // Everything is reported from "+", Pothole first (still one tap, no form).
+                    ReportMenuButton(isOpen: $showReportMenu) { kind in
+                        if kind == .pothole { reportPothole() } else { showToast("\(kind.rawValue) reported. Thanks!") }
                     }
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     .transition(.opacity)

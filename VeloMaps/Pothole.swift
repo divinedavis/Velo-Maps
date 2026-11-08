@@ -2,31 +2,6 @@ import SwiftUI
 
 private let amber = Color(red: 0.98, green: 0.68, blue: 0.08)
 
-/// Glass button that sits on the right, just above the trip card. One tap reports a pothole
-/// at the bus's current spot; no form.
-struct PotholeButton: View {
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 7) {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .symbolRenderingMode(.palette)
-                    .foregroundStyle(.black, amber)
-                Text("Pothole").foregroundStyle(.primary)
-            }
-            .scaledFont(15, .semibold)
-        }
-        .buttonStyle(.plain)
-        .padding(.horizontal, 16)
-        .frame(minHeight: 46)
-        .readableGlass(in: .capsule, interactive: true)
-        .contentShape(Capsule())
-        .accessibilityLabel("Report a pothole")
-        .accessibilityIdentifier("report-pothole")
-    }
-}
-
 /// Shown above the card when a reported pothole is coming up on the route.
 struct PotholeAheadPill: View {
     let metres: Double

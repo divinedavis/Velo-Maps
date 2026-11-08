@@ -1,0 +1,5 @@
+The street or highway you are on now shows just above the trip card, right on the route line, and changes as you turn onto each new road.
+
+Pothole has moved into the + menu, at the top. One tap still reports it right away with no form, drops a warning sign on the map and lets riders behind you see it. The menu now uses two columns so every option fits on screen.
+
+The Pothole ahead alert now appears just under the turn banner.
