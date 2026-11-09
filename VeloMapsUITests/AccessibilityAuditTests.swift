@@ -19,6 +19,7 @@ final class AccessibilityAuditTests: XCTestCase {
     private var auditShot: UIImage?
     private var unreproduced: [String] = []
     private var attachRetries = 0
+    private var attachStarted: Date?
 
     private func excused(_ issue: XCUIAccessibilityAuditIssue) -> Bool {
         guard let e = issue.element else { return true }   // nothing to point at, nothing to fix
@@ -88,13 +89,17 @@ final class AccessibilityAuditTests: XCTestCase {
         } catch {
             // -902 "Invalid target app" = the audit tool failed to attach (seen 11/8; the same
             // screens pass on a rerun). Real findings never retry — they fail immediately.
-            // Under heavy Mac load (11/8: load avg ~13 from other sessions) it can fail up to
-            // several times: retry up to 3 times, waiting longer and re-activating the app.
-            if (error as NSError).code == -902, attachRetries < 3 {
-                attachRetries += 1
-                sleep(UInt32(3 * attachRetries))
-                app.activate()
-                return audit(app, screen)
+            // Under heavy load (11/8) and right after a simulator boot (11/9: the first 4 audits
+            // of a run failed for ~2 min, the rest passed) it keeps failing for a while: keep
+            // retrying for up to 2 minutes per screen, re-activating the app each time.
+            if (error as NSError).code == -902 {
+                if attachStarted == nil { attachStarted = Date() }
+                if Date().timeIntervalSince(attachStarted!) < 120 {
+                    attachRetries += 1
+                    sleep(UInt32(min(3 * attachRetries, 10)))
+                    app.activate()
+                    return audit(app, screen)
+                }
             }
             XCTFail("\(screen): audit could not run: \(error)")
         }
