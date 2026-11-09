@@ -1,0 +1,26 @@
+[Unit]
+Description=Velo Maps routing (Mapbox live-traffic proxy, python, 127.0.0.1:3131)
+After=network.target
+
+[Service]
+Type=simple
+User=velomaps
+Group=velomaps
+EnvironmentFile=/etc/velomaps-route.env
+ExecStart=/usr/bin/python3 /opt/velomaps-route/velomaps_route.py
+StateDirectory=velomaps-route
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+[Install]
+WantedBy=multi-user.target

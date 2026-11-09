@@ -267,6 +267,15 @@ final class Trip: ObservableObject {
         publish(force: true)
     }
 
+    /// Live: a clearly faster route came up mid-drive (FasterRoute): switch, show and say it.
+    func switchToFaster(_ newRoute: Route, saves: TimeInterval) {
+        reroute(newRoute)
+        let mins = max(1, Int((saves / 60).rounded()))
+        let text = "Faster route found. Saves \(mins) minute\(mins == 1 ? "" : "s")"
+        announcement = Announcement(text: text)
+        if settings.voiceGuidance { say(VoiceCues.line(text)) }
+    }
+
     private func arrive() {
         arrived = true
         targetDistance = route.length

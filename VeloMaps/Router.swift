@@ -4,10 +4,14 @@ import MapKit
 
 /// Real driving routes for live navigation (owner, 11/8: "i have to test it in real time").
 ///
-/// OSRM (OpenStreetMap data) is used first because its steps carry the highway sign wording
-/// (`destinations`, `exits`) and lane data that the sign and lane features need. The public
-/// demo server is fine for testing but is rate-limited and not for production; Apple's
-/// MKDirections is the fallback. Requests are bounded: one per Start, reroutes ≥ 15 s apart.
+/// Each request asks for the best route plus up to 2 alternatives and the app takes the fastest
+/// (owner, 11/9). Sources, in order:
+///  1. Our droplet's /route proxy → Mapbox driving-traffic: live traffic and incidents, and the
+///     same OSRM-style steps (sign wording, exits, lanes). Daily request cap on the server;
+///     503 until a Mapbox token is configured, 429 over the cap.
+///  2. The public OSRM demo server (no traffic; testing only, rate-limited).
+///  3. Apple's MKDirections (traffic-aware times, but no sign wording or lanes).
+/// Requests are bounded: one per Start, reroutes ≥ 15 s apart, faster-route checks ≥ 4 min apart.
 enum Router {
     struct Failure: Error, LocalizedError {
         let message: String
@@ -15,33 +19,73 @@ enum Router {
     }
 
     static let osrmBase = "https://router.project-osrm.org"
+    static let trafficBase = URL(string: "https://velomaps.104.236.120.144.sslip.io/route")!
 
+    /// The fastest route (what Start and reroutes use).
     static func drive(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D, name: String) async throws -> Route {
-        do {
-            return try await osrm(from: from, to: to, name: name)
-        } catch {
-            return try await apple(from: from, to: to, name: name)
-        }
+        guard let best = try await routes(from: from, to: to, name: name).first else { throw Failure(message: "No route found") }
+        return best
+    }
+
+    /// The best route and up to 2 alternatives, fastest first.
+    static func routes(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D, name: String) async throws -> [Route] {
+        if trafficEnabled, let r = try? await traffic(from: from, to: to, name: name), !r.isEmpty { return r }
+        if let r = try? await osrm(from: from, to: to, name: name), !r.isEmpty { return r }
+        return try await apple(from: from, to: to, name: name)
+    }
+
+    /// Off under tests, the scripted demo and fixed-location UI tests (tests must never spend
+    /// the Mapbox allowance), and without the app token.
+    static var trafficEnabled: Bool {
+        let d = UserDefaults.standard
+        return !AppSecrets.voiceToken.isEmpty && ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil
+            && d.string(forKey: "demo") == nil && d.string(forKey: "mockLocation") == nil
+    }
+
+    // MARK: Live traffic (our proxy → Mapbox)
+
+    static func traffic(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D, name: String) async throws -> [Route] {
+        var c = URLComponents(url: trafficBase, resolvingAgainstBaseURL: false)!
+        c.queryItems = [URLQueryItem(name: "from", value: String(format: "%.6f,%.6f", from.latitude, from.longitude)),
+                        URLQueryItem(name: "to", value: String(format: "%.6f,%.6f", to.latitude, to.longitude))]
+        var req = URLRequest(url: c.url!)
+        req.timeoutInterval = 8
+        req.setValue(AppSecrets.voiceToken, forHTTPHeaderField: "X-Velo-App")
+        let (data, resp) = try await URLSession.shared.data(for: req)
+        guard (resp as? HTTPURLResponse)?.statusCode == 200 else { throw Failure(message: "Traffic routing unavailable") }
+        return try parseRoutes(data, destination: name)
     }
 
     // MARK: OSRM
 
-    static func osrm(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D, name: String) async throws -> Route {
+    static func osrm(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D, name: String) async throws -> [Route] {
         let coords = String(format: "%.6f,%.6f;%.6f,%.6f", from.longitude, from.latitude, to.longitude, to.latitude)
-        var req = URLRequest(url: URL(string: "\(osrmBase)/route/v1/driving/\(coords)?overview=full&geometries=geojson&steps=true")!)
+        var req = URLRequest(url: URL(string: "\(osrmBase)/route/v1/driving/\(coords)?alternatives=2&overview=full&geometries=geojson&steps=true")!)
         req.setValue("VeloMaps/1.0 (iOS navigation prototype)", forHTTPHeaderField: "User-Agent")
         req.timeoutInterval = 15
         let (data, resp) = try await URLSession.shared.data(for: req)
         guard (resp as? HTTPURLResponse)?.statusCode == 200 else { throw Failure(message: "Routing service unavailable") }
-        return try parseOSRM(data, destination: name)
+        return try parseRoutes(data, destination: name)
     }
 
-    /// OSRM JSON → Route. Separate so it can be tested with a saved response.
+    /// OSRM/Mapbox JSON → every route in it, fastest first.
+    static func parseRoutes(_ data: Data, destination: String) throws -> [Route] {
+        let json = try JSONDecoder().decode(OSRMResponse.self, from: data)
+        guard json.code == "Ok" else { throw Failure(message: "No route found") }
+        let routes = json.routes.compactMap { try? route(from: $0, destination: destination) }
+        guard !routes.isEmpty else { throw Failure(message: "No route found") }
+        return routes.sorted { ($0.duration ?? .infinity) < ($1.duration ?? .infinity) }
+    }
+
+    /// OSRM JSON → its first route. Separate so it can be tested with a saved response.
     static func parseOSRM(_ data: Data, destination: String) throws -> Route {
         let json = try JSONDecoder().decode(OSRMResponse.self, from: data)
-        guard json.code == "Ok", let r = json.routes.first, r.geometry.coordinates.count >= 2 else {
-            throw Failure(message: "No route found")
-        }
+        guard json.code == "Ok", let r = json.routes.first else { throw Failure(message: "No route found") }
+        return try route(from: r, destination: destination)
+    }
+
+    static func route(from r: OSRMRoute, destination: String) throws -> Route {
+        guard r.geometry.coordinates.count >= 2 else { throw Failure(message: "No route found") }
         let points = r.geometry.coordinates.map { CLLocationCoordinate2D(latitude: $0[1], longitude: $0[0]) }
         let steps = r.legs.flatMap(\.steps)
         var turns: [TurnSpec] = []
@@ -131,13 +175,22 @@ enum Router {
 
     // MARK: Apple fallback
 
-    static func apple(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D, name: String) async throws -> Route {
+    static func apple(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D, name: String) async throws -> [Route] {
         let req = MKDirections.Request()
         req.source = MKMapItem(location: CLLocation(latitude: from.latitude, longitude: from.longitude), address: nil)
         req.destination = MKMapItem(location: CLLocation(latitude: to.latitude, longitude: to.longitude), address: nil)
         req.transportType = .automobile
-        guard let r = try await MKDirections(request: req).calculate().routes.first else { throw Failure(message: "No route found") }
+        req.requestsAlternateRoutes = true
+        let routes = try await MKDirections(request: req).calculate().routes
+            .prefix(3).compactMap { apple($0, name: name) }
+            .sorted { ($0.duration ?? .infinity) < ($1.duration ?? .infinity) }
+        guard !routes.isEmpty else { throw Failure(message: "No route found") }
+        return routes
+    }
+
+    private static func apple(_ r: MKRoute, name: String) -> Route? {
         let pl = r.polyline
+        guard pl.pointCount >= 2 else { return nil }
         var coords = [CLLocationCoordinate2D](repeating: .init(), count: pl.pointCount)
         pl.getCoordinates(&coords, range: NSRange(location: 0, length: pl.pointCount))
         var turns: [TurnSpec] = []

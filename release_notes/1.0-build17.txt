@@ -1,0 +1,3 @@
+Routes are now picked from up to three options: the best route plus two alternatives, and Velo Maps takes the fastest.
+
+While you drive, Velo Maps checks for a faster route every four minutes. If one saves at least two minutes, it switches and Rene tells you how much time it saves. These checks use live traffic, which turns on once the traffic service is connected.

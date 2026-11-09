@@ -10,6 +10,8 @@ final class AppModel: ObservableObject {
     /// `-demo bus|drive`: the scripted demo ride (UI tests, previews). Riders never see it.
     let isDemo: Bool
     private var lastReroute = Date.distantPast
+    private var lastFasterCheck = Date()
+    private var checkingFaster = false
 
     init() {
         isDemo = UserDefaults.standard.string(forKey: "demo") != nil
@@ -37,8 +39,31 @@ final class AppModel: ObservableObject {
         location.setNavigating(true)
         let trip = Trip(route: route, live: true)
         self.trip = trip
+        lastFasterCheck = Date()
         if let fix = location.fix { trip.update(fix: fix) }
         loadLimits(for: trip)
+    }
+
+    /// Every 4 minutes on the route: ask for live-traffic routes from here and switch if one is
+    /// clearly faster. Only with live traffic (the no-traffic fallbacks never change their
+    /// answer mid-drive), never with a turn banner up, never in the last 2 km.
+    private func checkForFasterRoute(_ trip: Trip, from fix: CLLocation) {
+        guard Router.trafficEnabled, !trip.offRoute, !checkingFaster, trip.bannerManeuver == nil,
+              Date().timeIntervalSince(lastFasterCheck) >= FasterRoute.checkEvery,
+              trip.route.length - trip.distance > FasterRoute.minRemaining else { return }
+        lastFasterCheck = Date()
+        checkingFaster = true
+        let dest = trip.route.stops[trip.route.stops.count - 1].coordinate
+        let name = trip.route.destination
+        Task {
+            defer { checkingFaster = false }
+            guard let candidates = try? await Router.traffic(from: fix.coordinate, to: dest, name: name),
+                  self.trip === trip, !trip.offRoute, trip.bannerManeuver == nil,
+                  let (route, saves) = FasterRoute.pick(current: trip.route, at: trip.distance, candidates: candidates)
+            else { return }
+            trip.switchToFaster(route, saves: saves)
+            loadLimits(for: trip)
+        }
     }
 
     /// One Overpass request per route for posted speed limits (sign hidden until then).
@@ -60,8 +85,10 @@ final class AppModel: ObservableObject {
         startIfAsked(from: fix)
         guard let trip, trip.live else { return }
         trip.update(fix: fix)
+        checkForFasterRoute(trip, from: fix)
         guard trip.offRoute, Date().timeIntervalSince(lastReroute) > 15 else { return }
         lastReroute = Date()
+        lastFasterCheck = Date()
         let dest = trip.route.stops[trip.route.stops.count - 1].coordinate
         let name = trip.route.destination
         Task {
