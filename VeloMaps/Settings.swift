@@ -10,6 +10,8 @@ enum SettingKey {
     static let appearance = "appearance"
     static let buildings = "buildings3D"
     static let potholes = "showPotholes"
+    static let mapMode = "mapMode"
+    static let traffic = "mapTraffic"
 }
 
 extension UserDefaults {

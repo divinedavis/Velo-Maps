@@ -49,6 +49,7 @@ final class LocationService: NSObject, ObservableObject, CLLocationManagerDelega
     nonisolated func locationManagerDidChangeAuthorization(_ m: CLLocationManager) {
         let status = m.authorizationStatus
         Task { @MainActor in
+            guard mock == nil else { return }       // -mockLocation: never show "Turn on Location"
             authorized = status == .authorizedWhenInUse || status == .authorizedAlways
             denied = status == .denied || status == .restricted
             if authorized { manager.startUpdatingLocation() }

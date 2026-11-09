@@ -145,9 +145,11 @@ final class AccessibilityAuditTests: XCTestCase {
 
     func testHomeScreen() {
         let app = XCUIApplication()
-        app.launchArguments = ["-mockLocation", "40.7836,-73.9800", "-resetSettings", "YES"]
+        // The Apple Maps-style sheet filled in: Places row + Recents.
+        app.launchArguments = ["-mockLocation", "40.7836,-73.9800", "-resetSettings", "YES", "-demoPlaces", "YES"]
         app.launch()
         XCTAssertTrue(app.textFields["where-to"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["place-home"].waitForExistence(timeout: 5))
         sleep(2)   // map tiles
         audit(app, "home")
     }

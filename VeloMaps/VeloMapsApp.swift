@@ -8,7 +8,8 @@ struct VeloMapsApp: App {
         Metrics.shared.start()
         // -resetSettings YES (UI tests): start from the default navigation settings.
         if UserDefaults.standard.bool(forKey: "resetSettings") {
-            [SettingKey.voice, SettingKey.stopAlert, SettingKey.appearance, SettingKey.buildings, SettingKey.potholes]
+            [SettingKey.voice, SettingKey.stopAlert, SettingKey.appearance, SettingKey.buildings, SettingKey.potholes,
+             SettingKey.mapMode, SettingKey.traffic, PlacesStore.key]
                 .forEach { UserDefaults.standard.removeObject(forKey: $0) }
         }
     }
