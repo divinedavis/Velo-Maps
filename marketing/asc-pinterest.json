@@ -1,0 +1,16 @@
+{
+  "name": "Velo Maps",
+  "style": "dark",
+  "icon": "marketing/brand/icon-1024.png",
+  "raw_dir": "marketing/raw",
+  "out_dir": "marketing/asc-screenshots",
+  "masonry": ["drive.png", "night.png", "exit-sign.png", "walk.png", "turn-lanes.png", "report-menu.png"],
+  "panels": [
+    ["turn-lanes.png", "Know your lane early", [30, 180, 1176, 592]],
+    ["exit-sign.png", "Exit signs, word for word", [30, 180, 1176, 700]],
+    ["drive.png", "Speed limits always in view", [40, 826, 188, 1016, 2.4]],
+    ["report-menu.png", "Report potholes in one tap", [740, 890, 1185, 1680]],
+    ["night.png", "Made for night drives"],
+    ["walk.png", "Walk the last block", [30, 1840, 1176, 2350]]
+  ]
+}
