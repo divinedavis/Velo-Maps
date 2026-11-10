@@ -41,7 +41,7 @@ grep -q "MXMetricManager.shared.add" VeloMaps/Metrics.swift && grep -q "Metrics.
 
 ./scripts/generate.sh >/dev/null
 stage "2-4. unit, UI + accessibility audit, performance"
-./scripts/run_tests.sh all
+VELO_REUSE_PASSED=1 ./scripts/run_tests.sh all   # suites that passed on these sources are not repeated
 stage "4b. perf gate"
 python3 -I scripts/perf_gate.py build.nosync/perf.xcresult
 

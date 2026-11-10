@@ -106,7 +106,15 @@ struct Route {
     private(set) var stopDistances: [CLLocationDistance] = []
     /// Where each road starts along the line.
     private(set) var roadStarts: [CLLocationDistance] = []
+    /// Road indices ordered by where they start (ties keep list order), for binary search.
+    private var roadOrder: [Int] = []
     private(set) var maneuverList: [Maneuver] = []
+    /// The centre line sampled every `laneSpacing` metres, and the bearing pointing to its
+    /// right there. Worked out once per route: the lane line, every faint lane and the lane
+    /// offsets all read these instead of searching the line again (a 60 km route took 1.7 s
+    /// to draw on the main thread before, 11/10).
+    private var sampleCentres: [CLLocationCoordinate2D] = []
+    private var sampleRight: [CLLocationDirection] = []
     /// Expected travel time for the whole route (seconds), from the router; nil = estimate.
     var duration: Double?
     /// Live routes: posted limits along the route (SpeedLimits); empty = use the roads' own.
@@ -211,7 +219,16 @@ struct Route {
         }
         stopDistances = stops.map { distanceAlong(nearest: $0.coordinate) }
         roadStarts = roads.map { distanceAlong(nearest: $0.coordinate) }
+        roadOrder = roads.indices.sorted { (roadStarts[$0], $0) < (roadStarts[$1], $1) }
         maneuverList = computeManeuvers()
+        let n = total > 0 ? Int(total / Route.laneSpacing) + 1 : 0
+        sampleCentres = []; sampleRight = []
+        sampleCentres.reserveCapacity(n); sampleRight.reserveCapacity(n)
+        for i in 0..<n {
+            let d = Double(i) * Route.laneSpacing
+            sampleCentres.append(position(at: d).0)
+            sampleRight.append(vehicleHeading(at: d) + 90)
+        }
         laneOffsets = computeLaneOffsets()
     }
 
@@ -225,12 +242,15 @@ struct Route {
         let ms = maneuvers
         let n = Int(length / Route.laneSpacing) + 1
         var desired = [Double](repeating: 0, count: n)
+        var mi = 0   // first maneuver still ahead; d only grows, so this only moves forward
         for i in 0..<n {
             let d = Double(i) * Route.laneSpacing
             let r = road(at: d) ?? roads[0]
             let fwd = max(1, r.lanes)
             var k: Int = kind == .bus ? fwd - 1 : (r.twoWay ? fwd - 1 : fwd / 2)
-            if let next = ms.first(where: { $0.at > d }) {
+            while mi < ms.count, ms[mi].at <= d { mi += 1 }
+            if mi < ms.count {
+                let next = ms[mi]
                 let window: Double = next.sign != nil ? 600 : 150
                 if next.at - d <= window {
                     if next.icon.contains("left") { k = 0 }
@@ -270,19 +290,27 @@ struct Route {
     /// The lane path as points every 4 m (for drawing), or every lane `k` of the road for
     /// the all-lanes design (nil where the road has fewer lanes).
     func lanePath() -> [CLLocationCoordinate2D] {
-        stride(from: 0.0, through: length, by: Route.laneSpacing).map { lanePosition(at: $0) }
+        guard laneOffsets.count == sampleCentres.count else {   // no road data: the centre line
+            return sampleCentres
+        }
+        return sampleCentres.indices.map { i in
+            laneOffsets[i] == 0 ? sampleCentres[i] : sampleCentres[i].offset(by: laneOffsets[i], bearing: sampleRight[i])
+        }
     }
 
     func lanePaths(allLanesUpTo maxLanes: Int = 4) -> [[CLLocationCoordinate2D]] {
+        guard !roads.isEmpty else { return [] }
+        // The road under each sample, looked up once and shared by every lane.
+        let under = sampleCentres.indices.map { road(at: Double($0) * Route.laneSpacing) ?? roads[0] }
         var paths: [[CLLocationCoordinate2D]] = []
         for k in 0..<maxLanes {
             var current: [CLLocationCoordinate2D] = []
-            for d in stride(from: 0.0, through: length, by: Route.laneSpacing) {
-                let r = road(at: d) ?? roads[0]
+            for i in sampleCentres.indices {
+                let r = under[i]
                 if k < max(1, r.lanes) {
                     let off = r.twoWay ? (Double(k) + 0.5) * Route.laneWidth
                                        : (Double(k) + 0.5 - Double(max(1, r.lanes)) / 2) * Route.laneWidth
-                    current.append(position(at: d).0.offset(by: off, bearing: vehicleHeading(at: d) + 90))
+                    current.append(sampleCentres[i].offset(by: off, bearing: sampleRight[i]))
                 } else if current.count > 1 {
                     paths.append(current); current = []
                 } else { current = [] }
@@ -358,10 +386,13 @@ struct Route {
     func distanceAlong(nearest c: CLLocationCoordinate2D) -> CLLocationDistance {
         let cosLat = cos(c.latitude * .pi / 180)
         var best = 0, bestD = Double.infinity
-        for (i, p) in points.enumerated() {
-            let dy = p.latitude - c.latitude, dx = (p.longitude - c.longitude) * cosLat
-            let d = dx * dx + dy * dy
-            if d < bestD { bestD = d; best = i }
+        // Runs once per stop, road and turn of a route: a plain indexed loop over the buffer.
+        points.withUnsafeBufferPointer { pts in
+            for i in 0..<pts.count {
+                let dy = pts[i].latitude - c.latitude, dx = (pts[i].longitude - c.longitude) * cosLat
+                let d = dx * dx + dy * dy
+                if d < bestD { bestD = d; best = i }
+            }
         }
         return cumulative[best]
     }
@@ -381,11 +412,13 @@ struct Route {
     /// The road under the vehicle at `distance` metres along the line.
     func road(at distance: CLLocationDistance) -> RoadSpec? {
         guard !roads.isEmpty else { return nil }
-        var best: Int?
-        for (i, start) in roadStarts.enumerated() where start <= distance + 1 {
-            if best == nil || start >= roadStarts[best!] { best = i }
+        // Last road (in start order) that has started by here; none yet = the first road.
+        var lo = 0, hi = roadOrder.count
+        while lo < hi {
+            let mid = (lo + hi) / 2
+            if roadStarts[roadOrder[mid]] <= distance + 1 { lo = mid + 1 } else { hi = mid }
         }
-        return roads[best ?? 0]
+        return roads[lo > 0 ? roadOrder[lo - 1] : 0]
     }
 
     /// Index of the next stop the bus has not yet passed.

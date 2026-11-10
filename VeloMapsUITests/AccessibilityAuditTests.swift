@@ -98,10 +98,11 @@ final class AccessibilityAuditTests: XCTestCase {
             // screens pass on a rerun). Real findings never retry — they fail immediately.
             // Under heavy load (11/8) and right after a simulator boot (11/9: the first 4 audits
             // of a run failed for ~2 min, the rest passed) it keeps failing for a while: keep
-            // retrying for up to 2 minutes per screen, re-activating the app each time.
+            // retrying for up to 45 s per screen, re-activating the app each time. run_tests.sh runs
+            // the audit last and repeats it once if it still could not attach.
             if (error as NSError).code == -902 {
                 if attachStarted == nil { attachStarted = Date() }
-                if Date().timeIntervalSince(attachStarted!) < 120 {
+                if Date().timeIntervalSince(attachStarted!) < 45 {
                     attachRetries += 1
                     sleep(UInt32(min(3 * attachRetries, 10)))
                     app.activate()

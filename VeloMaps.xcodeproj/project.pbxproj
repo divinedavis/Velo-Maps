@@ -44,6 +44,7 @@
 		705A7261D655A93638D4BAF0 /* SpeedLimits.swift in Sources */ = {isa = PBXBuildFile; fileRef = 232859A67D56746938C1074F /* SpeedLimits.swift */; };
 		70B280E5D957F89E3CEC3980 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E200645BF3E0302A4E0E73B /* LocationService.swift */; };
 		70FFC7DEE97DBFD14BA1F5A6 /* cue-in-0-9-miles.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 5FF4CB7B970A006FB2296FB0 /* cue-in-0-9-miles.mp3 */; };
+		756637AF174260A74F33E5C6 /* RouteBuildSpeedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3386B03383010D5981585F /* RouteBuildSpeedTests.swift */; };
 		7B66B8BF5D22AE6D5BFC2CD7 /* cue-in-1-5-miles.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 712BF56AE1A9170B2A4940D3 /* cue-in-1-5-miles.mp3 */; };
 		7BE3F1575CAB06A746D96ED6 /* SettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF344E6EB1755D45BD406969 /* SettingsTests.swift */; };
 		7DA49142EAFAB916799EA408 /* HighwaySignView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87AFCC98A0845629A124D3BB /* HighwaySignView.swift */; };
@@ -198,6 +199,7 @@
 		D1BC7B13218AB2AC8E6AE7F4 /* GlassCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassCards.swift; sourceTree = "<group>"; };
 		DA6D319A13C80806F384F7FB /* cue-turn-left-onto-west-79th-street.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-turn-left-onto-west-79th-street.mp3"; sourceTree = "<group>"; };
 		DBEB995E61137D62ADCC561E /* osrm_hh_drive.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = osrm_hh_drive.json; sourceTree = "<group>"; };
+		DD3386B03383010D5981585F /* RouteBuildSpeedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteBuildSpeedTests.swift; sourceTree = "<group>"; };
 		DD48A387561B5C9BA8A43F2E /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		DE1F27481046F152E05410B1 /* cue-arriving-at-your-stop-columbus-av-w-96-st.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-arriving-at-your-stop-columbus-av-w-96-st.mp3"; sourceTree = "<group>"; };
 		DEDE76D5B14EF54133611354 /* cue-arrive-at-columbus-av-w-96-st.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-arrive-at-columbus-av-w-96-st.mp3"; sourceTree = "<group>"; };
@@ -241,6 +243,7 @@
 				5B7FDFAD3586C5C50FFD920C /* LiveNavigationTests.swift */,
 				DBEB995E61137D62ADCC561E /* osrm_hh_drive.json */,
 				58AC9F4A77C1925CFA7BCFA2 /* PlacesTests.swift */,
+				DD3386B03383010D5981585F /* RouteBuildSpeedTests.swift */,
 				B3C7EDF41AAB6727C6F5296F /* RouteTests.swift */,
 				5B651899353F0285E30BC193 /* RoutingTests.swift */,
 				FF344E6EB1755D45BD406969 /* SettingsTests.swift */,
@@ -572,6 +575,7 @@
 				968BB5776EDE98782F62025A /* LaneTests.swift in Sources */,
 				950264D9179E612DB4FF11BE /* LiveNavigationTests.swift in Sources */,
 				5EA8873A645ACF8C6E9BED97 /* PlacesTests.swift in Sources */,
+				756637AF174260A74F33E5C6 /* RouteBuildSpeedTests.swift in Sources */,
 				9A67867BBDE7505EB1B3E2D4 /* RouteTests.swift in Sources */,
 				BDA15A9CE1F08F6E71993A9F /* RoutingTests.swift in Sources */,
 				7BE3F1575CAB06A746D96ED6 /* SettingsTests.swift in Sources */,

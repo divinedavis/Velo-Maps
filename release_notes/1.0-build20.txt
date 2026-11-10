@@ -1,0 +1,3 @@
+Long routes now load much faster. Working out the lane lines for a 60 km drive used to freeze the screen for about two seconds when you pressed Start or got rerouted; it now takes about a fifth of a second.
+
+Nothing looks different. Please try a long drive and a reroute and check the map stays smooth.
