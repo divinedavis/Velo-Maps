@@ -52,8 +52,17 @@ def main():
     notes = paragraphs(pathlib.Path(notes_file).read_text())
     c = cfg()
     for attempt in range(60):   # up to ~30 min
-        r = requests.get(f"{API}/builds", headers=headers(c), timeout=30,
-                         params={"filter[app]": c["ASC_APP_ID"], "filter[version]": build})
+        # A network drop or an Apple 5xx while waiting must not fail a ship whose upload already
+        # succeeded (a DNS blip did on 11/10): report it and ask again on the next round.
+        try:
+            r = requests.get(f"{API}/builds", headers=headers(c), timeout=30,
+                             params={"filter[app]": c["ASC_APP_ID"], "filter[version]": build})
+            if r.status_code >= 500:
+                raise requests.ConnectionError(f"HTTP {r.status_code}")
+        except (requests.ConnectionError, requests.Timeout) as e:
+            print(f"build {build}: could not ask Apple ({type(e).__name__}), trying again", flush=True)
+            time.sleep(30)
+            continue
         r.raise_for_status()
         data = r.json()["data"]
         state = data[0]["attributes"]["processingState"] if data else "NOT_FOUND"
