@@ -101,7 +101,13 @@ def main():
         elif key in ceilings and verdict == "ok":
             verdict = f"ok (ceiling {ceilings[key]:g})"
         print(f"{key:<92} {m['median']:>9.3f} {ref if ref is not None else float('nan'):>9.3f}  {verdict}  {m['unit']}")
-    gone = sorted(set(base) - set(got))
+    # A metric with a fixed ceiling must be measured: a run that produced no number (11/10:
+    # a launch test under heavy swap came back empty) is not a pass, and recording it would
+    # drop the metric from the baseline.
+    for key in sorted(set(ceilings) - set(got)):
+        print(f"{key:<92} {'—':>9} {'':>9}  FAIL (not measured; it has a fixed ceiling)")
+        failed.append(key)
+    gone = sorted(set(base) - set(got) - set(ceilings))
     for key in gone:
         print(f"{key:<92} {'—':>9} {'':>9}  removed (test no longer exists)")
 
