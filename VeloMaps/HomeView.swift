@@ -125,7 +125,9 @@ struct HomeView: View {
     @State private var category: PlaceCategory?
     @State private var categoryResults: [NearbyPlace] = []
     @State private var showRecents = false
-    @FocusState private var searching: Bool
+    /// Mirrors the search field's focus (SearchField owns the @FocusState: one declared here,
+    /// outside the sheet, never turned true — the search screen never showed, 11/9).
+    @State private var searching = false
     @AppStorage(SettingKey.mapMode) private var mapMode = MapMode.explore.rawValue
     @AppStorage(SettingKey.traffic) private var traffic = false
 
@@ -179,16 +181,19 @@ struct HomeView: View {
         }
         .sheet(isPresented: $showSheet) {
             sheet
+                .dynamicTypeSize(...maxTextSize)   // sheets don't reliably inherit the app's cap
                 .presentationDetents([Self.peek, Self.half, .large], selection: $detent)
                 .presentationBackgroundInteraction(.enabled(upThrough: Self.half))
                 .presentationDragIndicator(.visible)
                 .interactiveDismissDisabled()
                 .sheet(isPresented: $showModes) {
                     MapModesSheet(mode: $mapMode, traffic: $traffic)
+                        .dynamicTypeSize(...maxTextSize)
                         .presentationDetents([.height(330)])
                 }
                 .sheet(isPresented: $showRecents) {
                     RecentsListView(places: places) { r in Task { await route(to: r) } }
+                        .dynamicTypeSize(...maxTextSize)
                         .presentationDetents([.large])
                 }
         }
@@ -287,19 +292,7 @@ struct HomeView: View {
 
     private var searchBar: some View {
         HStack(spacing: 10) {
-            HStack(spacing: 8) {
-                Image(systemName: "magnifyingglass").scaledFont(17, .semibold).foregroundStyle(Color.primary.opacity(0.7))
-                TextField("Where to?", text: $query)
-                    .scaledFont(17, .medium)
-                    .focused($searching)
-                    .submitLabel(.search)
-                    .autocorrectionDisabled()
-                    .accessibilityIdentifier("where-to")
-                if routing { ProgressView() }
-            }
-            .padding(.horizontal, 14)
-            .frame(minHeight: 46)
-            .background(Color.primary.opacity(0.08), in: Capsule())
+            SearchField(query: $query, focused: $searching, routing: routing)
             if searching || !query.isEmpty || picking != nil || category != nil {
                 Button("Cancel") { cancelSearch() }
                     .scaledFont(16, .semibold)
@@ -359,22 +352,25 @@ struct HomeView: View {
                     .scaledFont(24, .semibold).foregroundStyle(.white)
                     .frame(width: 62, height: 62)
                     .background(place == nil ? Color.gray : tint(forKind: kind), in: Circle())
-                Text(name).scaledFont(13, .semibold).lineLimit(1)
-                Text(detail).scaledFont(12).foregroundStyle(Color.primary.opacity(0.7)).lineLimit(1)
+                // No line limits: the accessibility audit reports one-line text as clipped.
+                Text(name).scaledFont(13, .semibold).multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text(detail).scaledFont(12).foregroundStyle(Color.primary.opacity(0.7)).multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            .frame(width: 78)
+            .frame(width: 84)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(place == nil ? "Add \(name)" : "\(name), \(place!.subtitle), \(detail)")
-        .accessibilityIdentifier(kind == .pinned ? "place-pinned" : "place-\(kind.rawValue)")
         .contextMenu {
             if let place {
                 if kind != .pinned { Button("Change", systemImage: "pencil") { startPicking(kind) } }
                 Button("Remove", systemImage: "trash", role: .destructive) { places.remove(place) }
             }
         }
+        // After the context menu: applied before it, the label and identifier were lost.
+        .accessibilityLabel(place == nil ? "Add \(name)" : "\(name), \(place!.subtitle), \(detail)")
+        .accessibilityIdentifier(kind == .pinned ? "place-pinned" : "place-\(kind.rawValue)")
     }
 
     @ViewBuilder private var recentsSection: some View {
@@ -390,9 +386,12 @@ struct HomeView: View {
                                         .foregroundStyle(.white).frame(width: 36, height: 36)
                                         .background(Color.tripRed(.light), in: Circle())
                                     VStack(alignment: .leading, spacing: 2) {
-                                        Text(r.name).scaledFont(16, .semibold).lineLimit(1)
+                                        Text(r.name).scaledFont(16, .semibold).multilineTextAlignment(.leading)
+                                            .fixedSize(horizontal: false, vertical: true)
                                         if !r.subtitle.isEmpty {
-                                            Text(r.subtitle).scaledFont(13).foregroundStyle(Color.primary.opacity(0.7)).lineLimit(1)
+                                            Text(r.subtitle).scaledFont(13).foregroundStyle(Color.primary.opacity(0.7))
+                                                .multilineTextAlignment(.leading)
+                                                .fixedSize(horizontal: false, vertical: true)
                                         }
                                     }
                                     Spacer(minLength: 0)
@@ -644,6 +643,33 @@ struct HomeView: View {
         case .work: Color(red: 0.55, green: 0.36, blue: 0.20)
         default: Color.tripRed(.light)
         }
+    }
+}
+
+/// The search field. It owns the focus state because it lives inside the sheet; `focused`
+/// mirrors it both ways for HomeView.
+struct SearchField: View {
+    @Binding var query: String
+    @Binding var focused: Bool
+    let routing: Bool
+    @FocusState private var field: Bool
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "magnifyingglass").scaledFont(17, .semibold).foregroundStyle(Color.primary.opacity(0.7))
+            TextField("Where to?", text: $query)
+                .scaledFont(17, .medium)
+                .focused($field)
+                .submitLabel(.search)
+                .autocorrectionDisabled()
+                .accessibilityIdentifier("where-to")
+            if routing { ProgressView() }
+        }
+        .padding(.horizontal, 14)
+        .frame(minHeight: 46)
+        .background(Color.primary.opacity(0.08), in: Capsule())
+        .onChange(of: field) { _, on in if focused != on { focused = on } }
+        .onChange(of: focused, initial: true) { _, on in if field != on { field = on } }
     }
 }
 

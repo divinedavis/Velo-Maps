@@ -1,0 +1,9 @@
+The Home screen now works like Apple Maps. Search sits at the bottom of the map in a sheet you can drag up to half or full height.
+
+Tap the search field to see category shortcuts, your recent places, suggested places and restaurants nearby with Look Around photos.
+
+You can save Home, Work and pinned places, and they stay on your phone. Recents can be opened as a full list and cleared.
+
+A new map button switches between Explore, Driving and Satellite, with a traffic toggle. There are also buttons for 2D or 3D and for jumping back to where you are.
+
+The route preview now has Look Around and Add to Places.
