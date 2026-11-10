@@ -11,7 +11,8 @@ import MapKit
 ///     503 until a Mapbox token is configured, 429 over the cap.
 ///  2. The public OSRM demo server (no traffic; testing only, rate-limited).
 ///  3. Apple's MKDirections (traffic-aware times, but no sign wording or lanes).
-/// Requests are bounded: one per Start, reroutes ≥ 15 s apart, faster-route checks ≥ 4 min apart.
+/// Requests are bounded: one per Start, reroutes ≥ 15 s apart, faster-route checks 1–3 min apart
+/// (FasterRoute.Policy).
 enum Router {
     struct Failure: Error, LocalizedError {
         let message: String
@@ -22,14 +23,16 @@ enum Router {
     static let trafficBase = URL(string: "https://velomaps.104.236.120.144.sslip.io/route")!
 
     /// The fastest route (what Start and reroutes use).
-    static func drive(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D, name: String) async throws -> Route {
-        guard let best = try await routes(from: from, to: to, name: name).first else { throw Failure(message: "No route found") }
+    static func drive(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D, name: String,
+                      moving: Moving? = nil) async throws -> Route {
+        guard let best = try await routes(from: from, to: to, name: name, moving: moving).first else { throw Failure(message: "No route found") }
         return best
     }
 
     /// The best route and up to 2 alternatives, fastest first.
-    static func routes(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D, name: String) async throws -> [Route] {
-        if trafficEnabled, let r = try? await traffic(from: from, to: to, name: name), !r.isEmpty { return r }
+    static func routes(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D, name: String,
+                       moving: Moving? = nil) async throws -> [Route] {
+        if trafficEnabled, let r = try? await traffic(from: from, to: to, name: name, moving: moving), !r.isEmpty { return r }
         if let r = try? await osrm(from: from, to: to, name: name), !r.isEmpty { return r }
         return try await apple(from: from, to: to, name: name)
     }
@@ -44,12 +47,36 @@ enum Router {
 
     // MARK: Live traffic (our proxy → Mapbox)
 
-    static func traffic(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D, name: String) async throws -> [Route] {
+    /// A car already moving (reroutes, faster-route checks): which way it is heading and how
+    /// fast. The route then starts in the direction of travel, with no U-turn or sharp turn in
+    /// the first 50 m (100 m above ~30 mph) — the nearest road piece alone can point the wrong
+    /// way after a wrong turn. nil when stopped or the GPS has no course.
+    struct Moving: Equatable {
+        let bearing: Int        // 0–359, clockwise from north
+        let clear: Int          // metres with no significant maneuver
+        init?(_ fix: CLLocation) { self.init(course: fix.course, speed: fix.speed) }
+        init?(course: CLLocationDirection, speed: CLLocationSpeed) {
+            guard course >= 0, speed >= 3 else { return nil }
+            bearing = Int(course.rounded()) % 360
+            clear = speed >= 13 ? 100 : 50
+        }
+    }
+
+    static func trafficURL(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D, moving: Moving?) -> URL {
         var c = URLComponents(url: trafficBase, resolvingAgainstBaseURL: false)!
         c.queryItems = [URLQueryItem(name: "from", value: String(format: "%.6f,%.6f", from.latitude, from.longitude)),
                         URLQueryItem(name: "to", value: String(format: "%.6f,%.6f", to.latitude, to.longitude))]
-        var req = URLRequest(url: c.url!)
-        req.timeoutInterval = 8
+        if let moving {
+            c.queryItems! += [URLQueryItem(name: "bearing", value: "\(moving.bearing)"),
+                              URLQueryItem(name: "clear", value: "\(moving.clear)")]
+        }
+        return c.url!
+    }
+
+    static func traffic(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D, name: String,
+                        moving: Moving? = nil, timeout: TimeInterval = 8) async throws -> [Route] {
+        var req = URLRequest(url: trafficURL(from: from, to: to, moving: moving))
+        req.timeoutInterval = timeout
         req.setValue(AppSecrets.voiceToken, forHTTPHeaderField: "X-Velo-App")
         let (data, resp) = try await URLSession.shared.data(for: req)
         guard (resp as? HTTPURLResponse)?.statusCode == 200 else { throw Failure(message: "Traffic routing unavailable") }

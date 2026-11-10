@@ -3,9 +3,15 @@
 driving-traffic profile (owner, 11/9: route with traffic, ask for 2 alternatives per route,
 keep checking for a faster route while driving). The Mapbox token never leaves this server.
 
-GET /route?from=<lat>,<lon>&to=<lat>,<lon>   header X-Velo-App: <APP_TOKEN>
+GET /route?from=<lat>,<lon>&to=<lat>,<lon>[&bearing=<0-359>&clear=<1-200>]
+    header X-Velo-App: <APP_TOKEN>
     → Mapbox Directions JSON (OSRM-style: routes[], legs[].steps[] with lanes, exits and
       sign destinations), unchanged.
+    bearing/clear (a car already moving: reroutes, faster-route checks): start the route in
+    the direction of travel (±45°) with no significant maneuver in the first `clear` metres,
+    so it can't begin with a U-turn. If Mapbox finds no road that way, asked again without.
+    Every request excludes ferries and unpaved roads. Only these named, validated values are
+    passed on — the phone can't send arbitrary Mapbox parameters.
 
 Guards (owner rule: never blow the budget):
   * a hard daily cap on requests sent to Mapbox (DAILY_ROUTES, default 3000 ≈ 90k a month,
@@ -49,14 +55,29 @@ def spend():
         return True
 
 
-def directions(a, b):
+def whole(value, low, high):
+    """A whole number in [low, high] from a query value, else None."""
+    return int(value) if re.fullmatch(r"\d{1,3}", value or "") and low <= int(value) <= high else None
+
+
+def directions(a, b, bearing=None, clear=None):
     coords = f"{a[1]:.6f},{a[0]:.6f};{b[1]:.6f},{b[0]:.6f}"
-    q = urlencode({"alternatives": "true", "geometries": "geojson", "overview": "full",
-                   "steps": "true", "access_token": MAPBOX})
-    req = urllib.request.Request(f"https://api.mapbox.com/directions/v5/mapbox/driving-traffic/{coords}?{q}",
+    q = {"alternatives": "true", "geometries": "geojson", "overview": "full", "steps": "true",
+         "exclude": "ferry,unpaved", "access_token": MAPBOX}
+    if bearing is not None:
+        q["bearings"] = f"{bearing},45;"                # the start only; the destination is free
+        q["avoid_maneuver_radius"] = str(clear or 50)
+    req = urllib.request.Request(f"https://api.mapbox.com/directions/v5/mapbox/driving-traffic/{coords}?{urlencode(q)}",
                                  headers={"User-Agent": "velomaps-route/1.0"})
     with urllib.request.urlopen(req, timeout=12) as r:
         return r.read()
+
+
+def ok(body):
+    try:
+        return json.loads(body).get("code") == "Ok"
+    except ValueError:
+        return False
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -87,21 +108,26 @@ class Handler(BaseHTTPRequestHandler):
             return self.send(400)
         if not MAPBOX:
             return self.send(503, b"traffic routing not configured")
-        if not spend():
-            return self.send(429, b"daily routing budget reached")
-        try:
-            body = directions(a, b)
-        except urllib.error.HTTPError as e:
-            print(f"mapbox error: HTTP {e.code}", flush=True)       # never the URL (token)
-            return self.send(502)
-        except (urllib.error.URLError, TimeoutError) as e:
-            print(f"mapbox unreachable: {type(e).__name__}", flush=True)
-            return self.send(502)
-        try:
-            ok = json.loads(body).get("code") == "Ok"
-        except ValueError:
-            ok = False
-        return self.send(200, body, "application/json") if ok else self.send(502)
+        bearing = whole((q.get("bearing") or [""])[0], 0, 359)
+        clear = whole((q.get("clear") or [""])[0], 1, 200)
+        # With a heading first; if Mapbox has no road that way (GPS course off, parking lot),
+        # once more without. Each try is one request from the budget.
+        for heading in ([bearing, None] if bearing is not None else [None]):
+            if not spend():
+                return self.send(429, b"daily routing budget reached")
+            try:
+                body = directions(a, b, heading, clear)
+            except urllib.error.HTTPError as e:
+                print(f"mapbox error: HTTP {e.code}", flush=True)       # never the URL (token)
+                if e.code == 422 and heading is not None:
+                    continue
+                return self.send(502)
+            except (urllib.error.URLError, TimeoutError) as e:
+                print(f"mapbox unreachable: {type(e).__name__}", flush=True)
+                return self.send(502)
+            if ok(body):
+                return self.send(200, body, "application/json")
+        return self.send(502)
 
 
 if __name__ == "__main__":

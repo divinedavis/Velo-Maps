@@ -13,6 +13,7 @@ final class AppModel: ObservableObject {
     private var lastReroute = Date.distantPast
     private var lastFasterCheck = Date()
     private var checkingFaster = false
+    private var fasterSwitches = 0
 
     init() {
         isDemo = UserDefaults.standard.string(forKey: "demo") != nil
@@ -41,30 +42,42 @@ final class AppModel: ObservableObject {
         let trip = Trip(route: route, live: true)
         self.trip = trip
         lastFasterCheck = Date()
+        fasterSwitches = 0
         if let fix = location.fix { trip.update(fix: fix) }
         loadLimits(for: trip)
     }
 
-    /// Every 4 minutes on the route: ask for live-traffic routes from here and switch if one is
-    /// clearly faster. Only with live traffic (the no-traffic fallbacks never change their
-    /// answer mid-drive), never with a turn banner up, never in the last 2 km.
+    /// On the route, every 1–3 minutes (FasterRoute.Policy, by distance left): ask for
+    /// live-traffic routes from here and switch if one is clearly faster. Only with live traffic
+    /// (the no-traffic fallbacks never change their answer mid-drive), never within 150 m of a
+    /// turn, never in the last few hundred metres, at most 1–2 switches a trip. The first check
+    /// is a full interval after Start, so a route is never swapped in its first minute.
     private func checkForFasterRoute(_ trip: Trip, from fix: CLLocation) {
-        guard Router.trafficEnabled, !trip.offRoute, !checkingFaster, trip.bannerManeuver == nil,
-              Date().timeIntervalSince(lastFasterCheck) >= FasterRoute.checkEvery,
-              trip.route.length - trip.distance > FasterRoute.minRemaining else { return }
+        let policy = FasterRoute.Policy.forRemaining(trip.route.length - trip.distance)
+        guard Router.trafficEnabled, !trip.offRoute, !checkingFaster, clearOfManeuver(trip),
+              fasterSwitches < policy.maxSwitches,
+              Date().timeIntervalSince(lastFasterCheck) >= policy.checkEvery,
+              trip.route.length - trip.distance > policy.minRemaining else { return }
         lastFasterCheck = Date()
         checkingFaster = true
         let dest = trip.route.stops[trip.route.stops.count - 1].coordinate
         let name = trip.route.destination
         Task {
             defer { checkingFaster = false }
-            guard let candidates = try? await Router.traffic(from: fix.coordinate, to: dest, name: name),
-                  self.trip === trip, !trip.offRoute, trip.bannerManeuver == nil,
+            guard let candidates = try? await Router.traffic(from: fix.coordinate, to: dest, name: name,
+                                                             moving: Router.Moving(fix), timeout: FasterRoute.timeout),
+                  self.trip === trip, !trip.offRoute, clearOfManeuver(trip),
                   let (route, saves) = FasterRoute.pick(current: trip.route, at: trip.distance, candidates: candidates)
             else { return }
+            fasterSwitches += 1
             trip.switchToFaster(route, saves: saves)
             loadLimits(for: trip)
         }
+    }
+
+    private func clearOfManeuver(_ trip: Trip) -> Bool {
+        guard let m = trip.bannerManeuver else { return true }
+        return m.at - trip.distance > FasterRoute.clearOfManeuver
     }
 
     /// One Overpass request per route for posted speed limits (sign hidden until then).
@@ -93,7 +106,7 @@ final class AppModel: ObservableObject {
         let dest = trip.route.stops[trip.route.stops.count - 1].coordinate
         let name = trip.route.destination
         Task {
-            if let r = try? await Router.drive(from: fix.coordinate, to: dest, name: name), self.trip === trip {
+            if let r = try? await Router.drive(from: fix.coordinate, to: dest, name: name, moving: Router.Moving(fix)), self.trip === trip {
                 trip.reroute(r)
                 loadLimits(for: trip)
             }

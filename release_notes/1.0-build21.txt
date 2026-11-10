@@ -1,0 +1,7 @@
+Faster routes now show up on short city trips. Velo checks for a faster route every one to three minutes depending on how far you have left, instead of every four minutes, and keeps checking until you are a few hundred metres away.
+
+The saving needed to switch now scales with your trip. On a short drive a saving of 45 seconds to about a minute is enough, while long highway drives still need two minutes and 10% so the route does not keep changing. A trip switches at most twice.
+
+Checks no longer stop whenever a turn banner is showing, only when the turn is close. Reroutes now start in the direction you are already driving, so a new route should no longer begin with a U-turn. Routes also leave out ferries and unpaved roads.
+
+To test, take a 10 to 20 minute drive in traffic and watch for the "Faster route found" message, and make a wrong turn to check the reroute keeps you heading the same way.
