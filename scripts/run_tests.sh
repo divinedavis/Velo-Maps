@@ -54,9 +54,12 @@ unit() {
   # Separate scheme + derived data: the unit-test host app never reaches the simulator
   # install the UI tests and smoke test use.
   log=$(run unit -scheme VeloMapsUnit -derivedDataPath build.nosync/dd-unit -only-testing:VeloMapsTests | tail -1)
-  grep -qE "Test run with [1-9][0-9]* tests? in [0-9]+ suites? passed" "$log" \
+  # xcodebuild already passed (run exits otherwise); this proves tests actually ran. Match
+  # only the start of the summary: app log lines interleave and cut it short ("…18 suit" +
+  # an AVPlayer message failed a ship on 11/10).
+  grep -qE "Test run with [1-9][0-9]* tests? in [0-9]+ suit" "$log" \
     || { echo "unit: no Swift Testing run found in $log"; exit 1; }
-  grep -E "Test run with" "$log" | tail -1
+  grep -oE "Test run with [0-9]+ tests? in [0-9]+ suites?( passed after [0-9.]+ seconds)?" "$log" | tail -1
   sources_hash > build.nosync/passed-unit
 }
 
