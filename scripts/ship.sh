@@ -10,6 +10,16 @@
 #   5. MetricKit wired + Organizer report (report-only)   6. cold-launch smoke test
 set -euo pipefail
 cd "$(dirname "$0")/.."
+# A ship started by hand had nothing keeping this Mac awake (it idle-sleeps on
+# battery after a minute); the nightly jobs already run under caffeinate.
+# Ends with this script; a closed lid still sleeps the Mac (2026-11-09).
+[[ -n "${DAILY_SHIP_AWAKE:-}" ]] || /usr/bin/caffeinate -i -w $$ &
+# Stage times, memory peaks and one SHIP SUMMARY line per run, pass or fail
+# (scripts/ship_log.sh, scripts/ship_summary.py; history in build/ship-history.jsonl).
+SHIP_LOG_DIR=build
+# shellcheck disable=SC1091
+source scripts/ship_log.sh
+ship_log_start
 NOTES="${1:?usage: ship.sh notes.txt}"
 [ -f "$NOTES" ] || { echo "no notes file $NOTES"; exit 1; }
 PY=~/.venvs/spendcap/bin/python
@@ -22,29 +32,29 @@ source scripts/asc-config.env
 # pgrep -x matches the process name only; -f would match this script's own text.
 while pgrep -x xcodebuild >/dev/null; do echo "waiting for another xcodebuild…"; sleep 15; done
 
-echo "==> 1. test coverage"
+stage "1. test coverage"
 python3 -I scripts/check_test_coverage.py
 
-echo "==> 5a. MetricKit wired"
+stage "5a. MetricKit wired"
 grep -q "MXMetricManager.shared.add" VeloMaps/Metrics.swift && grep -q "Metrics.shared.start()" VeloMaps/VeloMapsApp.swift \
   || { echo "MetricKit subscriber not wired"; exit 1; }
 
 ./scripts/generate.sh >/dev/null
-echo "==> 2-4. unit, UI + accessibility audit, performance"
+stage "2-4. unit, UI + accessibility audit, performance"
 ./scripts/run_tests.sh all
-echo "==> 4b. perf gate"
+stage "4b. perf gate"
 python3 -I scripts/perf_gate.py build.nosync/perf.xcresult
 
-echo "==> 6. smoke test"
+stage "6. smoke test"
 ./scripts/smoke_test.sh
 xcrun simctl shutdown "$(./scripts/sim.sh)" 2>/dev/null || true   # one sim at a time; free RAM for the archive
 
-echo "==> 5b. Organizer report (report-only)"
+stage "5b. Organizer report (report-only)"
 $PY scripts/organizer_report.py || true
 
 current=$(grep -m1 'CURRENT_PROJECT_VERSION:' project.yml | sed -E 's/.*"([0-9]+)".*/\1/')
 next=$((current + 1))
-echo "==> bumping build $current -> $next"
+stage "bumping build $current -> $next"
 sed -i '' "s/CURRENT_PROJECT_VERSION: \"$current\"/CURRENT_PROJECT_VERSION: \"$next\"/" project.yml
 ./scripts/generate.sh >/dev/null
 
@@ -53,29 +63,32 @@ ARCHIVE=build.nosync/VeloMaps.xcarchive
 EXPORT=build.nosync/export
 rm -rf "$ARCHIVE" "$EXPORT"
 
-echo "==> archiving"
+stage "archiving"
 xcodebuild -project VeloMaps.xcodeproj -scheme VeloMaps -configuration Release \
   -destination "generic/platform=iOS" -archivePath "$ARCHIVE" -jobs 4 \
   -allowProvisioningUpdates "${AUTH[@]}" archive 2>&1 | grep -E "error:|ARCHIVE (SUCCEEDED|FAILED)" | sort -u
 [ -d "$ARCHIVE" ] || { echo "archive failed"; exit 1; }
 
-echo "==> exporting IPA"
+stage "exporting IPA"
 # System PATH: Homebrew's rsync breaks Xcode's IPA export ("Copy failed").
 env PATH=/usr/bin:/bin:/usr/sbin:/sbin xcodebuild -exportArchive -archivePath "$ARCHIVE" -exportPath "$EXPORT" \
   -exportOptionsPlist ExportOptions.plist -allowProvisioningUpdates "${AUTH[@]}" 2>&1 | grep -E "error:|EXPORT (SUCCEEDED|FAILED)" | sort -u
 IPA=$(ls "$EXPORT"/*.ipa 2>/dev/null | head -1)
 [ -n "$IPA" ] || { echo "export failed"; exit 1; }
 
-echo "==> uploading build $next to TestFlight"
+stage "uploading build $next to TestFlight"
 xcrun altool --upload-app -f "$IPA" -t ios --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
 
-echo "==> recording perf baseline (passing ship)"
+stage "recording perf baseline (passing ship)"
 python3 -I scripts/perf_gate.py build.nosync/perf.xcresult --record
 
-echo "==> internal testers (automatic distribution)"
+stage "internal testers (automatic distribution)"
 $PY scripts/configure_internal_testers.py
 
-echo "==> What to Test (waits for processing)"
+stage "What to Test (waits for processing)"
 $PY scripts/set_whats_new.py "$next" "$NOTES"
 
-echo "==> shipped Velo Maps 1.0 ($next) to TestFlight"
+stage "shipped Velo Maps 1.0 ($next) to TestFlight"
+
+# Reached the end: the summary line reports this ship as ok.
+ship_done

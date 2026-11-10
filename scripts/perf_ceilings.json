@@ -1,0 +1,14 @@
+{
+  "PerformanceTests/testLaunch() :: Duration (ApplicationFirstFramePresentationResponsive)": {
+    "max": 1.36,
+    "unit": "s",
+    "reference": 1.2355,
+    "why": "Fixed ceiling set 2026-11-09: the slowest of the passing ships then on record plus 10%. Raise it only on purpose, with the reason here."
+  },
+  "PerformanceTests/testLaunchToRideReady() :: Clock Monotonic Time": {
+    "max": 4.61,
+    "unit": "s",
+    "reference": 4.1844,
+    "why": "Fixed ceiling set 2026-11-09: the slowest of the passing ships then on record plus 10%. Raise it only on purpose, with the reason here."
+  }
+}
