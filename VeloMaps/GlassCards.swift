@@ -329,7 +329,9 @@ struct GlassHeroCard: View {
                     // First open from the grabber, before it was ever measured.
                     .animation(.spring(response: 0.38, dampingFraction: 0.86), value: panel)
                     .allowsHitTesting(expanded && !dragging)
-                    .accessibilityHidden(!expanded)
+                    // No accessibilityHidden(!expanded) here: once open it read as
+                    // accessibilityHidden(false) and un-hid the rows' decorative icons
+                    // (audit, 11/22). Out of the tree while shut is enough.
             }
         }
         .padding(18)
