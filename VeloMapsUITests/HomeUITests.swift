@@ -26,6 +26,9 @@ final class HomeUITests: XCTestCase {
         let start = app.buttons["start-navigation"]
         XCTAssertTrue(start.waitForExistence(timeout: 25), "no route preview")
         XCTAssertTrue(app.descendants(matching: .any)["route-preview"].exists)
+        // Start is on screen on the half sheet, not pushed below it by a Look Around image (11/22).
+        XCTAssertTrue(start.isHittable, "Start should be visible without dragging the sheet up")
+        XCTAssertFalse(app.descendants(matching: .any)["look-around"].exists)
         // The search is remembered under Recents.
         app.buttons["cancel-preview"].tap()
         XCTAssertTrue(app.buttons["recent-row"].firstMatch.waitForExistence(timeout: 5), "search not in Recents")

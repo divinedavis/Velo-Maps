@@ -126,7 +126,6 @@ struct HomeView: View {
     @State private var camera: MapCameraPosition = .automatic
     @State private var query = ""
     @State private var preview: Route?
-    @State private var lookAround: MKLookAroundScene?
     @State private var routing = false
     @State private var error: String?
     @State private var detent: PresentationDetent = HomeView.half
@@ -456,13 +455,7 @@ struct HomeView: View {
                 .accessibilityLabel(saved ? "Saved to Places" : "Add to Places")
                 .accessibilityIdentifier("save-place")
             }
-            if let lookAround {
-                LookAroundPreview(initialScene: lookAround, allowsNavigation: true, badgePosition: .bottomTrailing)
-                    .frame(height: 150)
-                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                    .accessibilityLabel("Look Around at \(r.destination)")
-                    .accessibilityIdentifier("look-around")
-            }
+            // No Look Around image here (owner, 11/22): it pushed Start off the half sheet.
             HStack(spacing: 10) {
                 Button { closePreview() } label: {
                     Text("Cancel").scaledFont(16, .semibold).frame(maxWidth: .infinity, minHeight: 50)
@@ -561,7 +554,6 @@ struct HomeView: View {
     private func closePreview() {
         withAnimation {
             preview = nil
-            lookAround = nil
             detent = Self.half
         }
         if let c = location.fix?.coordinate { recenter(c) }
@@ -610,7 +602,6 @@ struct HomeView: View {
             let route = try await Router.drive(from: from, to: place.coordinate, name: name)
             // Warm the speed-limit cache while the rider looks at the preview.
             Task.detached(priority: .utility) { _ = await SpeedLimits.lookup(route) }
-            lookAround = nil
             category = nil
             withAnimation {
                 preview = route
@@ -618,7 +609,6 @@ struct HomeView: View {
                 camera = .rect(MKPolyline(coordinates: route.points, count: route.points.count).boundingMapRect
                     .insetBy(dx: -800, dy: -2400))
             }
-            lookAround = try? await MKLookAroundSceneRequest(coordinate: place.coordinate).scene
         } catch {
             self.error = "Couldn't get a route: \(error.localizedDescription)"
         }

@@ -3,17 +3,16 @@ import SwiftUI
 let busRed = Color(red: 0.84, green: 0.07, blue: 0.13)
 
 /// Frosted bottom card: line badge, destination, ETA + load, the next few stops, and a
-/// hold-to-end button with the ride timer.
+/// tap-to-end button with the ride timer.
 struct TripCard: View {
     @ObservedObject var trip: Trip
-    @State private var holdProgress: CGFloat = 0
     @State private var expanded = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             header
             if expanded { stopList }
-            holdButton
+            endButton
         }
         .padding(12)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 26, style: .continuous))
@@ -77,39 +76,30 @@ struct TripCard: View {
         .accessibilityIdentifier("stop-list")
     }
 
-    private var holdButton: some View {
-        TimelineView(.periodic(from: .now, by: 1)) { _ in
-            HStack {
-                Image(systemName: "stopwatch").scaledFont(14, .semibold)
-                Text(clock(trip.elapsed)).scaledFont(15, .semibold).monospacedDigit()
-                Spacer()
-                Text("Hold to end").scaledFont(13, .semibold).opacity(0.9)
-            }
-            .foregroundStyle(.white)
-            .padding(.horizontal, 14)
-            .frame(minHeight: 46)
-            .background(alignment: .leading) {
-                GeometryReader { g in
-                    ZStack(alignment: .leading) {
-                        busRed
-                        Color.black.opacity(0.18).frame(width: g.size.width * holdProgress)
-                    }
+    /// One tap ends the ride (owner, 11/22: was a 0.9 s hold).
+    private var endButton: some View {
+        Button { trip.endRide() } label: {
+            TimelineView(.periodic(from: .now, by: 1)) { _ in
+                HStack {
+                    Image(systemName: "stopwatch").scaledFont(14, .semibold)
+                    Text(clock(trip.elapsed)).scaledFont(15, .semibold).monospacedDigit()
+                    Spacer()
+                    Text("End ride").scaledFont(13, .semibold).opacity(0.9)
                 }
+                .foregroundStyle(.white)
+                .padding(.horizontal, 14)
+                .frame(minHeight: 46)
+                .background(alignment: .leading) {
+                    busRed
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             }
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .contentShape(Rectangle())
         }
-        .contentShape(Rectangle())
-        .onLongPressGesture(minimumDuration: 0.9) {
-            trip.endRide()
-            withAnimation(.easeOut(duration: 0.2)) { holdProgress = 0 }
-        } onPressingChanged: { pressing in
-            withAnimation(pressing ? .linear(duration: 0.9) : .easeOut(duration: 0.2)) {
-                holdProgress = pressing ? 1 : 0
-            }
-        }
+        .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
-        .accessibilityIdentifier("hold-to-end")
-        .accessibilityAddTraits(.isButton)
+        .accessibilityLabel("End ride")
+        .accessibilityIdentifier("end-ride")
     }
 
     private func clock(_ t: TimeInterval) -> String {

@@ -91,7 +91,7 @@ final class Trip: ObservableObject {
     private var lastGoodFix: Date?
     /// Live: the rider has left the route (3 fixes in a row well off the line) → reroute.
     @Published private(set) var offRoute = false
-    /// Live: the trip is over (arrived and ended, or "Hold to end").
+    /// Live: the trip is over (arrived and ended, or "End ride").
     @Published private(set) var ended = false
     private var arrived = false
 

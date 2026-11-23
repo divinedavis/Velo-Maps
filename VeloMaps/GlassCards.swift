@@ -14,32 +14,19 @@ private func clock(_ t: TimeInterval) -> String {
     return String(format: "%d:%02d", s / 60, s % 60)
 }
 
-/// Shared hold-to-end gesture: press and hold 0.9 s to end the ride; a darker fill sweeps
-/// across while held.
-private struct HoldToEnd: ViewModifier {
+/// Shared end-ride control: one tap ends the ride (owner, 11/22: it used to be a 0.9 s
+/// hold, "make it a tap"). A Button, so VoiceOver and the tests can press it.
+private struct TapToEnd: ViewModifier {
     let trip: Trip
-    @State private var progress: CGFloat = 0
 
     func body(content: Content) -> some View {
-        content
-            .overlay(alignment: .leading) {
-                GeometryReader { g in
-                    Color.black.opacity(0.18).frame(width: g.size.width * progress)
-                }
-                .allowsHitTesting(false)
-            }
-            .contentShape(Rectangle())
-            .onLongPressGesture(minimumDuration: 0.9) {
-                trip.endRide()
-                withAnimation(.easeOut(duration: 0.2)) { progress = 0 }
-            } onPressingChanged: { pressing in
-                withAnimation(pressing ? .linear(duration: 0.9) : .easeOut(duration: 0.2)) {
-                    progress = pressing ? 1 : 0
-                }
-            }
-            .accessibilityElement(children: .combine)
-            .accessibilityIdentifier("hold-to-end")
-            .accessibilityAddTraits(.isButton)
+        Button { trip.endRide() } label: {
+            content.contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("End ride")
+        .accessibilityIdentifier("end-ride")
     }
 }
 
@@ -88,7 +75,7 @@ struct GlassSheetCard: View {
                     Image(systemName: "stopwatch")
                     Text(clock(trip.elapsed)).monospacedDigit()
                     Spacer()
-                    Text("Hold to end").opacity(0.9)
+                    Text("End ride").opacity(0.9)
                 }
                 .scaledFont(15, .semibold)
                 .foregroundStyle(.white)
@@ -96,7 +83,7 @@ struct GlassSheetCard: View {
                 .frame(minHeight: 50)
                 .glassEffect(.regular.tint(Color.tripRed(scheme)).interactive(), in: .capsule)
             }
-            .modifier(HoldToEnd(trip: trip))
+            .modifier(TapToEnd(trip: trip))
         }
         .padding(16)
         .readableGlass(in: .rect(cornerRadius: 34))
@@ -163,9 +150,9 @@ struct GlassPillCard: View {
                     .foregroundStyle(.white)
                     .frame(width: 66, height: 66)
                     .glassEffect(.regular.tint(Color.tripRed(scheme)).interactive(), in: .circle)
-                    .modifier(HoldToEnd(trip: trip))
+                    .modifier(TapToEnd(trip: trip))
                     .clipShape(Circle())
-                    .accessibilityLabel("Hold to end")
+                    .accessibilityLabel("End ride")
             }
         }
         .padding(.bottom, 6)
@@ -208,7 +195,7 @@ struct GlassClusterCard: View {
                         Image(systemName: "stopwatch")
                         Text(clock(trip.elapsed)).monospacedDigit()
                         Spacer()
-                        Text("Hold to end")
+                        Text("End ride")
                     }
                     .scaledFont(15, .semibold)
                     .foregroundStyle(.white)
@@ -216,7 +203,7 @@ struct GlassClusterCard: View {
                     .frame(minHeight: 52)
                     .glassEffect(.regular.tint(Color.tripRed(scheme)).interactive(), in: .rect(cornerRadius: 22))
                 }
-                .modifier(HoldToEnd(trip: trip))
+                .modifier(TapToEnd(trip: trip))
                 .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
             }
         }
@@ -302,7 +289,7 @@ struct GlassHeroCard: View {
                     .accessibilityIdentifier("next-stop")
                 TimelineView(.periodic(from: .now, by: 1)) { _ in
                     HStack {
-                        Text("Hold to end ride")
+                        Text("End ride")
                         Spacer()
                         Text(clock(trip.elapsed)).monospacedDigit()
                     }
@@ -312,7 +299,7 @@ struct GlassHeroCard: View {
                     .frame(minHeight: 50)
                     .glassEffect(.regular.tint(Color.tripRed(scheme)).interactive(), in: .capsule)
                 }
-                .modifier(HoldToEnd(trip: trip))
+                .modifier(TapToEnd(trip: trip))
                 .clipShape(Capsule())
             }
             // Laid out from the first moment of a drag so it can be measured
@@ -517,7 +504,7 @@ struct GlassActivityCard: View {
                         .foregroundStyle(.white)
                         .frame(width: 42, height: 42)
                         .background(red, in: Circle())
-                    Text("Hold to end").scaledFont(15, .semibold)
+                    Text("End ride").scaledFont(15, .semibold)
                     Spacer()
                     Text(clock(trip.elapsed)).scaledFont(15, .semibold).monospacedDigit()
                         .foregroundStyle(.secondary)
@@ -526,7 +513,7 @@ struct GlassActivityCard: View {
                 .padding(4)
                 .readableGlass(in: .capsule, interactive: true)
             }
-            .modifier(HoldToEnd(trip: trip))
+            .modifier(TapToEnd(trip: trip))
             .clipShape(Capsule())
         }
         .padding(16)

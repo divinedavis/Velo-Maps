@@ -47,7 +47,7 @@ struct RootView: View {
 struct RideScreen: View {
     @ObservedObject var trip: Trip
     @ObservedObject var walk: Walk
-    /// Live: the trip ended (Hold to end, or arrived) — back to "Where to?".
+    /// Live: the trip ended (End ride, or arrived) — back to "Where to?".
     var onExit: () -> Void = {}
     @State private var cardTop: CGFloat = 0
     @State private var showReportMenu = false
