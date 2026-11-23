@@ -243,77 +243,120 @@ struct GlassClusterCard: View {
 struct GlassHeroCard: View {
     @ObservedObject var trip: Trip
     @Environment(\.colorScheme) private var scheme
-    @GestureState private var drag: CGFloat = 0
+    /// Finger travel since the drag began (negative = up), and whether one is under way.
+    @State private var dragY: CGFloat = 0
+    @State private var dragging = false
+    /// The settings panel's natural height, measured; the card reveals it point for point.
+    @State private var panel: CGFloat = 0
+    /// True while the card springs open or shut after a drag or a grabber tap.
+    @State private var settling = false
     private var expanded: Bool { trip.cardExpanded }
+    /// The panel is only in the view tree while it can be seen. Clipped to zero
+    /// height it was still found by XCUITest (and so by anything reading the
+    /// accessibility tree) with the card shut, despite accessibilityHidden.
+    private var panelInTree: Bool { expanded || dragging || settling }
+
+    /// Points of the settings panel on screen: tracks the finger while dragging
+    /// (rubber-banding past either end), else fully open or shut.
+    private var shown: CGFloat {
+        dragging ? CardDrag.reveal(expanded: expanded, translation: dragY, panel: panel)
+                 : (expanded ? panel : 0)
+    }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Capsule()
-                .fill(Color.secondary.opacity(0.45))
-                .frame(width: 38, height: 5)
-                .frame(width: 120, height: 44)          // 44 pt touch target (audit)
-                .contentShape(Rectangle())
-                .frame(maxWidth: .infinity)
-                .padding(.top, -24).padding(.bottom, -14)
-                .accessibilityLabel(expanded ? "Hide navigation settings" : "Show navigation settings")
-                .accessibilityAddTraits(.isButton)
-                .accessibilityIdentifier("card-grabber")
-                .onTapGesture { toggle() }
-            if trip.turnStyle == 4 { TurnRowInCard(trip: trip) }
-            // .lastTextBaseline puts "9 min" on the same line as the "10 aboard" row.
-            HStack(alignment: .lastTextBaseline) {
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Text("\(trip.minutesLeft)")
-                        .scaledFont(64, .bold, .rounded)
-                        .monospacedDigit()
-                    Text("min").scaledFont(22, .medium).foregroundStyle(.primary)
-                }
-                Spacer()
-                VStack(alignment: .trailing, spacing: 6) {
-                    LineBadge(line: trip.route.line)
-                    Text("to \(trip.route.destination)").scaledFont(14, .semibold)
-                        .accessibilityIdentifier("trip-destination")
-                    if trip.route.kind == .bus {
-                        Label("10 aboard", systemImage: "person.2.fill")
-                            .scaledFont(12, .semibold).foregroundStyle(.primary)
+        VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 14) {
+                Capsule()
+                    .fill(Color.secondary.opacity(0.45))
+                    .frame(width: 38, height: 5)
+                    .frame(width: 120, height: 44)          // 44 pt touch target (audit)
+                    .contentShape(Rectangle())
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, -24).padding(.bottom, -14)
+                    .accessibilityLabel(expanded ? "Hide navigation settings" : "Show navigation settings")
+                    .accessibilityAddTraits(.isButton)
+                    .accessibilityIdentifier("card-grabber")
+                    .onTapGesture { toggle() }
+                if trip.turnStyle == 4 { TurnRowInCard(trip: trip) }
+                // .lastTextBaseline puts "9 min" on the same line as the "10 aboard" row.
+                HStack(alignment: .lastTextBaseline) {
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Text("\(trip.minutesLeft)")
+                            .scaledFont(64, .bold, .rounded)
+                            .monospacedDigit()
+                        Text("min").scaledFont(22, .medium).foregroundStyle(.primary)
+                    }
+                    Spacer()
+                    VStack(alignment: .trailing, spacing: 6) {
+                        LineBadge(line: trip.route.line)
+                        Text("to \(trip.route.destination)").scaledFont(14, .semibold)
+                            .accessibilityIdentifier("trip-destination")
+                        if trip.route.kind == .bus {
+                            Label("10 aboard", systemImage: "person.2.fill")
+                                .scaledFont(12, .semibold).foregroundStyle(.primary)
+                        }
                     }
                 }
-            }
-            Text(trip.route.kind == .drive ? "Via \(trip.route.via ?? trip.route.destination)" : "Next: \(trip.nextStopName)")
-                .scaledFont(14, .bold)
-                .accessibilityIdentifier("next-stop")
-            TimelineView(.periodic(from: .now, by: 1)) { _ in
-                HStack {
-                    Text("Hold to end ride")
-                    Spacer()
-                    Text(clock(trip.elapsed)).monospacedDigit()
+                Text(trip.route.kind == .drive ? "Via \(trip.route.via ?? trip.route.destination)" : "Next: \(trip.nextStopName)")
+                    .scaledFont(14, .bold)
+                    .accessibilityIdentifier("next-stop")
+                TimelineView(.periodic(from: .now, by: 1)) { _ in
+                    HStack {
+                        Text("Hold to end ride")
+                        Spacer()
+                        Text(clock(trip.elapsed)).monospacedDigit()
+                    }
+                    .scaledFont(15, .semibold)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 18)
+                    .frame(minHeight: 50)
+                    .glassEffect(.regular.tint(Color.tripRed(scheme)).interactive(), in: .capsule)
                 }
-                .scaledFont(15, .semibold)
-                .foregroundStyle(.white)
-                .padding(.horizontal, 18)
-                .frame(minHeight: 50)
-                .glassEffect(.regular.tint(Color.tripRed(scheme)).interactive(), in: .capsule)
+                .modifier(HoldToEnd(trip: trip))
+                .clipShape(Capsule())
             }
-            .modifier(HoldToEnd(trip: trip))
-            .clipShape(Capsule())
-            if expanded {
+            // Laid out from the first moment of a drag so it can be measured
+            // (the height is kept after that) and revealed under the finger,
+            // clipped to `shown`; only interactive once open.
+            if panelInTree {
                 NavSettings(trip: trip)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .padding(.top, 14)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { panel = $0 }
+                    .frame(height: min(max(shown, 0), panel), alignment: .top)
+                    .clipped()
+                    .opacity(panel > 0 ? min(1, max(shown, 0) / (panel * 0.5)) : 0)
+                    // First open from the grabber, before it was ever measured.
+                    .animation(.spring(response: 0.38, dampingFraction: 0.86), value: panel)
+                    .allowsHitTesting(expanded && !dragging)
+                    .accessibilityHidden(!expanded)
             }
         }
         .padding(18)
         .readableGlass(in: .rect(cornerRadius: 36))
-        // Follows the finger a little while dragging, then snaps open or closed.
-        .offset(y: max(-40, min(40, drag * 0.35)))
-        // Simultaneous so the buttons and hold gesture inside the card don't swallow the swipe;
-        // predicted end counts a quick flick as a full swipe.
+        // Past either end the whole card gives a little, like a system sheet.
+        .offset(y: shown < 0 ? -shown : (shown > panel ? panel - shown : 0))
+        // Simultaneous so the buttons and hold gesture inside the card don't swallow the swipe.
         .simultaneousGesture(
-            DragGesture(minimumDistance: 12)
-                .updating($drag) { v, state, _ in state = v.translation.height }
+            // Global, not the card's own space: the card moves with the finger, so
+            // measured locally the finger hardly moves and the card stalls under it.
+            DragGesture(minimumDistance: 12, coordinateSpace: .global)
+                .onChanged { v in
+                    dragging = true
+                    dragY = v.translation.height
+                }
                 .onEnded { v in
-                    let up = min(v.translation.height, v.predictedEndTranslation.height)
-                    let down = max(v.translation.height, v.predictedEndTranslation.height)
-                    if up < -40, !expanded { toggle() } else if down > 40, expanded { toggle() }
+                    let open = CardDrag.settlesExpanded(
+                        expanded: expanded, translation: v.translation.height,
+                        predicted: v.predictedEndTranslation.height, panel: panel)
+                    settling = true
+                    withAnimation(.spring(response: 0.38, dampingFraction: 0.86)) {
+                        trip.cardExpanded = open
+                        dragging = false
+                        dragY = 0
+                    } completion: {
+                        settling = false
+                    }
                 }
         )
         .accessibilityElement(children: .contain)
@@ -321,7 +364,12 @@ struct GlassHeroCard: View {
     }
 
     private func toggle() {
-        withAnimation(.spring(response: 0.38, dampingFraction: 0.86)) { trip.cardExpanded.toggle() }
+        settling = true
+        withAnimation(.spring(response: 0.38, dampingFraction: 0.86)) {
+            trip.cardExpanded.toggle()
+        } completion: {
+            settling = false
+        }
     }
 }
 

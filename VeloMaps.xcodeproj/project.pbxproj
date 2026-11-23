@@ -64,6 +64,7 @@
 		9A67867BBDE7505EB1B3E2D4 /* RouteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3C7EDF41AAB6727C6F5296F /* RouteTests.swift */; };
 		9D6DCD8AEC54781AC30AD822 /* Readability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35690661AC6F1D578D8F5BF4 /* Readability.swift */; };
 		9F6FFDC790C1903E4C13467D /* WalkMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C1EF73DD5A5539675F8AB84 /* WalkMapView.swift */; };
+		A2EDB55B7C22038224C58862 /* CardDragTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7717493AC18B33FE44A9369E /* CardDragTests.swift */; };
 		A91822C3F7C5B20CA5489BFB /* Pothole.swift in Sources */ = {isa = PBXBuildFile; fileRef = 868B047B581941CA3316D432 /* Pothole.swift */; };
 		ABD81535D9E70B423548E466 /* HighwaySignTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EDD3D5A530A44E8A75D7CAF /* HighwaySignTests.swift */; };
 		AEE2989524F6D6CF6F57291E /* cue-arriving-at-your-stop-columbus-av-w-96-st.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = DE1F27481046F152E05410B1 /* cue-arriving-at-your-stop-columbus-av-w-96-st.mp3 */; };
@@ -90,6 +91,7 @@
 		E1045D21BE4615D22429BB95 /* cue-in-1-1-miles.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = ADC96B3BB067C9588F6935DC /* cue-in-1-1-miles.mp3 */; };
 		E1A13977925E5312B8515824 /* cue-in-600-feet.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 3D55D42539394B2F4ED64301 /* cue-in-600-feet.mp3 */; };
 		E3B26BD9EA4B8BEE2FC8308E /* cue-turn-right-onto-west-72nd-street.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = B52417DE787BF88ED7B6F105 /* cue-turn-right-onto-west-72nd-street.mp3 */; };
+		E4B1D4ECB691315CB9A29C3E /* CardDrag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58638E7E4637459B890F2932 /* CardDrag.swift */; };
 		E56EF6424EF30B28A7CB921E /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD48A387561B5C9BA8A43F2E /* Settings.swift */; };
 		E80AFF314EE51D908F61DAEB /* SpeedLimitCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E2739A749881708B3B6DC03 /* SpeedLimitCache.swift */; };
 		E9F25F5F6DDA46FE3A987EC3 /* VoiceCueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF40C3B07DE63DD8561EC4C7 /* VoiceCueTests.swift */; };
@@ -148,6 +150,7 @@
 		52EC3CAA5A571431A6A62E66 /* SpeedLimitCacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedLimitCacheTests.swift; sourceTree = "<group>"; };
 		546BA85AB85E847E54F0DD13 /* cue-take-the-exit-to-west-96th-street.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-take-the-exit-to-west-96th-street.mp3"; sourceTree = "<group>"; };
 		548C30603940B864098BD707 /* TripCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripCard.swift; sourceTree = "<group>"; };
+		58638E7E4637459B890F2932 /* CardDrag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardDrag.swift; sourceTree = "<group>"; };
 		58AC9F4A77C1925CFA7BCFA2 /* PlacesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesTests.swift; sourceTree = "<group>"; };
 		5B651899353F0285E30BC193 /* RoutingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingTests.swift; sourceTree = "<group>"; };
 		5B7FDFAD3586C5C50FFD920C /* LiveNavigationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveNavigationTests.swift; sourceTree = "<group>"; };
@@ -164,6 +167,7 @@
 		712BF56AE1A9170B2A4940D3 /* cue-in-1-5-miles.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-in-1-5-miles.mp3"; sourceTree = "<group>"; };
 		7308FE227F042D1390486D35 /* DemoDrive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoDrive.swift; sourceTree = "<group>"; };
 		7493EAB4777B9A09368449F8 /* VeloMapsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VeloMapsApp.swift; sourceTree = "<group>"; };
+		7717493AC18B33FE44A9369E /* CardDragTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardDragTests.swift; sourceTree = "<group>"; };
 		79FDAEF3917C62AA16561C1F /* cue-arrive-at-west-96th-street.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-arrive-at-west-96th-street.mp3"; sourceTree = "<group>"; };
 		7C2C4B93EF1229644CD747E0 /* cue-your-stop-is-next-columbus-av-w-96-st.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "cue-your-stop-is-next-columbus-av-w-96-st.mp3"; sourceTree = "<group>"; };
 		7C708CC86B357FBB2401F335 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -238,6 +242,7 @@
 		32695CB6737318EF1C665238 /* VeloMapsTests */ = {
 			isa = PBXGroup;
 			children = (
+				7717493AC18B33FE44A9369E /* CardDragTests.swift */,
 				9EDD3D5A530A44E8A75D7CAF /* HighwaySignTests.swift */,
 				99BEBC3D3926117767BDEC8F /* LaneTests.swift */,
 				5B7FDFAD3586C5C50FFD920C /* LiveNavigationTests.swift */,
@@ -270,6 +275,7 @@
 			children = (
 				EE86D9C8FF96A842F35F9E66 /* AppSecrets.swift */,
 				5F99356A7357375F7B849983 /* Assets.xcassets */,
+				58638E7E4637459B890F2932 /* CardDrag.swift */,
 				8F82542A3955B45288349195 /* CurrentRoadLabel.swift */,
 				7308FE227F042D1390486D35 /* DemoDrive.swift */,
 				F703AD5058236EE20B712C34 /* FasterRoute.swift */,
@@ -536,6 +542,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0E035AFDF5D7199F27DAEB2B /* AppSecrets.swift in Sources */,
+				E4B1D4ECB691315CB9A29C3E /* CardDrag.swift in Sources */,
 				C57FCF633091E3E4CF2DB602 /* CurrentRoadLabel.swift in Sources */,
 				0D8F6628C859A1B4263127A0 /* DemoDrive.swift in Sources */,
 				3A06AE62A59E879F44A0A666 /* FasterRoute.swift in Sources */,
@@ -571,6 +578,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A2EDB55B7C22038224C58862 /* CardDragTests.swift in Sources */,
 				ABD81535D9E70B423548E466 /* HighwaySignTests.swift in Sources */,
 				968BB5776EDE98782F62025A /* LaneTests.swift in Sources */,
 				950264D9179E612DB4FF11BE /* LiveNavigationTests.swift in Sources */,

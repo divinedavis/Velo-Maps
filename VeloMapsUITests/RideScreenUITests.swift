@@ -41,6 +41,34 @@ final class RideScreenUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Voice guidance"].exists)
     }
 
+    /// The card follows the thumb and settles by where it is let go: a short, slow drag
+    /// that stops before halfway falls back shut, and dragging down from open closes it.
+    func testCardSettlesByWhereTheThumbLetsGo() {
+        let app = XCUIApplication()
+        app.launchArguments += ["-demo", "bus", "-paused", "YES"]
+        app.launch()
+
+        let next = app.staticTexts["next-stop"]
+        XCTAssertTrue(next.waitForExistence(timeout: 10))
+        let start = next.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+        // Slow, and held at the end so there is no momentum to carry it open.
+        start.press(forDuration: 0.05, thenDragTo: start.withOffset(CGVector(dx: 0, dy: -50)),
+                    withVelocity: .slow, thenHoldForDuration: 0.4)
+        XCTAssertFalse(app.staticTexts["nav-settings"].waitForExistence(timeout: 1.5),
+                       "a short drag let go before halfway should fall back shut")
+
+        start.press(forDuration: 0.05, thenDragTo: start.withOffset(CGVector(dx: 0, dy: -240)),
+                    withVelocity: .slow, thenHoldForDuration: 0.4)
+        XCTAssertTrue(app.staticTexts["nav-settings"].waitForExistence(timeout: 3))
+
+        let top = app.staticTexts["next-stop"].coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+        top.press(forDuration: 0.05, thenDragTo: top.withOffset(CGVector(dx: 0, dy: 260)),
+                  withVelocity: .slow, thenHoldForDuration: 0.4)
+        let gone = NSPredicate(format: "exists == false")
+        expectation(for: gone, evaluatedWith: app.staticTexts["nav-settings"])
+        waitForExpectations(timeout: 3)
+    }
+
     /// Pothole lives in the "+" menu (first item) and reports straight away, no form.
     func testPotholeIsReportedFromThePlusMenu() {
         let app = XCUIApplication()
